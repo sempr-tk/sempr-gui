@@ -29,6 +29,7 @@ link_directories(${Qt5_LIBRARY_DIRS})
 
 set(GUI_SRC
     src/ECModel.cpp
+    src/DirectConnection.cpp
     src/main.cpp
     ui/main.ui
 )
