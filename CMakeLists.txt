@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.5)
 
 project(sempr-gui VERSION 0.1.0)
 
+add_definitions(-DCEREAL_THREAD_SAFE=1)
+
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
