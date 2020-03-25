@@ -13,11 +13,9 @@ namespace sempr { namespace gui {
 
 /**
     The main GUI-widget. Contains different widgets for different views and
-    editors. Handles the connection between the ECModel and SEMPR.
+    editors.
 */
 class SemprGui : public QWidget {
-    /// the connection to sempr
-    AbstractInterface::Ptr semprInterface_;
 
     /// the local data model to be used by the different views
     ECModel dataModel_;

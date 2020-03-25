@@ -30,6 +30,8 @@ using namespace sempr::gui;
 void runGUI(int argc, char** args, AbstractInterface::Ptr interface)
 {
     QApplication app(argc, args);
+    qRegisterMetaType<ModelEntry>();
+
     SemprGui gui(interface);
     gui.show();
 
@@ -85,6 +87,11 @@ int main(int argc, char** args)
     while (true)
     {
         std::this_thread::sleep_for(std::chrono::seconds(1));
+
+        // test: just add more and more components... :)
+        affine = std::make_shared<AffineTransform>();
+        entity->addComponent(affine);
+
         sempr.performInference();
     }
 

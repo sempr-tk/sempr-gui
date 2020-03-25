@@ -3,7 +3,7 @@
 namespace sempr { namespace gui {
 
 SemprGui::SemprGui(AbstractInterface::Ptr interface)
-    : semprInterface_(interface)
+    : dataModel_(interface)
 {
     form_.setupUi(this);
     // both views use the same model

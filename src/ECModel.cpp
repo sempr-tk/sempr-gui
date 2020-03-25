@@ -1,8 +1,117 @@
 #include "ECModel.hpp"
 
+#include <thread>
 #include <iostream>
 
 namespace sempr { namespace gui {
+
+ECModel::ECModel(AbstractInterface::Ptr interface)
+    : semprInterface_(interface)
+{
+    connect(this, &ECModel::gotEntryAdd,
+            this, &ECModel::addModelEntry);
+
+    // TODO: Register callback for updates
+    semprInterface_->setUpdateCallback(
+        [this](ModelEntry entry, AbstractInterface::Notification n)
+        {
+            std::cout << "Dummy update callback" << std::endl;
+
+            // TODO:
+            // DONT call addModelEntry etc from this callback, as it
+            // will call it from the wrong thread. Might not sound like
+            // a big deal, as it does not directly do any UI stuff,
+            // BUT:
+            // beginInsertRows(...) etc. emit signals that need to be processed
+            // by the views *BEFORE* data is changed! I'm not entirely sure if
+            // I understood the docs correctly, but to be sure: Lets emit
+            // a signal instead (emitting signals is thread safe), and connect
+            // it to the addModelEntry-slot (etc). As the ECModel lives in the
+            // gui thread its events are handled there, and everything should
+            // be fine.
+            //
+            std::cout << "callback called in thread: " << std::this_thread::get_id() << std::endl;
+
+            if (n == AbstractInterface::ADDED)
+                this->emit gotEntryAdd(entry);
+        }
+    );
+    // TODO: Initialize by retrieving all existing data
+}
+
+
+void ECModel::addModelEntry(const ModelEntry& entry)
+{
+    std::cout << "addModelEntry called in thread: " << std::this_thread::get_id() << std::endl;
+
+    // find the entity
+    auto entity = std::find_if(data_.begin(), data_.end(),
+        [&entry](const ModelEntryGroup& group) -> bool
+        {
+            return group[0].entityId_ == entry.entityId_;
+        }
+    );
+
+    if (entity != data_.end())
+    {
+        int entityRow = std::distance(data_.begin(), entity);
+        // TODO: Check if component already present? Ah, don't care...
+        int componentRow = entity->size();
+
+        // index of the parent where the row is inserted
+        auto parent = this->index(entityRow, 0, QModelIndex());
+
+        // and we are going to insert at the end of the component list
+        this->beginInsertRows(parent, componentRow, componentRow);
+
+        // now, insert:
+        entity->push_back(entry);
+
+        // finish insertion
+        this->endInsertRows();
+    }
+    else
+    {
+        // the entity does not exist yet, so lets insert it.
+        int entityRow = data_.size();
+
+        // parent is the root item
+        QModelIndex parent;
+
+        this->beginInsertRows(parent, entityRow, entityRow);
+        ModelEntryGroup group;
+        group.push_back(entry);
+        data_.push_back(group);
+        this->endInsertRows();
+    }
+}
+
+
+void ECModel::removeModelEntry(const ModelEntry& entry)
+{
+    // TODO
+}
+void ECModel::updateModelEntry(const ModelEntry& entry)
+{
+    // TODO
+}
+
+void ECModel::addComponent(const ModelEntry& entry)
+{
+    // TODO
+}
+
+void ECModel::removeComponent(const ModelEntry& entry)
+{
+    // TODO
+}
+
+void ECModel::updateComponent(const ModelEntry& entry)
+{
+    removeComponent(entry);
+    addComponent(entry);
+}
+
 
 
 Qt::ItemFlags ECModel::flags(const QModelIndex&) const

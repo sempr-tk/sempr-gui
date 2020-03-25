@@ -1,6 +1,7 @@
 #ifndef SEMPR_GUI_MODELENTRY_HPP_
 #define SEMPR_GUI_MODELENTRY_HPP_
 
+#include <QtCore>
 #include <string>
 
 #include <sempr/Component.hpp>
@@ -15,6 +16,11 @@ namespace sempr { namespace gui {
     Entity-Component pairs, matching the ECWMEs in the reasoner.
 */
 struct ModelEntry {
+    ModelEntry() = default;
+    ModelEntry(const ModelEntry&) = default;
+    ~ModelEntry() = default;
+
+
     /**
         The ID of the entity this data belongs to.
     */
@@ -49,7 +55,9 @@ struct ModelEntry {
 };
 
 
-
 }}
+
+Q_DECLARE_METATYPE(sempr::gui::ModelEntry)
+
 
 #endif /* include guard: SEMPR_GUI_MODELENTRY_HPP_ */
