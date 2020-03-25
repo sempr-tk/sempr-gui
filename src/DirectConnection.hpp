@@ -15,7 +15,10 @@ namespace sempr { namespace gui {
 class DirectConnection : public AbstractInterface {
     sempr::Core* core_;
     std::mutex& semprMutex_;
+    callback_t callback_;
+    friend class DirectConnectionNode;
 public:
+    using Ptr = std::shared_ptr<DirectConnection>;
     DirectConnection(sempr::Core* core, std::mutex& m);
 
     std::vector<ModelEntry> listEntityComponentPairs() override;

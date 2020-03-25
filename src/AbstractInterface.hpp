@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <functional>
+#include <memory>
 
 #include "ModelEntry.hpp"
 
@@ -26,6 +27,7 @@ namespace sempr { namespace gui {
 */
 class AbstractInterface {
 public:
+    using Ptr = std::shared_ptr<AbstractInterface>;
     virtual ~AbstractInterface() = default;
 
     // for the callback

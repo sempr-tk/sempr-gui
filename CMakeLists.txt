@@ -16,6 +16,7 @@ endif()
 add_definitions(-std=c++11 -Wall -Wextra -pedantic -Wnon-virtual-dtor)
 
 find_package(PkgConfig REQUIRED)
+find_package(Threads REQUIRED)
 
 pkg_check_modules(sempr REQUIRED sempr-core)
 include_directories(${sempr_INCLUDE_DIRS})
@@ -30,10 +31,13 @@ link_directories(${Qt5_LIBRARY_DIRS})
 set(GUI_SRC
     src/ECModel.cpp
     src/DirectConnection.cpp
+    src/DirectConnectionNode.cpp
+    src/DirectConnectionBuilder.cpp
+    src/SemprGui.cpp
     src/main.cpp
     ui/main.ui
 )
 
 
 add_executable(main ${GUI_SRC})
-target_link_libraries(main ${sempr_LIBRARIES} Qt5::Core Qt5::Widgets)
+target_link_libraries(main ${sempr_LIBRARIES} Qt5::Core Qt5::Widgets Threads::Threads)

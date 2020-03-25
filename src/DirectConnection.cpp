@@ -114,7 +114,7 @@ void DirectConnection::removeEntityComponentPair(const ModelEntry& entry)
 
 void DirectConnection::setUpdateCallback(callback_t cb)
 {
-    // TODO!
+    callback_ = cb;
 }
 
 }}
