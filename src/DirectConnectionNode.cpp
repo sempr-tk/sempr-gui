@@ -67,7 +67,7 @@ void DirectConnectionNode::execute(
     }
 
     // call the callback!
-    connection_->callback_(entry, n);
+    if (connection_->callback_) connection_->callback_(entry, n);
 }
 
 

@@ -10,14 +10,16 @@ ECModel::ECModel(AbstractInterface::Ptr interface)
 {
     connect(this, &ECModel::gotEntryAdd,
             this, &ECModel::addModelEntry);
+    connect(this, &ECModel::gotEntryUpdate,
+            this, &ECModel::updateModelEntry);
+    connect(this, &ECModel::gotEntryRemove,
+            this, &ECModel::removeModelEntry);
 
     // TODO: Register callback for updates
     semprInterface_->setUpdateCallback(
         [this](ModelEntry entry, AbstractInterface::Notification n)
         {
-            std::cout << "Dummy update callback" << std::endl;
 
-            // TODO:
             // DONT call addModelEntry etc from this callback, as it
             // will call it from the wrong thread. Might not sound like
             // a big deal, as it does not directly do any UI stuff,
@@ -30,21 +32,86 @@ ECModel::ECModel(AbstractInterface::Ptr interface)
             // gui thread its events are handled there, and everything should
             // be fine.
             //
-            std::cout << "callback called in thread: " << std::this_thread::get_id() << std::endl;
 
-            if (n == AbstractInterface::ADDED)
-                this->emit gotEntryAdd(entry);
+            switch (n) {
+                case AbstractInterface::ADDED:
+                    std::cout << "Dummy update callback add " << entry.componentId_ << std::endl;
+                    this->emit gotEntryAdd(entry);
+                    break;
+                case AbstractInterface::UPDATED:
+                    this->emit gotEntryUpdate(entry);
+                    break;
+                case AbstractInterface::REMOVED:
+                    this->emit gotEntryRemove(entry);
+                    break;
+            }
         }
     );
-    // TODO: Initialize by retrieving all existing data
+    // Initialize by retrieving all existing data
+    auto entries = semprInterface_->listEntityComponentPairs();
+    // Sort by entity id first.
+    std::sort(entries.begin(), entries.end(),
+            [](const ModelEntry& left, const ModelEntry& right)
+            {
+                return left.entityId_ < right.entityId_;
+            }
+    );
+    // add them one by one, groups them by entityId.
+    for (auto& e : entries)
+    {
+        addModelEntry(e);
+    }
+}
+
+ECModel::~ECModel()
+{
+    semprInterface_->clearUpdateCallback();
+    std::cout << "~ECModel" << std::endl;
+}
+
+
+QModelIndex ECModel::findEntry(const ModelEntry& entry) const
+{
+    // find the row of the entity-group
+    auto group = std::find_if(data_.begin(), data_.end(),
+        [&entry](const ModelEntryGroup& group)
+        {
+            return group[0].entityId_ == entry.entityId_;
+        }
+    );
+
+    if (group != data_.end())
+    {
+        int entityRow = std::distance(data_.begin(), group);
+        auto parent = this->index(entityRow, 0, QModelIndex());
+
+        // find the entry in the group
+        auto component = std::find_if(group->begin(), group->end(),
+            [&entry](const ModelEntry& other)
+            {
+                return entry.componentId_ == other.componentId_;
+            }
+        );
+        if (component != group->end())
+        {
+            int componentRow = std::distance(group->begin(), component);
+            auto index = parent.child(componentRow, 0);
+            return index;
+        }
+    }
+
+    return QModelIndex();
 }
 
 
 void ECModel::addModelEntry(const ModelEntry& entry)
 {
-    std::cout << "addModelEntry called in thread: " << std::this_thread::get_id() << std::endl;
+    // This can happen e.g. if data was added between setting the callback
+    // for updates and the initialization of the model.
+    auto index = this->findEntry(entry);
+    if (index.isValid()) return;
 
-    // find the entity
+    // find the entity-group
     auto entity = std::find_if(data_.begin(), data_.end(),
         [&entry](const ModelEntryGroup& group) -> bool
         {
@@ -55,7 +122,6 @@ void ECModel::addModelEntry(const ModelEntry& entry)
     if (entity != data_.end())
     {
         int entityRow = std::distance(data_.begin(), entity);
-        // TODO: Check if component already present? Ah, don't care...
         int componentRow = entity->size();
 
         // index of the parent where the row is inserted
@@ -89,11 +155,44 @@ void ECModel::addModelEntry(const ModelEntry& entry)
 
 void ECModel::removeModelEntry(const ModelEntry& entry)
 {
-    // TODO
+    auto index = this->findEntry(entry);
+    if (index.isValid())
+    {
+        // signal removal of this entry
+        this->beginRemoveRows(index.parent(), index.row(), index.row());
+        // find the group
+        auto group = data_.begin() + index.parent().row();
+        // find the component
+        auto component = group->begin() + index.row();
+        // remove the entry
+        group->erase(component);
+        // signal end of removal
+        this->endRemoveRows();
+
+        // if this was the last entry, remove the entity-entry all together!
+        // (at some points we make the assumption that there is always at least
+        // one entry in every group!)
+        if (group->empty())
+        {
+            this->beginRemoveRows(QModelIndex(), index.parent().row(), index.parent().row());
+            data_.erase(group);
+            this->endRemoveRows();
+        }
+    }
 }
+
 void ECModel::updateModelEntry(const ModelEntry& entry)
 {
-    // TODO
+    // find the entries index
+    auto index = this->findEntry(entry);
+    // get the group
+    auto group = data_.begin() + index.parent().row();
+    // get the entry
+    auto component = group->begin() + index.row();
+    *component = entry;
+
+    // notify views
+    this->dataChanged(index, index);
 }
 
 void ECModel::addComponent(const ModelEntry& entry)
@@ -134,8 +233,8 @@ QVariant ECModel::data(const QModelIndex& index, int role) const
         }
         else
         {
-            //auto& entry = data_[parent.row()][index.row()];
-            return "Component"; // TODO: Need to get something sensible to display.
+            auto& entry = data_[parent.row()][index.row()];
+            return QString::fromStdString("Component_" + entry.componentId_); // TODO: Need to get something sensible to display.
         }
     }
     return QVariant();

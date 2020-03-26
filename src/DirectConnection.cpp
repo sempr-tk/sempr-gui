@@ -114,7 +114,22 @@ void DirectConnection::removeEntityComponentPair(const ModelEntry& entry)
 
 void DirectConnection::setUpdateCallback(callback_t cb)
 {
+    std::lock_guard<std::mutex> lg(callbackMutex_);
     callback_ = cb;
+}
+
+void DirectConnection::clearUpdateCallback()
+{
+    std::lock_guard<std::mutex> lg(callbackMutex_);
+    callback_ = nullptr;
+}
+
+void DirectConnection::triggerCallback(
+        callback_t::first_argument_type arg1,
+        callback_t::second_argument_type arg2)
+{
+    std::lock_guard<std::mutex> lg(callbackMutex_);
+    callback_(arg1, arg2);
 }
 
 }}

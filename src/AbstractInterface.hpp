@@ -65,6 +65,17 @@ public:
         in the core changes
     */
     virtual void setUpdateCallback(callback_t) = 0;
+
+    /**
+        Removes the currently set callback
+    */
+    virtual void clearUpdateCallback() = 0;
+
+    /**
+        Calls the internally stored callback
+    */
+    virtual void triggerCallback(callback_t::first_argument_type,
+                                 callback_t::second_argument_type) = 0;
 };
 
 

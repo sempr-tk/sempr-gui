@@ -70,8 +70,11 @@ int main(int argc, char** args)
     prop->map_["foo"] = "bar";
     prop->map_["baz"] = { "resource", true };
     entity->addComponent(prop);
-    sempr.addEntity(entity);
-    sempr.performInference();
+    {
+        std::lock_guard<std::mutex> lg(semprMutex);
+        sempr.addEntity(entity);
+        sempr.performInference();
+    }
 
     // start the gui
     std::thread gui_thread(&runGUI, argc, args, connection);
@@ -80,39 +83,41 @@ int main(int argc, char** args)
     entity = Entity::create();
     auto affine = std::make_shared<AffineTransform>();
     entity->addComponent(affine);
-    sempr.addEntity(entity);
+
+    {
+        std::lock_guard<std::mutex> lg(semprMutex);
+        sempr.addEntity(entity);
+    }
 
 
     // ... :/
+    bool add = true;
     while (true)
     {
         std::this_thread::sleep_for(std::chrono::seconds(1));
 
-        // test: just add more and more components... :)
-        affine = std::make_shared<AffineTransform>();
-        entity->addComponent(affine);
+        // test: add / remove components
+        if (add)
+        {
+            affine = std::make_shared<AffineTransform>();
+            entity->addComponent(affine);
+            if (entity->getComponents<Component>().size() >= 10)
+            {
+                add = false;
+            }
+        }
+        else
+        {
+            auto components = entity->getComponents<Component>();
+            entity->removeComponent(components[0]);
+            if (components.size() <= 1)
+            {
+                add = true;
+            }
+        }
 
         sempr.performInference();
     }
-
-
-//    ECModel model;
-//    ECModel::ModelEntryGroup g1, g2;
-//    ModelEntry m11{"Entity_1", "1", {}, true, nullptr};
-//    ModelEntry m12{"Entity_1", "2", {}, true, nullptr};
-//    g1.push_back(m11);
-//    g1.push_back(m12);
-//
-//    ModelEntry m21{"Entity_2", "3", {}, true, nullptr};
-//    ModelEntry m22{"Entity_2", "4", {}, true, nullptr};
-//    ModelEntry m23{"Entity_2", "5", {}, true, nullptr};
-//    g2.push_back(m21);
-//    g2.push_back(m22);
-//    g2.push_back(m23);
-//
-//    model.data_.push_back(g1);
-//    model.data_.push_back(g2);
-
 
     return 0;
 }

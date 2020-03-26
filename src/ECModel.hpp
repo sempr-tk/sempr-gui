@@ -44,6 +44,9 @@ class ECModel : public QAbstractItemModel {
     /// the connection to sempr
     AbstractInterface::Ptr semprInterface_;
 
+    /// compute the model index of the entry
+    QModelIndex findEntry(const ModelEntry&) const;
+
 signals:
     // These are emitted from the thread that calls the set callback in
     // semprInterface_, and are connected to the [add|remove|update]ModelEntry
@@ -72,6 +75,7 @@ private slots:
 
 public:
     ECModel(AbstractInterface::Ptr interface);
+    ~ECModel();
 
     Qt::ItemFlags flags(const QModelIndex& index) const override;
     QVariant data(const QModelIndex& index, int role) const override;
