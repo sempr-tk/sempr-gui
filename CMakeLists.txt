@@ -27,13 +27,16 @@ find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
 include_directories(${Qt5_INCLUDE_DIRS})
 link_directories(${Qt5_LIBRARY_DIRS})
 
+include_directories(src)
 
 set(GUI_SRC
     src/ECModel.cpp
+    src/ModelEntry.cpp
     src/DirectConnection.cpp
     src/DirectConnectionNode.cpp
     src/DirectConnectionBuilder.cpp
     src/SemprGui.cpp
+    src/RawComponentWidget.cpp
     src/main.cpp
     ui/main.ui
 )

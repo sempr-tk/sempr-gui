@@ -22,6 +22,21 @@ struct ModelEntry {
 
 
     /**
+        Sets componentJSON_ = json and tries to de-serialize the component.
+        On success, sets component_ to the newly created component, returns true.
+        On failure, sets component_ to nullptr, returns false;
+    */
+    bool setJSON(const std::string& json);
+
+    /**
+        Sets component_ = component and tries to serialize the component into
+        componentJSON_.
+        On failure, sets componentJSON_ to an empty string and returns false,
+        on success returns true.
+    */
+    bool setComponent(Component::Ptr component);
+
+    /**
         The ID of the entity this data belongs to.
     */
     std::string entityId_;

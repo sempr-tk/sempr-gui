@@ -69,6 +69,7 @@ int main(int argc, char** args)
     auto prop = std::make_shared<TriplePropertyMap>();
     prop->map_["foo"] = "bar";
     prop->map_["baz"] = { "resource", true };
+    prop->map_["some integer"] = 0;
     entity->addComponent(prop);
     {
         std::lock_guard<std::mutex> lg(semprMutex);
@@ -90,13 +91,21 @@ int main(int argc, char** args)
     }
 
 
-    // ... :/
+    // just for testing:
+    // on every press of "ENTER", increment a value in the property map,
+    // and add or remove a component.
     bool add = true;
     while (true)
     {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        // wait for enter key pressed
+        while (std::cin.get() != '\n');
 
-        // test: add / remove components
+        // increment value
+        int val = prop->map_["some integer"];
+        prop->map_["some integer"] = ++val;
+        prop->changed();
+
+        // add / remove components
         if (add)
         {
             affine = std::make_shared<AffineTransform>();
@@ -116,6 +125,7 @@ int main(int argc, char** args)
             }
         }
 
+        // performInference to update the gui
         sempr.performInference();
     }
 

@@ -197,12 +197,12 @@ void ECModel::updateModelEntry(const ModelEntry& entry)
 
 void ECModel::addComponent(const ModelEntry& entry)
 {
-    // TODO
+    semprInterface_->addEntityComponentPair(entry);
 }
 
 void ECModel::removeComponent(const ModelEntry& entry)
 {
-    // TODO
+    semprInterface_->removeEntityComponentPair(entry);
 }
 
 void ECModel::updateComponent(const ModelEntry& entry)
@@ -237,6 +237,15 @@ QVariant ECModel::data(const QModelIndex& index, int role) const
             return QString::fromStdString("Component_" + entry.componentId_); // TODO: Need to get something sensible to display.
         }
     }
+    else if (role == Qt::UserRole)
+    {
+        if (parent.isValid())
+        {
+            auto& entry = data_[parent.row()][index.row()];
+            return QVariant::fromValue(entry);
+        }
+    }
+
     return QVariant();
 }
 
