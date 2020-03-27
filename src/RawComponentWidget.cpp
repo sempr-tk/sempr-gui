@@ -45,19 +45,24 @@ void RawComponentWidget::updateWidget()
 
             // enable text entry and save button only if the component is
             // mutable!
-            form_.rawComponentEdit->setEnabled(entry.mutable_);
-            form_.btnSave->setEnabled(entry.mutable_);
+            //form_.rawComponentEdit->setEnabled(entry.mutable_);
+            //form_.btnSave->setEnabled(entry.mutable_);
+            this->setEnabled(entry.mutable_);
+            this->show();
         }
         else
         {
+            this->hide();
+            this->setEnabled(false);
             // couldn't get a model entry, so clear the edit
             form_.rawComponentEdit->setPlainText("");
-            form_.rawComponentEdit->setEnabled(false);
-            form_.btnSave->setEnabled(false);
+            //form_.rawComponentEdit->setEnabled(false);
+            //form_.btnSave->setEnabled(false);
         }
     }
     else
     {
+        this->hide();
         // nothing selected.
         form_.rawComponentEdit->setPlainText("");
         form_.rawComponentEdit->setEnabled(false);
