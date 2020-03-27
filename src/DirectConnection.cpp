@@ -32,15 +32,24 @@ std::vector<ModelEntry> DirectConnection::listEntityComponentPairs()
         auto ec = std::dynamic_pointer_cast<sempr::ECWME>(wme);
         if (ec)
         {
+            auto entity = std::get<0>(ec->value_);
+            auto component = std::get<1>(ec->value_);
+
             ModelEntry entry;
             // populate the model entry with...
             // ... the component "id" (ptr to string)
-            entry.componentId_ = rete::util::ptrToStr(std::get<1>(ec->value_).get());
+            entry.componentId_ = rete::util::ptrToStr(component.get());
             // entity id
-            entry.entityId_ = std::get<0>(ec->value_)->id();
-            // whether it is mutable
-            // TODO: is "isComputed" enough? Or do we need to check if the component is part of the entities component list?
-            entry.mutable_ = !ec->isComputed();
+            entry.entityId_ = entity->id();
+            // whether it is mutable, i.e., if it is not inferred --
+            // we can check this by trying to find the component in the entity.
+            // If it is there, it is not inferred.
+            auto allComponents = entity->getComponents<Component>();
+            bool inferred =
+                (std::find(allComponents.begin(), allComponents.end(), component)
+                 == allComponents.end());
+            entry.mutable_ = !inferred;
+
 
             // create the serialized version of the component
             std::stringstream ss;
