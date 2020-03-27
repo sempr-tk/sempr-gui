@@ -3,9 +3,11 @@
 namespace sempr { namespace gui {
 
 RawComponentWidget::RawComponentWidget(QWidget* parent)
-    : QWidget(parent), model_(nullptr), selectionModel_(nullptr)
+    : UsefulWidget(parent), model_(nullptr), selectionModel_(nullptr)
 {
     form_.setupUi(this);
+    this->setWindowTitle("raw");
+
     connect(form_.btnSave, &QPushButton::clicked,
             this, &RawComponentWidget::save);
 }
@@ -45,28 +47,30 @@ void RawComponentWidget::updateWidget()
 
             // enable text entry and save button only if the component is
             // mutable!
-            //form_.rawComponentEdit->setEnabled(entry.mutable_);
-            //form_.btnSave->setEnabled(entry.mutable_);
             this->setEnabled(entry.mutable_);
-            this->show();
+
+            // signal this this widget is useful right now
+            setUseful(true);
         }
         else
         {
-            this->hide();
             this->setEnabled(false);
             // couldn't get a model entry, so clear the edit
             form_.rawComponentEdit->setPlainText("");
-            //form_.rawComponentEdit->setEnabled(false);
-            //form_.btnSave->setEnabled(false);
+
+            // signal that his widget isn't useful right now
+            setUseful(false);
         }
     }
     else
     {
-        this->hide();
         // nothing selected.
         form_.rawComponentEdit->setPlainText("");
         form_.rawComponentEdit->setEnabled(false);
         form_.btnSave->setEnabled(false);
+
+        // signal that this widget isn't useful right now
+        setUseful(false);
     }
 }
 

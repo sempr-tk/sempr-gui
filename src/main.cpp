@@ -68,15 +68,15 @@ int main(int argc, char** args)
     );
 
     // add an entity to test initialization of the gui
-    auto entity = Entity::create();
+    auto entity1 = Entity::create();
     auto prop = std::make_shared<TriplePropertyMap>();
     prop->map_["foo"] = "bar";
     prop->map_["baz"] = { "resource", true };
     prop->map_["some integer"] = 0;
-    entity->addComponent(prop);
+    entity1->addComponent(prop);
     {
         std::lock_guard<std::mutex> lg(semprMutex);
-        sempr.addEntity(entity);
+        sempr.addEntity(entity1);
         sempr.performInference();
     }
 
@@ -84,7 +84,7 @@ int main(int argc, char** args)
     std::thread gui_thread(&runGUI, argc, args, connection);
 
     // add an entity to test updating the gui
-    entity = Entity::create();
+    auto entity = Entity::create();
     auto affine = std::make_shared<AffineTransform>();
     entity->addComponent(affine);
 
@@ -101,12 +101,26 @@ int main(int argc, char** args)
     while (true)
     {
         // wait for enter key pressed
-        while (std::cin.get() != '\n');
+        while (std::cin.get() != '\n')
+        {
+            ; // nothing to do
+        }
 
-        // increment value
-        int val = prop->map_["some integer"];
-        prop->map_["some integer"] = ++val;
-        prop->changed();
+        {
+            std::lock_guard<std::mutex> lg(semprMutex);
+            // get the property map -- the old one might have been replaced
+            // due to an update from the gui
+            auto prop = entity1->getComponents<TriplePropertyMap>();
+            if (prop.empty())
+            {
+                throw std::exception(); // WTF?
+            }
+
+            // increment value
+            int val = prop[0]->map_["some integer"];
+            prop[0]->map_["some integer"] = ++val;
+            prop[0]->changed();
+        }
 
         // add / remove components
         if (add)

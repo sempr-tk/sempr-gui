@@ -6,10 +6,11 @@
 
 #include "../ui/ui_raw_component.h"
 #include "ECModel.hpp"
+#include "UsefulWidget.hpp"
 
 namespace sempr { namespace gui {
 
-class RawComponentWidget : public QWidget {
+class RawComponentWidget : public UsefulWidget {
     Q_OBJECT
 
     Ui_RawComponent form_;
@@ -29,7 +30,7 @@ private slots:
     void save();
 
 public:
-    RawComponentWidget(QWidget* parent);
+    RawComponentWidget(QWidget* parent = nullptr);
 
     void setModel(ECModel* model);
     void setSelectionModel(QItemSelectionModel* model);

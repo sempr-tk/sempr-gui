@@ -37,6 +37,7 @@ set(GUI_SRC
     src/DirectConnectionBuilder.cpp
     src/SemprGui.cpp
     src/RawComponentWidget.cpp
+    src/UsefulWidget.cpp
     src/main.cpp
     ui/main.ui
 )

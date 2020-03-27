@@ -40,9 +40,11 @@ ECModel::ECModel(AbstractInterface::Ptr interface)
                     this->emit gotEntryAdd(entry);
                     break;
                 case AbstractInterface::UPDATED:
+                    std::cout << "Dummy update callback updated " << entry.componentId_ << std::endl;
                     this->emit gotEntryUpdate(entry);
                     break;
                 case AbstractInterface::REMOVED:
+                    std::cout << "Dummy update callback removed " << entry.componentId_ << std::endl;
                     this->emit gotEntryRemove(entry);
                     break;
             }
@@ -186,6 +188,7 @@ void ECModel::updateModelEntry(const ModelEntry& entry)
 {
     // find the entries index
     auto index = this->findEntry(entry);
+
     // get the group
     auto group = data_.begin() + index.parent().row();
     // get the entry

@@ -6,6 +6,7 @@
 
 #include "ECModel.hpp"
 #include "AbstractInterface.hpp"
+#include "UsefulWidget.hpp"
 
 #include "../ui/ui_main.h"
 
@@ -22,6 +23,10 @@ class SemprGui : public QWidget {
 
     // the main ui form
     Ui_Form form_;
+
+private slots:
+    void updateTabStatus(UsefulWidget* w, bool visible);
+
 public:
     SemprGui(AbstractInterface::Ptr interface);
     ~SemprGui();
