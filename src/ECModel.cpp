@@ -1,5 +1,6 @@
 #include "ECModel.hpp"
 
+#include <QColor>
 #include <thread>
 #include <iostream>
 
@@ -243,6 +244,14 @@ QVariant ECModel::data(const QModelIndex& index, int role) const
         {
             auto& entry = data_[parent.row()][index.row()];
             return QVariant::fromValue(entry);
+        }
+    }
+    else if (role == Qt::BackgroundRole)
+    {
+        if (parent.isValid())
+        {
+            auto& entry = data_[parent.row()][index.row()];
+            return (entry.mutable_ ? QVariant() : QColor::fromHsl(0, 0, 180));
         }
     }
 
