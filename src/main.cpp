@@ -12,6 +12,7 @@
 #include <sempr/Entity.hpp>
 
 #include <sempr/nodes/ECNodeBuilder.hpp>
+#include <sempr/nodes/AffineTransformBuilders.hpp>
 #include <sempr/nodes/InferECBuilder.hpp>
 #include "DirectConnectionBuilder.hpp"
 
@@ -57,10 +58,12 @@ int main(int argc, char** args)
     parser.registerNodeBuilder<ECNodeBuilder<TriplePropertyMap>>();
     parser.registerNodeBuilder<ECNodeBuilder<AffineTransform>>();
     parser.registerNodeBuilder<InferECBuilder<AffineTransform>>();
+    parser.registerNodeBuilder<AffineTransformCreateBuilder>();
     parser.registerNodeBuilder<DirectConnectionBuilder>(connection);
 
     parser.parseRules(
-        "[EC<Component>(?e ?c) -> DirectConnection(?e ?c)]",
+        "[EC<Component>(?e ?c) -> DirectConnection(?e ?c)]\n" // connect to the gui
+        "[EC<TripleContainer>(?e ?c), tf:create(?tf 1 2 3 0 0 0 1) -> EC<Transform>(?e ?tf)]", // every entity with a triplecontainer gets a transform
         sempr.reasoner().net()
     );
 
