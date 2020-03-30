@@ -11,7 +11,12 @@ SemprGui::SemprGui(AbstractInterface::Ptr interface)
     form_.tabRawComponent->setModel(&dataModel_);
     form_.tabRawComponent->setSelectionModel(form_.treeView->selectionModel());
 
+    form_.tabTriplePropertyMap->setModel(&dataModel_);
+    form_.tabTriplePropertyMap->setSelectionModel(form_.treeView->selectionModel());
+
     connect(form_.tabRawComponent, &UsefulWidget::isUseful,
+            this, &SemprGui::updateTabStatus);
+    connect(form_.tabTriplePropertyMap, &UsefulWidget::isUseful,
             this, &SemprGui::updateTabStatus);
 }
 

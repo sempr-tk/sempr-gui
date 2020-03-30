@@ -27,6 +27,11 @@
        <string>Tab 1</string>
       </attribute>
      </widget>
+     <widget class="sempr::gui::TriplePropertyMapWidget" name="tabTriplePropertyMap">
+      <attribute name="title">
+       <string>Page</string>
+      </attribute>
+     </widget>
     </widget>
    </item>
   </layout>
@@ -36,6 +41,12 @@
    <class>sempr::gui::RawComponentWidget</class>
    <extends>QWidget</extends>
    <header>../src/RawComponentWidget.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>sempr::gui::TriplePropertyMapWidget</class>
+   <extends>QWidget</extends>
+   <header>../src/TriplePropertyMapWidget.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
