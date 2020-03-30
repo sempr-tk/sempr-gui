@@ -12,6 +12,49 @@
 namespace sempr { namespace gui {
 
 /**
+    The ModelEntryGroup is a simple helper class to combine multiple
+    ModelEntry objects with the same entity id. It also has an internal id that
+    is automatically incremented with each new ModelEntryGroup, which allows us
+    to add this id as an internalId to every QModelIndex to keep track of the
+    corresponing parent, regardless of its current position in the vector.
+
+    The internal id (groupId_) starts at 1, so that 0 is reserved for indices
+    that do not refer to a ModelEntry, but to a first-level entry. It sounds a
+    bit counter-intuitive: The ModelEntryGroups are indexed by a QModelIndex
+    where the parent is invalid, the row refers to the index in the data_
+    vector, and the internalId is 0. A specific ModelEntry is indexed by a
+    QModelIndex where the parent is as described above, the row refers to the
+    index in the entries_ vector and the internalId is the groupId_ of the
+    ModelEntryGroup it is located in.
+    Actually, the parent of an index is not stored in the index, but computed
+    by the ECModel::parent method. And this method uses to internalId as the
+    groupId to find the row of the parent of an index.
+
+    Only to be used in ECModel.
+
+    See e.g. ECModel::parent
+*/
+class ModelEntryGroup {
+    static int nextId()
+    {
+        static size_t id = 0;
+        return ++id;
+    }
+
+public:
+    size_t groupId_;
+    std::string entityId_;
+    std::vector<ModelEntry> entries_;
+
+    ModelEntryGroup()
+        : groupId_(ModelEntryGroup::nextId())
+    {
+    }
+    ModelEntryGroup(const ModelEntryGroup&) = default;
+    ModelEntryGroup& operator = (const ModelEntryGroup&) = default;
+};
+
+/**
     The ECModel is an implementation of the QAbstractItemModel and provides
     access to the Entity-Component pairs stored in ModelEntry structs.
     The data is organized in a shallow tree structure, where the first level
@@ -38,7 +81,6 @@ namespace sempr { namespace gui {
 class ECModel : public QAbstractItemModel {
     Q_OBJECT
 
-    typedef std::vector<ModelEntry> ModelEntryGroup;
     std::vector<ModelEntryGroup> data_;
 
     /// the connection to sempr

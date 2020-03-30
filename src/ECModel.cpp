@@ -79,7 +79,7 @@ QModelIndex ECModel::findEntry(const ModelEntry& entry) const
     auto group = std::find_if(data_.begin(), data_.end(),
         [&entry](const ModelEntryGroup& group)
         {
-            return group[0].entityId_ == entry.entityId_;
+            return group.entityId_ == entry.entityId_;
         }
     );
 
@@ -89,15 +89,15 @@ QModelIndex ECModel::findEntry(const ModelEntry& entry) const
         auto parent = this->index(entityRow, 0, QModelIndex());
 
         // find the entry in the group
-        auto component = std::find_if(group->begin(), group->end(),
+        auto component = std::find_if(group->entries_.begin(), group->entries_.end(),
             [&entry](const ModelEntry& other)
             {
                 return entry.componentId_ == other.componentId_;
             }
         );
-        if (component != group->end())
+        if (component != group->entries_.end())
         {
-            int componentRow = std::distance(group->begin(), component);
+            int componentRow = std::distance(group->entries_.begin(), component);
             auto index = parent.child(componentRow, 0);
             return index;
         }
@@ -118,14 +118,14 @@ void ECModel::addModelEntry(const ModelEntry& entry)
     auto entity = std::find_if(data_.begin(), data_.end(),
         [&entry](const ModelEntryGroup& group) -> bool
         {
-            return group[0].entityId_ == entry.entityId_;
+            return group.entityId_ == entry.entityId_;
         }
     );
 
     if (entity != data_.end())
     {
         int entityRow = std::distance(data_.begin(), entity);
-        int componentRow = entity->size();
+        int componentRow = entity->entries_.size();
 
         // index of the parent where the row is inserted
         auto parent = this->index(entityRow, 0, QModelIndex());
@@ -134,7 +134,7 @@ void ECModel::addModelEntry(const ModelEntry& entry)
         this->beginInsertRows(parent, componentRow, componentRow);
 
         // now, insert:
-        entity->push_back(entry);
+        entity->entries_.push_back(entry);
 
         // finish insertion
         this->endInsertRows();
@@ -149,7 +149,8 @@ void ECModel::addModelEntry(const ModelEntry& entry)
 
         this->beginInsertRows(parent, entityRow, entityRow);
         ModelEntryGroup group;
-        group.push_back(entry);
+        group.entityId_ = entry.entityId_;
+        group.entries_.push_back(entry);
         data_.push_back(group);
         this->endInsertRows();
     }
@@ -166,16 +167,16 @@ void ECModel::removeModelEntry(const ModelEntry& entry)
         // find the group
         auto group = data_.begin() + index.parent().row();
         // find the component
-        auto component = group->begin() + index.row();
+        auto component = group->entries_.begin() + index.row();
         // remove the entry
-        group->erase(component);
+        group->entries_.erase(component);
         // signal end of removal
         this->endRemoveRows();
 
         // if this was the last entry, remove the entity-entry all together!
         // (at some points we make the assumption that there is always at least
         // one entry in every group!)
-        if (group->empty())
+        if (group->entries_.empty())
         {
             this->beginRemoveRows(QModelIndex(), index.parent().row(), index.parent().row());
             data_.erase(group);
@@ -192,7 +193,7 @@ void ECModel::updateModelEntry(const ModelEntry& entry)
     // get the group
     auto group = data_.begin() + index.parent().row();
     // get the entry
-    auto component = group->begin() + index.row();
+    auto component = group->entries_.begin() + index.row();
     *component = entry;
 
     // notify views
@@ -233,11 +234,11 @@ QVariant ECModel::data(const QModelIndex& index, int role) const
         if (!parent.isValid())
         {
             // top level -> entity id
-            return QString::fromStdString(data_[index.row()][0].entityId_);
+            return QString::fromStdString(data_[index.row()].entityId_);
         }
         else
         {
-            auto& entry = data_[parent.row()][index.row()];
+            auto& entry = data_[parent.row()].entries_[index.row()];
             return QString::fromStdString("Component_" + entry.componentId_); // TODO: Need to get something sensible to display.
         }
     }
@@ -245,7 +246,7 @@ QVariant ECModel::data(const QModelIndex& index, int role) const
     {
         if (parent.isValid())
         {
-            auto& entry = data_[parent.row()][index.row()];
+            auto& entry = data_[parent.row()].entries_[index.row()];
             return QVariant::fromValue(entry);
         }
     }
@@ -253,7 +254,7 @@ QVariant ECModel::data(const QModelIndex& index, int role) const
     {
         if (parent.isValid())
         {
-            auto& entry = data_[parent.row()][index.row()];
+            auto& entry = data_[parent.row()].entries_[index.row()];
             return (entry.mutable_ ? QVariant() : QColor::fromHsl(0, 0, 180));
         }
     }
@@ -280,12 +281,12 @@ int ECModel::rowCount(const QModelIndex& parent) const
     }
     else
     {
-        // index is valid
+        // an internalId of zero indicates that this is a first-level entry,
+        // i.e. is group, an entity.
         if (parent.internalId() == 0)
         {
-            // and internalId indicates that it is a first level entry
             // --> number of components in the entity
-            return data_[parent.row()].size();
+            return data_[parent.row()].entries_.size();
         }
         else
         {
@@ -304,20 +305,44 @@ int ECModel::columnCount(const QModelIndex&) const
 
 QModelIndex ECModel::index(int row, int col, const QModelIndex& parent) const
 {
-    // the internal id stores the row of the parent (+1) so that we can easily
-    // find the parent of this index. The internal id is set to 0 if there is
-    // no parent.
+    // the internalId stores the groupId of the ModelEntryGroup that the parent
+    // points to. This allows us to find the correct parent of an index even
+    // after the parent has been moved, as opposed to using simply the row of
+    // the parent as the internalId.
+    int groupId = data_[parent.row()].groupId_;
 
     if (parent.isValid())
-        return this->createIndex(row, col, parent.row()+1);
+        return this->createIndex(row, col, groupId);
+    // if the parent is not valid, i.e. we want to create an index that points
+    // at a ModelEntryGroup, we just set the internalId to zero.
     return this->createIndex(row, col, quintptr(0));
 }
 
 QModelIndex ECModel::parent(const QModelIndex& index) const
 {
+    // if the internalId is 0 this index point at a first-level entry, and thus
+    // the parent is the root entry -> invalid QModelIndex.
     if (index.internalId() == 0)
         return QModelIndex();
-    return createIndex(index.internalId()-1, 0, quintptr(0));
+
+    // else, we need to find the row in data_ where the ModelEntryGroup with the
+    // groupId as specified in the internalId is located.
+    auto it = std::find_if(data_.begin(), data_.end(),
+        [&index](const ModelEntryGroup& group)
+        {
+            return group.groupId_ == index.internalId();
+        }
+    );
+
+    if (it == data_.end())
+    {
+        // this should not happen. The Index we wanted to get the parent for
+        // is not in the datastructure. :(
+        throw std::exception();
+    }
+
+    int row = std::distance(data_.begin(), it);
+    return createIndex(row, 0, quintptr(0));
 }
 
 }}
