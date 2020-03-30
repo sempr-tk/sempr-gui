@@ -18,11 +18,43 @@ SemprGui::SemprGui(AbstractInterface::Ptr interface)
             this, &SemprGui::updateTabStatus);
     connect(form_.tabTriplePropertyMap, &UsefulWidget::isUseful,
             this, &SemprGui::updateTabStatus);
+
+    connect(&dataModel_, &ECModel::gotEntryAdd, this,
+            [this](const ModelEntry& entry)
+            {
+                this->logUpdate(entry, "ADD");
+            });
+
+    connect(&dataModel_, &ECModel::gotEntryRemove, this,
+            [this](const ModelEntry& entry)
+            {
+                this->logUpdate(entry, "REM");
+            });
+    connect(&dataModel_, &ECModel::gotEntryUpdate, this,
+            [this](const ModelEntry& entry)
+            {
+                this->logUpdate(entry, "UPD");
+            });
 }
 
 
 SemprGui::~SemprGui()
 {
+}
+
+
+void SemprGui::logUpdate(const ModelEntry& entry, const QString& mod)
+{
+    QListWidgetItem* item = new QListWidgetItem();
+    QString text = "%1 | %2 | %3";
+    text = text.arg(mod);
+
+    item->setText(
+        text.arg(QString::fromStdString(entry.entityId_))
+            .arg(QString::fromStdString(entry.componentId_))
+    );
+
+    form_.historyList->insertItem(0, item);
 }
 
 void SemprGui::updateTabStatus(UsefulWidget* widget, bool visible)

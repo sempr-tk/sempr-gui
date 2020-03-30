@@ -25,7 +25,17 @@ class SemprGui : public QWidget {
     Ui_Form form_;
 
 private slots:
+    /**
+        Adds/removes the widget tab to/from the tab widget.
+    */
     void updateTabStatus(UsefulWidget* w, bool visible);
+
+    /**
+        Adds a entry to the history list that shows the latest updates from the
+        sempr core. The second argument is prepended to the history entry.
+    */
+    void logUpdate(const sempr::gui::ModelEntry&,
+                   const QString&);
 
 public:
     SemprGui(AbstractInterface::Ptr interface);
