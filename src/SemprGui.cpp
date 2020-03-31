@@ -8,17 +8,27 @@ SemprGui::SemprGui(AbstractInterface::Ptr interface)
     form_.setupUi(this);
     // both views use the same model
     form_.treeView->setModel(&dataModel_);
+    auto selectionModel = form_.treeView->selectionModel();
+    // raw json editing
     form_.tabRawComponent->setModel(&dataModel_);
-    form_.tabRawComponent->setSelectionModel(form_.treeView->selectionModel());
-
+    form_.tabRawComponent->setSelectionModel(selectionModel);
+    // read-only triple container
+    form_.tabTripleContainer->setModel(&dataModel_);
+    form_.tabTripleContainer->setSelectionModel(selectionModel);
+    // property maps
     form_.tabTriplePropertyMap->setModel(&dataModel_);
-    form_.tabTriplePropertyMap->setSelectionModel(form_.treeView->selectionModel());
+    form_.tabTriplePropertyMap->setSelectionModel(selectionModel);
 
+    // connection to hide/show tabs depending on selected component type
     connect(form_.tabRawComponent, &UsefulWidget::isUseful,
+            this, &SemprGui::updateTabStatus);
+    connect(form_.tabTripleContainer, &UsefulWidget::isUseful,
             this, &SemprGui::updateTabStatus);
     connect(form_.tabTriplePropertyMap, &UsefulWidget::isUseful,
             this, &SemprGui::updateTabStatus);
 
+
+    // connect incoming updates with the history
     connect(&dataModel_, &ECModel::gotEntryAdd, this,
             [this](const ModelEntry& entry)
             {
@@ -30,11 +40,17 @@ SemprGui::SemprGui(AbstractInterface::Ptr interface)
             {
                 this->logUpdate(entry, "REM");
             });
+
     connect(&dataModel_, &ECModel::gotEntryUpdate, this,
             [this](const ModelEntry& entry)
             {
                 this->logUpdate(entry, "UPD");
             });
+
+    // hide all tabs in the beginning, as no data is selected yet.
+    updateTabStatus(form_.tabRawComponent, false);
+    updateTabStatus(form_.tabTripleContainer, false);
+    updateTabStatus(form_.tabTriplePropertyMap, false);
 }
 
 

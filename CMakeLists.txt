@@ -37,7 +37,10 @@ set(GUI_SRC
     src/DirectConnectionBuilder.cpp
     src/SemprGui.cpp
     src/RawComponentWidget.cpp
+    src/TripleContainerWidget.cpp
     src/TriplePropertyMapWidget.cpp
+    src/StackedColumnsProxyModel.cpp
+    src/UniqueFilterProxyModel.cpp
     src/UsefulWidget.cpp
     src/main.cpp
     ui/main.ui
