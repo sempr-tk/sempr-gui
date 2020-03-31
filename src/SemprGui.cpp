@@ -45,16 +45,13 @@ SemprGui::~SemprGui()
 
 void SemprGui::logUpdate(const ModelEntry& entry, const QString& mod)
 {
-    QListWidgetItem* item = new QListWidgetItem();
-    QString text = "%1 | %2 | %3";
-    text = text.arg(mod);
+    QTreeWidgetItem* item = new QTreeWidgetItem();
 
-    item->setText(
-        text.arg(QString::fromStdString(entry.entityId_))
-            .arg(QString::fromStdString(entry.componentId_))
-    );
+    item->setText(0, mod);
+    item->setText(1, QString::fromStdString(entry.entityId_));
+    item->setText(2, QString::fromStdString(entry.componentId_));
 
-    form_.historyList->insertItem(0, item);
+    form_.historyList->insertTopLevelItem(0, item);
 }
 
 void SemprGui::updateTabStatus(UsefulWidget* widget, bool visible)

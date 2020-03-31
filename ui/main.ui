@@ -50,7 +50,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QListWidget" name="historyList">
+      <widget class="QTreeWidget" name="historyList">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -60,6 +60,33 @@
        <property name="editTriggers">
         <set>QAbstractItemView::NoEditTriggers</set>
        </property>
+       <property name="columnCount">
+        <number>3</number>
+       </property>
+       <attribute name="headerVisible">
+        <bool>false</bool>
+       </attribute>
+       <attribute name="headerDefaultSectionSize">
+        <number>70</number>
+       </attribute>
+       <attribute name="headerStretchLastSection">
+        <bool>true</bool>
+       </attribute>
+       <column>
+        <property name="text">
+         <string notr="true">1</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string notr="true">2</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string notr="true">3</string>
+        </property>
+       </column>
       </widget>
      </item>
     </layout>
