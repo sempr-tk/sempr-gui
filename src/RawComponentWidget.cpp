@@ -46,7 +46,15 @@ void RawComponentWidget::updateWidget()
 
             // enable text entry and save button only if the component is
             // mutable!
-            this->setEnabled(entry.mutable_);
+            //
+            //this->setEnabled(entry.mutable_);
+            // disabling the edit is a bit too much: Cannot read it properly
+            // anymore due to the grey background, and no selection for
+            // copy & paste is possible anymore. Instead, disable the button,
+            // and set the edit to read only.
+            this->setEnabled(true);
+            form_.btnSave->setEnabled(entry.mutable_);
+            form_.rawComponentEdit->setReadOnly(!entry.mutable_);
 
             // signal this this widget is useful right now
             setUseful(true);
@@ -65,8 +73,7 @@ void RawComponentWidget::updateWidget()
     {
         // nothing selected.
         form_.rawComponentEdit->setPlainText("");
-        form_.rawComponentEdit->setEnabled(false);
-        form_.btnSave->setEnabled(false);
+        this->setEnabled(false);
 
         // signal that this widget isn't useful right now
         setUseful(false);
