@@ -17,6 +17,7 @@
 #include "DirectConnectionBuilder.hpp"
 
 #include <sempr/component/TripleContainer.hpp>
+#include <sempr/component/TripleVector.hpp>
 #include <sempr/component/TriplePropertyMap.hpp>
 #include <sempr/component/AffineTransform.hpp>
 
@@ -79,6 +80,14 @@ int main(int argc, char** args)
         sempr.addEntity(entity1);
         sempr.performInference();
     }
+    auto vector = std::make_shared<TripleVector>();
+    vector->addTriple({"<s1>", "<p1>", "<o1>"});
+    vector->addTriple({"<s2>", "<p2>", "<o2>"});
+    vector->addTriple({"<s3>", "<p3>", "<o3>"});
+    vector->addTriple({"<s4>", "<p4>", "<o4>"});
+    entity1->addComponent(vector);
+
+    sempr.performInference();
 
     // start the gui
     std::thread gui_thread(&runGUI, argc, args, connection);

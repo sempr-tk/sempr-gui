@@ -29,7 +29,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="sempr::gui::RawComponentWidget" name="tabRawComponent">
       <attribute name="title">
@@ -39,6 +39,11 @@
      <widget class="sempr::gui::TripleContainerWidget" name="tabTripleContainer">
       <attribute name="title">
        <string>TripleContainer</string>
+      </attribute>
+     </widget>
+     <widget class="sempr::gui::TripleVectorWidget" name="tabTripleVector">
+      <attribute name="title">
+       <string>TripleVector</string>
       </attribute>
      </widget>
      <widget class="sempr::gui::TriplePropertyMapWidget" name="tabTriplePropertyMap">
@@ -121,6 +126,12 @@
    <class>sempr::gui::TripleContainerWidget</class>
    <extends>QWidget</extends>
    <header>../src/TripleContainerWidget.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>sempr::gui::TripleVectorWidget</class>
+   <extends>QWidget</extends>
+   <header>../src/TripleVectorWidget.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

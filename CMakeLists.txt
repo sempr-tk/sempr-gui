@@ -39,6 +39,7 @@ set(GUI_SRC
     src/RawComponentWidget.cpp
     src/TripleContainerWidget.cpp
     src/TriplePropertyMapWidget.cpp
+    src/TripleVectorWidget.cpp
     src/StackedColumnsProxyModel.cpp
     src/UniqueFilterProxyModel.cpp
     src/UsefulWidget.cpp

@@ -15,7 +15,11 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
-    <widget class="QLineEdit" name="lineEdit"/>
+    <widget class="QLineEdit" name="lineEdit">
+     <property name="placeholderText">
+      <string>search</string>
+     </property>
+    </widget>
    </item>
    <item row="1" column="0">
     <widget class="QTreeWidget" name="treeWidget">

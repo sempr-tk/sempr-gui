@@ -15,6 +15,9 @@ SemprGui::SemprGui(AbstractInterface::Ptr interface)
     // read-only triple container
     form_.tabTripleContainer->setModel(&dataModel_);
     form_.tabTripleContainer->setSelectionModel(selectionModel);
+    // triple vector
+    form_.tabTripleVector->setModel(&dataModel_);
+    form_.tabTripleVector->setSelectionModel(selectionModel);
     // property maps
     form_.tabTriplePropertyMap->setModel(&dataModel_);
     form_.tabTriplePropertyMap->setSelectionModel(selectionModel);
@@ -23,6 +26,8 @@ SemprGui::SemprGui(AbstractInterface::Ptr interface)
     connect(form_.tabRawComponent, &UsefulWidget::isUseful,
             this, &SemprGui::updateTabStatus);
     connect(form_.tabTripleContainer, &UsefulWidget::isUseful,
+            this, &SemprGui::updateTabStatus);
+    connect(form_.tabTripleVector, &UsefulWidget::isUseful,
             this, &SemprGui::updateTabStatus);
     connect(form_.tabTriplePropertyMap, &UsefulWidget::isUseful,
             this, &SemprGui::updateTabStatus);
@@ -51,6 +56,7 @@ SemprGui::SemprGui(AbstractInterface::Ptr interface)
     updateTabStatus(form_.tabRawComponent, false);
     updateTabStatus(form_.tabTripleContainer, false);
     updateTabStatus(form_.tabTriplePropertyMap, false);
+    updateTabStatus(form_.tabTripleVector, false);
 }
 
 
