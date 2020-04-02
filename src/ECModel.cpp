@@ -212,8 +212,9 @@ void ECModel::removeComponent(const ModelEntry& entry)
 
 void ECModel::updateComponent(const ModelEntry& entry)
 {
-    removeComponent(entry);
-    addComponent(entry);
+    //removeComponent(entry);
+    //addComponent(entry);
+    semprInterface_->modifyEntityComponentPair(entry);
 }
 
 

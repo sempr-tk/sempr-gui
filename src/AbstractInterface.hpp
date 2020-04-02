@@ -47,13 +47,8 @@ public:
 
     /**
         Sends an update to the component of an entity
-
-        NOTE: Modification is not directly possible through just the json
-        serialized string -- "overwriting" cannot be done, it would just
-        create a *new* instance. So please do exactly that explicitely:
-        Remove the old and add the new component. :(
     */
-    //virtual void modifyEntityComponentPair(const ModelEntry&) = 0;
+    virtual void modifyEntityComponentPair(const ModelEntry&) = 0;
 
     /**
         Triggers removal of a specified component from an entity

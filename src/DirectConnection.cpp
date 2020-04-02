@@ -7,6 +7,7 @@
 
 #include <sstream>
 #include <iostream>
+#include <typeinfo>
 
 #include "DirectConnection.hpp"
 
@@ -118,6 +119,65 @@ void DirectConnection::removeEntityComponentPair(const ModelEntry& entry)
             return;
         }
     }
+}
+
+
+void DirectConnection::modifyEntityComponentPair(const ModelEntry& entry)
+{
+    std::lock_guard<std::mutex> lg(semprMutex_);
+
+    // find the entity
+    auto entity = core_->getEntity(entry.entityId_);
+    if (!entity) throw std::exception(); // TODO: Better exceptions.
+
+    // find the component
+    auto components = entity->getComponents<Component>();
+    for (auto c : components)
+    {
+        if (rete::util::ptrToStr(c.get()) == entry.componentId_)
+        {
+            // update the component
+            // this requires multiple steps:
+            // The json we receive is that of a Component::Ptr. To check if
+            // it is valid, and matches the type of the actual component, we
+            // deserialize it first into a new component.
+            std::stringstream ss(entry.componentJSON_);
+            cereal::JSONInputArchive ar(ss);
+
+            Component::Ptr tmp;
+            try {
+                ar(tmp);
+                // next, check if the type is correct.
+                auto& oldC = *c;
+                auto& newC = *tmp;
+                if (typeid(oldC) == typeid(newC))
+                {
+                    // types match, all good.
+                    // dump a plain version of tmp into a stream
+                    std::stringstream ss;
+                    {
+                        cereal::JSONOutputArchive ar(ss);
+                        tmp->saveToJSON(ar);
+                    }
+                    // and use it to update the existing component
+                    cereal::JSONInputArchive ar(ss);
+                    c->loadFromJSON(ar);
+
+                    // inform the reasoner
+                    c->changed();
+                    return;
+                }
+                // type ids dont match. :(
+                throw std::exception();
+
+            } catch (cereal::Exception& e) {
+                // ... well.. what to do?
+                throw;
+            }
+        }
+    }
+    // not found. what to do?
+    throw std::exception();
 }
 
 

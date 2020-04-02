@@ -27,6 +27,7 @@ public:
     std::vector<ModelEntry> listEntityComponentPairs() override;
     std::string addEntityComponentPair(const ModelEntry&) override;
     void removeEntityComponentPair(const ModelEntry&) override;
+    void modifyEntityComponentPair(const ModelEntry&) override;
 
     void setUpdateCallback(callback_t) override;
     void clearUpdateCallback() override;
