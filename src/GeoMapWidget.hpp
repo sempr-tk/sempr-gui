@@ -3,12 +3,21 @@
 
 #include "../ui/ui_geomap.h"
 
+#include <QStandardItemModel>
+
 namespace sempr { namespace gui {
 
 class GeoMapWidget : public QWidget {
     Q_OBJECT
 
+    enum Role {
+        CoordinateRole = Qt::UserRole + 1000
+    };
+
     Ui_GeoMapWidget form_;
+
+    QStandardItemModel circleModel_;
+
 public:
     GeoMapWidget(QWidget* parent = nullptr);
 };
