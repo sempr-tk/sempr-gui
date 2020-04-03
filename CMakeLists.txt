@@ -23,7 +23,7 @@ include_directories(${sempr_INCLUDE_DIRS})
 link_directories(${sempr_LIBRARY_DIRS})
 
 
-find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
+find_package(Qt5 COMPONENTS Core Widgets Quick QuickWidgets Location REQUIRED)
 include_directories(${Qt5_INCLUDE_DIRS})
 link_directories(${Qt5_LIBRARY_DIRS})
 
@@ -35,6 +35,7 @@ set(GUI_SRC
     src/DirectConnection.cpp
     src/DirectConnectionNode.cpp
     src/DirectConnectionBuilder.cpp
+    src/GeoMapWidget.cpp
     src/SemprGui.cpp
     src/RawComponentWidget.cpp
     src/TripleContainerWidget.cpp
@@ -45,8 +46,9 @@ set(GUI_SRC
     src/UsefulWidget.cpp
     src/main.cpp
     ui/main.ui
+    qrc/resources.qrc
 )
 
 
 add_executable(main ${GUI_SRC})
-target_link_libraries(main ${sempr_LIBRARIES} Qt5::Core Qt5::Widgets Threads::Threads)
+target_link_libraries(main ${sempr_LIBRARIES} Qt5::Core Qt5::Widgets Qt5::Quick Qt5::QuickWidgets Qt5::Location Threads::Threads)

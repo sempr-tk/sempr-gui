@@ -57,6 +57,12 @@ SemprGui::SemprGui(AbstractInterface::Ptr interface)
     updateTabStatus(form_.tabTripleContainer, false);
     updateTabStatus(form_.tabTriplePropertyMap, false);
     updateTabStatus(form_.tabTripleVector, false);
+
+    // connect the checkboxes to show/hide the editors and the map
+    connect(form_.boxShowEditors, &QCheckBox::stateChanged,
+            form_.tabWidget, &QWidget::setVisible);
+    connect(form_.boxShowOSM, &QCheckBox::stateChanged,
+            form_.geoMapWidget, &QWidget::setVisible);
 }
 
 

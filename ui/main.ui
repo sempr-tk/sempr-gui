@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>798</width>
-    <height>592</height>
+    <width>899</width>
+    <height>747</height>
    </rect>
   </property>
   <property name="font">
@@ -17,42 +17,9 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>SEMPR</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="3">
-    <widget class="QTabWidget" name="tabWidget">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="currentIndex">
-      <number>0</number>
-     </property>
-     <widget class="sempr::gui::RawComponentWidget" name="tabRawComponent">
-      <attribute name="title">
-       <string>Raw</string>
-      </attribute>
-     </widget>
-     <widget class="sempr::gui::TripleContainerWidget" name="tabTripleContainer">
-      <attribute name="title">
-       <string>TripleContainer</string>
-      </attribute>
-     </widget>
-     <widget class="sempr::gui::TripleVectorWidget" name="tabTripleVector">
-      <attribute name="title">
-       <string>TripleVector</string>
-      </attribute>
-     </widget>
-     <widget class="sempr::gui::TriplePropertyMapWidget" name="tabTriplePropertyMap">
-      <attribute name="title">
-       <string>TriplePropertyMap</string>
-      </attribute>
-     </widget>
-    </widget>
-   </item>
    <item row="0" column="2">
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
@@ -62,6 +29,26 @@
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="boxShowOSM">
+       <property name="text">
+        <string>show openstreetmap</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="boxShowEditors">
+       <property name="text">
+        <string>show component editors</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -107,6 +94,62 @@
      </item>
     </layout>
    </item>
+   <item row="0" column="3">
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <property name="leftMargin">
+      <number>20</number>
+     </property>
+     <item>
+      <widget class="QTabWidget" name="tabWidget">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="sempr::gui::RawComponentWidget" name="tabRawComponent">
+        <attribute name="title">
+         <string>Raw</string>
+        </attribute>
+       </widget>
+       <widget class="sempr::gui::TripleContainerWidget" name="tabTripleContainer">
+        <attribute name="title">
+         <string>TripleContainer</string>
+        </attribute>
+       </widget>
+       <widget class="sempr::gui::TripleVectorWidget" name="tabTripleVector">
+        <attribute name="title">
+         <string>TripleVector</string>
+        </attribute>
+       </widget>
+       <widget class="sempr::gui::TriplePropertyMapWidget" name="tabTriplePropertyMap">
+        <attribute name="title">
+         <string>TriplePropertyMap</string>
+        </attribute>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="0" column="4">
+    <widget class="sempr::gui::GeoMapWidget" name="geoMapWidget" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -132,6 +175,12 @@
    <class>sempr::gui::TripleVectorWidget</class>
    <extends>QWidget</extends>
    <header>../src/TripleVectorWidget.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>sempr::gui::GeoMapWidget</class>
+   <extends>QWidget</extends>
+   <header>../src/GeoMapWidget.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
