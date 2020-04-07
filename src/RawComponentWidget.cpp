@@ -17,20 +17,18 @@ void RawComponentWidget::save()
     if (!currentIndex_.isValid()) return;
     if (!model_) return;
 
-    // get the entry
-    auto variant = model_->data(currentIndex_, Qt::UserRole);
-    if (!variant.canConvert<ModelEntry>()) return;
-
-    ModelEntry currentEntry = variant.value<ModelEntry>();
-    // set the new json string
-    bool ok = currentEntry.setJSON(form_.rawComponentEdit->toPlainText().toStdString());
-
+    bool ok = model_->setData(currentIndex_, form_.rawComponentEdit->toPlainText(),
+                              ECModel::Role::ComponentJsonRole);
     // TODO: what to do when the json is not ok?
     // just ignore for now, might be that the component type is just not known
+    // ... could add an info label, change the save buttons colour, whatever.
+    // Somehow signal that things... worked, or did not.
 
-    // send the update to the sempr core.
-    // currently, this removes the current entry and adds a new one... :/
-    model_->updateComponent(currentEntry);
+    // Note: We don't tell the model to send the data to the sempr core anymore.
+    // Instead, we keep the change in a kind of "staging area", and will send it
+    // when explicitely called for. This allows for a clearer differentiation
+    // between the models data, and the data in the sempr core, gives us a way
+    // to reset things, etc.
 }
 
 
@@ -38,11 +36,14 @@ void RawComponentWidget::updateWidget()
 {
     if (currentIndex_.isValid())
     {
-        auto variant = model_->data(currentIndex_, Qt::UserRole);
-        if (variant.canConvert<ModelEntry>())
+        auto varJson = model_->data(currentIndex_, ECModel::Role::ComponentJsonRole);
+        auto varMut = model_->data(currentIndex_, ECModel::Role::ComponentMutableRole);
+        if (varJson.canConvert<QString>() && varMut.canConvert<bool>())
         {
-            ModelEntry entry = variant.value<ModelEntry>();
-            form_.rawComponentEdit->setPlainText(QString::fromStdString(entry.componentJSON_));
+            bool mut = varMut.value<bool>();
+            QString json = varJson.value<QString>();
+
+            form_.rawComponentEdit->setPlainText(json);
 
             // enable text entry and save button only if the component is
             // mutable!
@@ -53,8 +54,8 @@ void RawComponentWidget::updateWidget()
             // copy & paste is possible anymore. Instead, disable the button,
             // and set the edit to read only.
             this->setEnabled(true);
-            form_.btnSave->setEnabled(entry.mutable_);
-            form_.rawComponentEdit->setReadOnly(!entry.mutable_);
+            form_.btnSave->setEnabled(mut);
+            form_.rawComponentEdit->setReadOnly(!mut);
 
             // signal this this widget is useful right now
             setUseful(true);
