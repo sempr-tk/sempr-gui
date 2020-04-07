@@ -286,6 +286,10 @@ QVariant ECModel::data(const QModelIndex& index, int role) const
     {
         return QVariant::fromValue(entry.component());
     }
+    else if (role == Role::ComponentMutableRole)
+    {
+        return QVariant::fromValue(entry.isComponentMutable());
+    }
     else if (role == Role::ModelEntryRole)
     {
         return QVariant::fromValue(entry);
@@ -298,6 +302,40 @@ QVariant ECModel::data(const QModelIndex& index, int role) const
 
     return QVariant();
 }
+
+
+bool ECModel::setData(const QModelIndex& index, const QVariant& value, int role)
+{
+    if (!index.isValid()) return false;
+    if (!index.parent().isValid()) return false;
+
+    auto& entry = data_[index.parent().row()].entries_[index.row()];
+    if (role == Role::ComponentJsonRole && value.canConvert<QString>())
+    {
+        entry.setJSON(value.value<QString>().toStdString());
+        emit dataChanged(index, index);
+        return true;
+    }
+    else if (role == Role::ComponentPtrRole && value.canConvert<Component::Ptr>())
+    {
+        // TODO: Don't really *want* to change the pointer! Noone is supposed to
+        // do that! Only *update* the one that is already there.
+        // So, actually, this is only supposed to trigger a "hey I changed
+        // something that this pointer points to".
+        auto ptr = value.value<Component::Ptr>();
+        if (ptr == entry.component_)
+        {
+            // only on pointer-equality, do something.
+            entry.componentPtrChanged();
+            emit dataChanged(index, index);
+            return true;
+        }
+        return false;
+    }
+
+    return false;
+}
+
 
 QVariant ECModel::headerData(int, Qt::Orientation, int role) const
 {

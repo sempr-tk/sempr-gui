@@ -129,7 +129,8 @@ public:
         ComponentIdRole,             // ro: ComponentId from ModelEntry
         ComponentJsonRole,           // rw: json representation of component
         ComponentPtrRole,            // rw: component pointer
-        ModelEntryRole,              // rw: whole ModelEntry
+        ComponentMutableRole,        // ro: bool isComponentMutable
+        ModelEntryRole,              // ro: whole ModelEntry
         FirstUnusedRole              // Just a marker to be used for further
                                      // extensions
     };
@@ -140,6 +141,7 @@ public:
 
     Qt::ItemFlags flags(const QModelIndex& index) const override;
     QVariant data(const QModelIndex& index, int role) const override;
+    bool setData(const QModelIndex& index, const QVariant& value, int role) override;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
     int rowCount(const QModelIndex& parent) const override;
     int columnCount(const QModelIndex& parent) const override;
