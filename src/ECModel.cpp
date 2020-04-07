@@ -332,7 +332,18 @@ QVariant ECModel::data(const QModelIndex& index, int role) const
     else if (role == Qt::BackgroundRole)
     {
         // grey background if the component is not mutable
-        return (entry.isComponentMutable() ? QVariant() : QColor::fromHsl(0, 0, 180));
+        if (!entry.isComponentMutable())
+        {
+            return QColor::fromRgb(147, 161, 161);
+        }
+        else if (entry.isModified())
+        {
+            return QColor::fromRgb(181, 137, 0);
+        }
+        else
+        {
+            return QColor::fromRgb(255, 255, 255);
+        }
     }
 
     return QVariant();

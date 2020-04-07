@@ -32,6 +32,7 @@ include_directories(src)
 set(GUI_SRC
     src/ECModel.cpp
     src/ModelEntry.cpp
+    src/ColoredBranchTreeView.cpp
     src/DirectConnection.cpp
     src/DirectConnectionNode.cpp
     src/DirectConnectionBuilder.cpp
