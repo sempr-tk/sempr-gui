@@ -16,6 +16,12 @@ std::string ModelEntry::entityId()           const { return coreData_.entityId; 
 std::string ModelEntry::componentId()        const { return coreData_.componentId; }
 bool        ModelEntry::isComponentMutable() const { return coreData_.isComponentMutable; }
 
+bool ModelEntry::isModified() const
+{
+    return !(coreData_.componentJSON == componentJSON_);
+}
+
+
 std::string ModelEntry::json() const
 {
     return componentJSON_;

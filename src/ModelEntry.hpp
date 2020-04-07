@@ -57,6 +57,14 @@ public:
     std::string componentId() const;
     bool isComponentMutable() const;
 
+
+    /**
+        Compares the current json representation with the one originally
+        received from the sempr core to tell if this entry has been modified
+        locally and needs to be committed.
+    */
+    bool isModified() const;
+
     /**
         Returns the current state of the model entry in json format.
     */
