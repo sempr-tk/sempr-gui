@@ -28,7 +28,10 @@ TripleVectorWidget::TripleVectorWidget(QWidget* parent)
             this, &TripleVectorWidget::add);
     connect(form_.btnRemove, &QPushButton::clicked,
             this, &TripleVectorWidget::remove);
-    connect(form_.btnSave, &QPushButton::clicked,
+
+
+    // save to the model whenever a TreeWidgetItem is edited by the user
+    connect(form_.treeWidget, &QTreeWidget::itemChanged,
             this, &TripleVectorWidget::save);
 }
 
@@ -38,6 +41,9 @@ void TripleVectorWidget::add()
     auto item = new QTreeWidgetItem();
     item->setFlags(item->flags() | Qt::ItemFlag::ItemIsEditable);
     form_.treeWidget->insertTopLevelItem(0, item);
+
+    // update the model
+    save();
 }
 
 
@@ -50,6 +56,9 @@ void TripleVectorWidget::remove()
         item = form_.treeWidget->takeTopLevelItem(index);
         delete item;
     }
+
+    // update the model
+    save();
 }
 
 void TripleVectorWidget::save()
