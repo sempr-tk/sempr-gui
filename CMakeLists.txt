@@ -38,6 +38,7 @@ set(GUI_SRC
     src/GeoMapWidget.cpp
     src/SemprGui.cpp
     src/RawComponentWidget.cpp
+    src/RoleNameProxyModel.cpp
     src/TripleContainerWidget.cpp
     src/TriplePropertyMapWidget.cpp
     src/TripleVectorWidget.cpp
