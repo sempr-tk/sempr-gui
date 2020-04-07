@@ -5,7 +5,7 @@
 namespace sempr { namespace gui {
 
 TripleContainerWidget::TripleContainerWidget(QWidget* parent)
-    : UsefulWidget(parent)
+    : SingleComponentWidget(parent)
 {
     form_.setupUi(this);
 
@@ -49,40 +49,32 @@ void TripleContainerWidget::updateFilter(const QString& text)
     }
 }
 
-void TripleContainerWidget::updateWidget()
+bool TripleContainerWidget::updateComponentWidget(
+        TripleContainer::Ptr container, bool /*isMutable*/)
 {
-    bool useful = false;
-    if (currentIndex_.isValid())
+    // Note: TripleContainerWidget cannot modify anything, as TripleContainer
+    // is a read-only interface. -> isMutable is ignored.
+    if (container)
     {
-        auto variant = model_->data(currentIndex_, Qt::UserRole);
-        if (variant.canConvert<ModelEntry>())
+        // first: clear.
+        form_.lineEdit->clear();
+        form_.treeWidget->clear();
+
+        // then: fill with data
+        for (auto triple : *container)
         {
-            auto entry = variant.value<ModelEntry>();
-            auto container = std::dynamic_pointer_cast<TripleContainer>(entry.component_);
-            if (container)
-            {
-                useful = true;
+            auto item = new QTreeWidgetItem();
+            item->setText(0, QString::fromStdString(triple.getField(Triple::Field::SUBJECT)));
+            item->setText(1, QString::fromStdString(triple.getField(Triple::Field::PREDICATE)));
+            item->setText(2, QString::fromStdString(triple.getField(Triple::Field::OBJECT)));
 
-                // first: clear.
-                form_.lineEdit->clear();
-                form_.treeWidget->clear();
-
-                // then: fill with data
-                for (auto triple : *container)
-                {
-                    auto item = new QTreeWidgetItem();
-                    item->setText(0, QString::fromStdString(triple.getField(Triple::Field::SUBJECT)));
-                    item->setText(1, QString::fromStdString(triple.getField(Triple::Field::PREDICATE)));
-                    item->setText(2, QString::fromStdString(triple.getField(Triple::Field::OBJECT)));
-
-                    form_.treeWidget->addTopLevelItem(item);
-                }
-            }
+            form_.treeWidget->addTopLevelItem(item);
         }
+
+        return true;
     }
 
-
-    this->setUseful(useful);
+    return false;
 }
 
 }}

@@ -1,6 +1,8 @@
 #ifndef SEMPR_GUI_ABSTRACTINTERFACE_HPP_
 #define SEMPR_GUI_ABSTRACTINTERFACE_HPP_
 
+#include <QtCore>
+
 #include <vector>
 #include <string>
 #include <functional>
@@ -104,5 +106,7 @@ public:
 
 
 }}
+
+Q_DECLARE_METATYPE(sempr::gui::ECData)
 
 #endif /* include guard: SEMPR_GUI_ABSTRACTINTERFACE_HPP_ */

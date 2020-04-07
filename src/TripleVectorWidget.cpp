@@ -1,12 +1,9 @@
 #include "TripleVectorWidget.hpp"
 
-#include <sempr/component/TripleVector.hpp>
-
-
 namespace sempr { namespace gui {
 
 TripleVectorWidget::TripleVectorWidget(QWidget* parent)
-    : UsefulWidget(parent)
+    : SingleComponentWidget(parent)
 {
     form_.setupUi(this);
 
@@ -58,39 +55,30 @@ void TripleVectorWidget::remove()
 void TripleVectorWidget::save()
 {
     bool okay = false;
-
-    if (currentIndex_.isValid())
+    auto vector = currentPtr();
+    if (vector)
     {
-        auto variant = model_->data(currentIndex_, Qt::UserRole);
-        if (variant.canConvert<ModelEntry>())
+        // clear old data, construct completely new.
+        vector->clear();
+
+        // iterate the tree widget to fill it with the new values
+        int numItems = form_.treeWidget->topLevelItemCount();
+        for (int i = 0; i < numItems; i++)
         {
-            auto entry = variant.value<ModelEntry>();
-            auto vector = std::dynamic_pointer_cast<TripleVector>(entry.component_);
-            if (vector)
-            {
-                // clear old data, construct completely new.
-                vector->clear();
+            auto item = form_.treeWidget->topLevelItem(i);
+            sempr::Triple t;
+            t.setField(sempr::Triple::Field::SUBJECT, item->text(0).toStdString());
+            t.setField(sempr::Triple::Field::PREDICATE, item->text(1).toStdString());
+            t.setField(sempr::Triple::Field::OBJECT, item->text(2).toStdString());
 
-                // iterate the tree widget to fill it with the new values
-                int numItems = form_.treeWidget->topLevelItemCount();
-                for (int i = 0; i < numItems; i++)
-                {
-                    auto item = form_.treeWidget->topLevelItem(i);
-                    sempr::Triple t;
-                    t.setField(sempr::Triple::Field::SUBJECT, item->text(0).toStdString());
-                    t.setField(sempr::Triple::Field::PREDICATE, item->text(1).toStdString());
-                    t.setField(sempr::Triple::Field::OBJECT, item->text(2).toStdString());
-
-                    vector->addTriple(t);
-                }
-
-                // trigger re-compuation of the json serialization
-                okay = entry.setComponent(entry.component_);
-
-                // tell the model to save this.
-                model_->updateComponent(entry);
-            }
+            vector->addTriple(t);
         }
+
+        // update the model
+        okay = model_->setData(
+                currentIndex_,
+                QVariant::fromValue(std::static_pointer_cast<Component>(vector)),
+                ECModel::Role::ComponentPtrRole);
     }
 
     if (!okay)
@@ -110,60 +98,47 @@ void TripleVectorWidget::updateFilter(const QString& text)
     {
         auto item = form_.treeWidget->topLevelItem(i);
         bool show =  (item->text(0).contains(text, Qt::CaseInsensitive) ||
-                      item->text(1).contains(text, Qt::CaseInsensitive) ||
-                      item->text(2).contains(text, Qt::CaseInsensitive));
+                item->text(1).contains(text, Qt::CaseInsensitive) ||
+                item->text(2).contains(text, Qt::CaseInsensitive));
         item->setHidden(!show);
     }
 }
 
 
-void TripleVectorWidget::updateWidget()
+bool TripleVectorWidget::updateComponentWidget(TripleVector::Ptr vector, bool isMutable)
 {
-    bool useful = false;
-    bool canEdit = false;
-
-    if (currentIndex_.isValid())
+    if (vector)
     {
-        auto variant = model_->data(currentIndex_, Qt::UserRole);
-        if (variant.canConvert<ModelEntry>())
+        // first get rid of old data
+        form_.lineEdit->clear();
+        form_.treeWidget->clear();
+
+        // then: fill with data
+        for (auto triple : *vector)
         {
-            auto entry = variant.value<ModelEntry>();
-            auto vector = std::dynamic_pointer_cast<TripleVector>(entry.component_);
-            if (vector)
+            auto item = new QTreeWidgetItem();
+            item->setText(0, QString::fromStdString(triple.getField(Triple::Field::SUBJECT)));
+            item->setText(1, QString::fromStdString(triple.getField(Triple::Field::PREDICATE)));
+            item->setText(2, QString::fromStdString(triple.getField(Triple::Field::OBJECT)));
+
+            Qt::ItemFlags flags = item->flags();
+            if (isMutable)
             {
-                useful = true;
-                canEdit = entry.mutable_;
-
-                // first get rid of old data
-                form_.lineEdit->clear();
-                form_.treeWidget->clear();
-
-                // then: fill with data
-                for (auto triple : *vector)
-                {
-                    auto item = new QTreeWidgetItem();
-                    item->setText(0, QString::fromStdString(triple.getField(Triple::Field::SUBJECT)));
-                    item->setText(1, QString::fromStdString(triple.getField(Triple::Field::PREDICATE)));
-                    item->setText(2, QString::fromStdString(triple.getField(Triple::Field::OBJECT)));
-
-                    Qt::ItemFlags flags = item->flags();
-                    if (canEdit)
-                    {
-                        flags = flags | Qt::ItemFlag::ItemIsEditable;
-                    }
-                    else
-                    {
-                        flags = flags & (~Qt::ItemFlag::ItemIsEditable);
-                    }
-                    item->setFlags(flags);
-
-                    form_.treeWidget->addTopLevelItem(item);
-                }
+                flags = flags | Qt::ItemFlag::ItemIsEditable;
             }
+            else
+            {
+                flags = flags & (~Qt::ItemFlag::ItemIsEditable);
+            }
+            item->setFlags(flags);
+
+            form_.treeWidget->addTopLevelItem(item);
         }
+
+        return true;
     }
 
-    this->setUseful(useful);
+    return false;
 }
 
 }}

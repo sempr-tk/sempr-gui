@@ -33,6 +33,7 @@ void runGUI(int argc, char** args, AbstractInterface::Ptr interface)
 {
     QApplication app(argc, args);
     qRegisterMetaType<ModelEntry>();
+    qRegisterMetaType<ECData>();
 
     SemprGui gui(interface);
     gui.show();
@@ -47,7 +48,7 @@ int main(int argc, char** args)
     std::mutex semprMutex;
     auto connection = std::make_shared<DirectConnection>(&sempr, semprMutex);
     connection->setUpdateCallback(
-        [](ModelEntry, AbstractInterface::Notification) -> void
+        [](ECData, AbstractInterface::Notification) -> void
         {
             std::cout << "update callback!" << std::endl;
         }

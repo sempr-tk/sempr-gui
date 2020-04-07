@@ -1,7 +1,9 @@
 #ifndef SEMPR_GUI_TRIPLEVECTORWIDGET_HPP_
 #define SEMPR_GUI_TRIPLEVECTORWIDGET_HPP_
 
-#include "UsefulWidget.hpp"
+#include <sempr/component/TripleVector.hpp>
+#include "SingleComponentWidget.hpp"
+
 #include "../ui/ui_triplevector.h"
 
 #include "StackedColumnsProxyModel.hpp"
@@ -15,7 +17,7 @@ namespace sempr { namespace gui {
     This widget is similar to the TripleContainerWidget, but provides editing
     of the entries.
 */
-class TripleVectorWidget : public UsefulWidget {
+class TripleVectorWidget : public SingleComponentWidget<TripleVector> {
     Q_OBJECT
 
     Ui_TripleVectorWidget form_;
@@ -25,8 +27,7 @@ class TripleVectorWidget : public UsefulWidget {
     UniqueFilterProxyModel* uniqueProxy_;
     QCompleter* completer_;
 
-    /// updates the whole widget with the data pointed at by currentIndex_
-    void updateWidget() override;
+    bool updateComponentWidget(std::shared_ptr<TripleVector> vector, bool isMutable) override;
 
 protected slots:
     /// hides entries in the tree widget that do not match the search

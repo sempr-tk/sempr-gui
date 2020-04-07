@@ -6,18 +6,22 @@
 
 #include "../ui/ui_triplecontainer.h"
 #include "ECModel.hpp"
-#include "UsefulWidget.hpp"
+#include "SingleComponentWidget.hpp"
+
 #include "StackedColumnsProxyModel.hpp"
 #include "UniqueFilterProxyModel.hpp"
 
-namespace sempr { namespace gui {
+namespace sempr {
+    class TripleContainer;
+
+    namespace gui {
 
 /**
     The TripleContainerWidget is a read-only widget for displaying any component
     that implements the TripleContainer interface. An additional text field lets
     you filter the triples.
 */
-class TripleContainerWidget : public UsefulWidget {
+class TripleContainerWidget : public SingleComponentWidget<TripleContainer> {
     Q_OBJECT
 
     Ui_TripleContainerWidget form_;
@@ -30,8 +34,8 @@ class TripleContainerWidget : public UsefulWidget {
     // a filter for the tree widget
     QSortFilterProxyModel* listFilterProxy_;
 
-    /// Uses the currentIndex_ to access the data from the model and display it
-    void updateWidget() override;
+    // updates the widget with the data from the given component
+    bool updateComponentWidget(std::shared_ptr<TripleContainer> component, bool isMutable) override;
 
 protected slots:
     // updates the filter for the triple list based on the current

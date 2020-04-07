@@ -4,22 +4,24 @@
 #include <QtCore>
 #include <QtWidgets>
 
+// needed ad SingleComponentWidget already implements a dynamic cast to this type
+#include <sempr/component/TriplePropertyMap.hpp>
+
 #include "../ui/ui_triplepropertymap.h"
 #include "ECModel.hpp"
-#include "UsefulWidget.hpp"
+#include "SingleComponentWidget.hpp"
 
 namespace sempr { namespace gui {
 
-class TriplePropertyMapWidget : public UsefulWidget {
+class TriplePropertyMapWidget : public SingleComponentWidget<TriplePropertyMap> {
     Q_OBJECT
 
     Ui_TriplePropertyMapWidget form_;
 
-    /// Uses the currentIndex_ to access the data from the model and display it
-    void updateWidget() override;
+    bool updateComponentWidget(std::shared_ptr<TriplePropertyMap> map, bool isMutable) override;
 
 private slots:
-    // saves the content of the table widget and submits it to the model -> to the core
+    // updates the model with the data from the TableWidget
     void save();
 
     // removes the currently selected entry from the TableWidget
