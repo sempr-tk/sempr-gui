@@ -267,8 +267,11 @@ QVariant ECModel::data(const QModelIndex& index, int role) const
     auto& entry = data_[parent.row()].entries_[index.row()];
     if (role == Qt::DisplayRole)
     {
-        // TODO: Need to get something sensible to display.
-        return QString::fromStdString("Component_" + entry.componentId());
+        // "*" (if modified) + "Component_" + componentId.
+        QString display("%1Component_%2");
+        display = display.arg(entry.isModified() ? "*" : "")
+                         .arg(QString::fromStdString(entry.componentId()));
+        return display;
     }
     else if (role == Role::EntityIdRole)
     {
