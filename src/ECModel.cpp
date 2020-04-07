@@ -206,6 +206,38 @@ void ECModel::updateModelEntry(const ECData& entry)
     this->dataChanged(index, index);
 }
 
+
+void ECModel::commit()
+{
+    for (auto& group : data_)
+    {
+        for (auto& entry : group.entries_)
+        {
+            if (entry.isModified())
+            {
+                updateComponent(entry);
+            }
+        }
+    }
+}
+
+void ECModel::reset()
+{
+    for (auto& group : data_)
+    {
+        for (auto& entry : group.entries_)
+        {
+            if (entry.isModified())
+            {
+                entry.setJSON(entry.coreData_.componentJSON);
+                auto index = findEntry(entry);
+                emit dataChanged(index, index);
+            }
+        }
+    }
+}
+
+
 void ECModel::addComponent(const ModelEntry& entry)
 {
     ECData data;

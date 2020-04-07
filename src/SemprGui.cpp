@@ -63,6 +63,12 @@ SemprGui::SemprGui(AbstractInterface::Ptr interface)
             form_.tabWidget, &QWidget::setVisible);
     connect(form_.boxShowOSM, &QCheckBox::stateChanged,
             form_.geoMapWidget, &QWidget::setVisible);
+
+    // connect the reset and commit buttons to the model
+    connect(form_.btnReset, &QPushButton::clicked,
+            &dataModel_, &ECModel::reset);
+    connect(form_.btnCommit, &QPushButton::clicked,
+            &dataModel_, &ECModel::commit);
 }
 
 

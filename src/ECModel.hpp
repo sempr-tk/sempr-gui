@@ -168,6 +168,16 @@ public slots:
         Shortcut for removeComponent(ModelEntry) and addComponent(ModelEntry).
     */
     void updateComponent(const ModelEntry&);
+
+    /**
+        Sends all updates for all modified entries to the sempr core
+    */
+    void commit();
+
+    /**
+        Resets all entries to the last received state from the sempr core
+    */
+    void reset();
 };
 
 
