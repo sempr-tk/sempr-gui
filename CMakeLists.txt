@@ -23,7 +23,7 @@ include_directories(${sempr_INCLUDE_DIRS})
 link_directories(${sempr_LIBRARY_DIRS})
 
 
-find_package(Qt5 COMPONENTS Core Widgets Quick QuickWidgets Location REQUIRED)
+find_package(Qt5 COMPONENTS Core Widgets Quick QuickWidgets Location QuickControls2 REQUIRED)
 include_directories(${Qt5_INCLUDE_DIRS})
 link_directories(${Qt5_LIBRARY_DIRS})
 
@@ -52,4 +52,4 @@ set(GUI_SRC
 
 
 add_executable(main ${GUI_SRC})
-target_link_libraries(main ${sempr_LIBRARIES} Qt5::Core Qt5::Widgets Qt5::Quick Qt5::QuickWidgets Qt5::Location Threads::Threads)
+target_link_libraries(main ${sempr_LIBRARIES} Qt5::Core Qt5::Widgets Qt5::Quick Qt5::QuickWidgets Qt5::QuickControls2 Qt5::Location Threads::Threads)

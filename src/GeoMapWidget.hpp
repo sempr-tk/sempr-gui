@@ -4,6 +4,9 @@
 #include "../ui/ui_geomap.h"
 
 #include <QStandardItemModel>
+#include <QTimer>
+
+#include "RoleNameProxyModel.hpp"
 
 namespace sempr { namespace gui {
 
@@ -17,6 +20,9 @@ class GeoMapWidget : public QWidget {
     Ui_GeoMapWidget form_;
 
     QStandardItemModel circleModel_;
+    RoleNameProxyModel* circleProxy_;
+
+    QTimer debugTimer_;
 
 public:
     GeoMapWidget(QWidget* parent = nullptr);
