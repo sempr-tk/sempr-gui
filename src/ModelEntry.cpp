@@ -6,6 +6,26 @@
 
 namespace sempr { namespace gui {
 
+ModelEntry::ModelEntry(const ECData& data)
+{
+    coreData_ = data;
+    setJSON(data.componentJSON);
+}
+
+std::string ModelEntry::entityId()           const { return coreData_.entityId; }
+std::string ModelEntry::componentId()        const { return coreData_.componentId; }
+bool        ModelEntry::isComponentMutable() const { return coreData_.isComponentMutable; }
+
+std::string ModelEntry::json() const
+{
+    return componentJSON_;
+}
+
+Component::Ptr ModelEntry::component() const
+{
+    return component_;
+}
+
 bool ModelEntry::setJSON(const std::string& json)
 {
     componentJSON_ = json;
@@ -23,23 +43,21 @@ bool ModelEntry::setJSON(const std::string& json)
 }
 
 
-bool ModelEntry::setComponent(Component::Ptr c)
+void ModelEntry::componentPtrChanged()
 {
-    component_ = c;
+    if (!component_) return;
+
     try {
         std::stringstream ss;
         {
             cereal::JSONOutputArchive ar(ss);
-            ar(c);
+            ar(component_);
         }
         componentJSON_ = ss.str();
     } catch (cereal::Exception& e) {
         std::cerr << "ModelEntry::setJSON: " << e.what() << std::endl;
         componentJSON_ = "";
-        return false;
     }
-
-    return true;
 }
 
 }}

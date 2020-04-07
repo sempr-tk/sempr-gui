@@ -88,34 +88,53 @@ class ECModel : public QAbstractItemModel {
 
     /// compute the model index of the entry
     QModelIndex findEntry(const ModelEntry&) const;
+    QModelIndex findEntry(const std::string& entityId,
+                          const std::string& componentId) const;
 
 signals:
     // These are emitted from the thread that calls the set callback in
     // semprInterface_, and are connected to the [add|remove|update]ModelEntry
     // slots below. This is done to make sure that the slots are called from
     // the main (gui) thread.
-    void gotEntryAdd(const sempr::gui::ModelEntry&);
-    void gotEntryUpdate(const sempr::gui::ModelEntry&);
-    void gotEntryRemove(const sempr::gui::ModelEntry&);
+    void gotEntryAdd(const sempr::gui::ECData&);
+    void gotEntryUpdate(const sempr::gui::ECData&);
+    void gotEntryRemove(const sempr::gui::ECData&);
 
 private slots:
     /**
-        Adds a model entry to the internal vector structure.
+        Adds a model entry to the internal vector structure, created from
+        the ECData given.
     */
-    void addModelEntry(const ModelEntry&);
+    void addModelEntry(const ECData&);
 
     /**
         Removes a model entry from the local vector structure as indicated
-        by the entity- and component-id.
+        by the entity- and component-id in the ECData.
     */
-    void removeModelEntry(const ModelEntry&);
+    void removeModelEntry(const ECData&);
 
     /**
-        Updates a model entry in the internal vector structure.
+        Updates a model entry in the internal vector structure from the given
+        ECData.
     */
-    void updateModelEntry(const ModelEntry&);
+    void updateModelEntry(const ECData&);
 
 public:
+
+    /**
+        Custom roles definitions.
+    */
+    enum Role {
+        EntityIdRole = Qt::UserRole, // ro: EntityId from ModelEntry
+        ComponentIdRole,             // ro: ComponentId from ModelEntry
+        ComponentJsonRole,           // rw: json representation of component
+        ComponentPtrRole,            // rw: component pointer
+        ModelEntryRole,              // rw: whole ModelEntry
+        FirstUnusedRole              // Just a marker to be used for further
+                                     // extensions
+    };
+
+
     ECModel(AbstractInterface::Ptr interface);
     ~ECModel();
 

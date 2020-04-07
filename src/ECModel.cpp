@@ -18,7 +18,7 @@ ECModel::ECModel(AbstractInterface::Ptr interface)
 
     // TODO: Register callback for updates
     semprInterface_->setUpdateCallback(
-        [this](ModelEntry entry, AbstractInterface::Notification n)
+        [this](ECData entry, AbstractInterface::Notification n)
         {
 
             // DONT call addModelEntry etc from this callback, as it
@@ -36,15 +36,15 @@ ECModel::ECModel(AbstractInterface::Ptr interface)
 
             switch (n) {
                 case AbstractInterface::ADDED:
-                    std::cout << "Dummy update callback add " << entry.componentId_ << std::endl;
+                    std::cout << "Dummy update callback add " << entry.componentId << std::endl;
                     this->emit gotEntryAdd(entry);
                     break;
                 case AbstractInterface::UPDATED:
-                    std::cout << "Dummy update callback updated " << entry.componentId_ << std::endl;
+                    std::cout << "Dummy update callback updated " << entry.componentId << std::endl;
                     this->emit gotEntryUpdate(entry);
                     break;
                 case AbstractInterface::REMOVED:
-                    std::cout << "Dummy update callback removed " << entry.componentId_ << std::endl;
+                    std::cout << "Dummy update callback removed " << entry.componentId << std::endl;
                     this->emit gotEntryRemove(entry);
                     break;
             }
@@ -54,9 +54,9 @@ ECModel::ECModel(AbstractInterface::Ptr interface)
     auto entries = semprInterface_->listEntityComponentPairs();
     // Sort by entity id first.
     std::sort(entries.begin(), entries.end(),
-            [](const ModelEntry& left, const ModelEntry& right)
+            [](const ECData& left, const ECData& right)
             {
-                return left.entityId_ < right.entityId_;
+                return left.entityId < right.entityId;
             }
     );
     // add them one by one, groups them by entityId.
@@ -72,14 +72,19 @@ ECModel::~ECModel()
     std::cout << "~ECModel" << std::endl;
 }
 
-
 QModelIndex ECModel::findEntry(const ModelEntry& entry) const
+{
+    return findEntry(entry.entityId(), entry.componentId());
+}
+
+QModelIndex ECModel::findEntry(const std::string& entityId,
+                               const std::string& componentId) const
 {
     // find the row of the entity-group
     auto group = std::find_if(data_.begin(), data_.end(),
-        [&entry](const ModelEntryGroup& group)
+        [&entityId](const ModelEntryGroup& group)
         {
-            return group.entityId_ == entry.entityId_;
+            return group.entityId_ == entityId;
         }
     );
 
@@ -90,9 +95,9 @@ QModelIndex ECModel::findEntry(const ModelEntry& entry) const
 
         // find the entry in the group
         auto component = std::find_if(group->entries_.begin(), group->entries_.end(),
-            [&entry](const ModelEntry& other)
+            [&componentId](const ModelEntry& other)
             {
-                return entry.componentId_ == other.componentId_;
+                return componentId == other.componentId();
             }
         );
         if (component != group->entries_.end())
@@ -107,23 +112,24 @@ QModelIndex ECModel::findEntry(const ModelEntry& entry) const
 }
 
 
-void ECModel::addModelEntry(const ModelEntry& entry)
+void ECModel::addModelEntry(const ECData& entry)
 {
     // This can happen e.g. if data was added between setting the callback
     // for updates and the initialization of the model.
-    auto index = this->findEntry(entry);
+    auto index = this->findEntry(entry.entityId, entry.componentId);
     if (index.isValid()) return;
 
     // find the entity-group
     auto entity = std::find_if(data_.begin(), data_.end(),
         [&entry](const ModelEntryGroup& group) -> bool
         {
-            return group.entityId_ == entry.entityId_;
+            return group.entityId_ == entry.entityId;
         }
     );
 
     if (entity != data_.end())
     {
+        // the group exists, to lets add the entry
         int entityRow = std::distance(data_.begin(), entity);
         int componentRow = entity->entries_.size();
 
@@ -134,14 +140,14 @@ void ECModel::addModelEntry(const ModelEntry& entry)
         this->beginInsertRows(parent, componentRow, componentRow);
 
         // now, insert:
-        entity->entries_.push_back(entry);
+        entity->entries_.push_back(ModelEntry(entry));
 
         // finish insertion
         this->endInsertRows();
     }
     else
     {
-        // the entity does not exist yet, so lets insert it.
+        // the group does not exist yet, so lets insert it.
         int entityRow = data_.size();
 
         // parent is the root item
@@ -149,17 +155,17 @@ void ECModel::addModelEntry(const ModelEntry& entry)
 
         this->beginInsertRows(parent, entityRow, entityRow);
         ModelEntryGroup group;
-        group.entityId_ = entry.entityId_;
-        group.entries_.push_back(entry);
+        group.entityId_ = entry.entityId;
+        group.entries_.push_back(ModelEntry(entry));
         data_.push_back(group);
         this->endInsertRows();
     }
 }
 
 
-void ECModel::removeModelEntry(const ModelEntry& entry)
+void ECModel::removeModelEntry(const ECData& entry)
 {
-    auto index = this->findEntry(entry);
+    auto index = this->findEntry(entry.entityId, entry.componentId);
     if (index.isValid())
     {
         // signal removal of this entry
@@ -185,16 +191,16 @@ void ECModel::removeModelEntry(const ModelEntry& entry)
     }
 }
 
-void ECModel::updateModelEntry(const ModelEntry& entry)
+void ECModel::updateModelEntry(const ECData& entry)
 {
     // find the entries index
-    auto index = this->findEntry(entry);
+    auto index = this->findEntry(entry.entityId, entry.componentId);
 
     // get the group
     auto group = data_.begin() + index.parent().row();
     // get the entry
     auto component = group->entries_.begin() + index.row();
-    *component = entry;
+    *component = ModelEntry(entry);
 
     // notify views
     this->dataChanged(index, index);
@@ -202,19 +208,31 @@ void ECModel::updateModelEntry(const ModelEntry& entry)
 
 void ECModel::addComponent(const ModelEntry& entry)
 {
-    semprInterface_->addEntityComponentPair(entry);
+    ECData data;
+    data.entityId = entry.entityId();
+    data.componentId = entry.componentId();
+    data.componentJSON = entry.json();
+
+    semprInterface_->addEntityComponentPair(data);
 }
 
 void ECModel::removeComponent(const ModelEntry& entry)
 {
-    semprInterface_->removeEntityComponentPair(entry);
+    ECData data;
+    data.entityId = entry.entityId();
+    data.componentId = entry.componentId();
+
+    semprInterface_->removeEntityComponentPair(data);
 }
 
 void ECModel::updateComponent(const ModelEntry& entry)
 {
-    //removeComponent(entry);
-    //addComponent(entry);
-    semprInterface_->modifyEntityComponentPair(entry);
+    ECData data;
+    data.entityId = entry.entityId();
+    data.componentId = entry.componentId();
+    data.componentJSON = entry.json();
+
+    semprInterface_->modifyEntityComponentPair(data);
 }
 
 
@@ -230,34 +248,52 @@ QVariant ECModel::data(const QModelIndex& index, int role) const
 {
     auto parent = index.parent();
 
-    if (role == Qt::DisplayRole)
+    // most roles can only be served for ModelEntrys, not ModelEntryGroups.
+    // -> parent must be valid.
+    // Hence: First check if thet parent is not valid, and serve only the
+    // Qt::DisplayRole.
+    if (!parent.isValid())
     {
-        if (!parent.isValid())
+        if (role == Qt::DisplayRole)
         {
             // top level -> entity id
             return QString::fromStdString(data_[index.row()].entityId_);
         }
-        else
-        {
-            auto& entry = data_[parent.row()].entries_[index.row()];
-            return QString::fromStdString("Component_" + entry.componentId_); // TODO: Need to get something sensible to display.
-        }
+        // no other roles served for top level items.
+        return QVariant();
     }
-    else if (role == Qt::UserRole)
+
+    // --- only ModelEntry below this line ---
+    auto& entry = data_[parent.row()].entries_[index.row()];
+    if (role == Qt::DisplayRole)
     {
-        if (parent.isValid())
-        {
-            auto& entry = data_[parent.row()].entries_[index.row()];
-            return QVariant::fromValue(entry);
-        }
+        // TODO: Need to get something sensible to display.
+        return QString::fromStdString("Component_" + entry.componentId());
+    }
+    else if (role == Role::EntityIdRole)
+    {
+        return QString::fromStdString(entry.entityId());
+    }
+    else if (role == Role::ComponentIdRole)
+    {
+        return QString::fromStdString(entry.componentId());
+    }
+    else if (role == Role::ComponentJsonRole)
+    {
+        return QString::fromStdString(entry.json());
+    }
+    else if (role == Role::ComponentPtrRole)
+    {
+        return QVariant::fromValue(entry.component());
+    }
+    else if (role == Role::ModelEntryRole)
+    {
+        return QVariant::fromValue(entry);
     }
     else if (role == Qt::BackgroundRole)
     {
-        if (parent.isValid())
-        {
-            auto& entry = data_[parent.row()].entries_[index.row()];
-            return (entry.mutable_ ? QVariant() : QColor::fromHsl(0, 0, 180));
-        }
+        // grey background if the component is not mutable
+        return (entry.isComponentMutable() ? QVariant() : QColor::fromHsl(0, 0, 180));
     }
 
     return QVariant();
@@ -267,7 +303,7 @@ QVariant ECModel::headerData(int, Qt::Orientation, int role) const
 {
     if (role == Qt::DisplayRole)
     {
-        return "foo";
+        return "Id";
     }
 
     return QVariant();

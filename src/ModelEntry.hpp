@@ -7,19 +7,65 @@
 #include <sempr/Component.hpp>
 #include <cereal/external/rapidjson/document.h>
 
+#include "AbstractInterface.hpp"
+
 namespace sempr { namespace gui {
 
 /**
-    The ModelEntry represents the single data blobs retrieved from the sempr
-    core. Be aware that we do not just serialize and send entities -- that
-    would not be enough, as it would not include inferred data. Hence we send
-    Entity-Component pairs, matching the ECWMEs in the reasoner.
+    The ModelEntry holds all the data that is stored in the QAbstractItemModel
+    (ECModel) for the views in the GUI. This is basically the Data as it was
+    retrieved by the core, as well as a copy of the data in form of a JSON
+    string and a deserialized Component::Ptr as a "staging" area. The different
+    views/editors may edit these, and the state can be reset if mistakes were
+    made.
 */
-struct ModelEntry {
+class ModelEntry {
+
+    /**
+        The data as it was retrieved by the core.
+    */
+    ECData coreData_;
+
+    /**
+        A copy of the json representation of the component.
+        Even if the GUI is not aware of the concrete component type
+        (and thus the deserialization fails), we can still view and edit the
+        raw json.
+    */
+    std::string componentJSON_;
+
+    /**
+        A Component::Ptr deserialized from the componentJSON_, for convenience.
+    */
+    Component::Ptr component_;
+
+    friend class ECModel;
+protected:
+    /**
+        Constructs a ModelEntry from some received data.
+        This already tries to deserialize the json representation to set the
+        Component::Ptr.
+    */
+    explicit ModelEntry(const ECData& data);
+
+public:
     ModelEntry() = default;
     ModelEntry(const ModelEntry&) = default;
     ~ModelEntry() = default;
 
+    std::string entityId() const;
+    std::string componentId() const;
+    bool isComponentMutable() const;
+
+    /**
+        Returns the current state of the model entry in json format.
+    */
+    std::string json() const;
+
+    /**
+        Returns the current state of the model entry as a component ptr.
+    */
+    Component::Ptr component() const;
 
     /**
         Sets componentJSON_ = json and tries to de-serialize the component.
@@ -28,45 +74,12 @@ struct ModelEntry {
     */
     bool setJSON(const std::string& json);
 
-    /**
-        Sets component_ = component and tries to serialize the component into
-        componentJSON_.
-        On failure, sets componentJSON_ to an empty string and returns false,
-        on success returns true.
-    */
-    bool setComponent(Component::Ptr component);
 
     /**
-        The ID of the entity this data belongs to.
+        Updates componentJSON_ by deserializing the component_ pointer again.
     */
-    std::string entityId_;
+    void componentPtrChanged();
 
-    /**
-        Some string to identify the component. Necessary when not only reading,
-        but also modifying data in the core.
-    */
-    std::string componentId_;
-
-    /**
-        The json representation of the component. This is what we will get from
-        the AbstractInterface. Even if the GUI is not aware of the concrete
-        component type (and thus the deserialization fails), we can still
-        view and edit the raw json.
-    */
-//    rapidjson::Document componentJSON_;
-    std::string componentJSON_;
-
-    /**
-        A flag that specifies if the component was manually added to the entity
-        or if it was inferred, and must/can therefore not be modified.
-    */
-    bool mutable_;
-
-    /**
-        If the GUI is aware of the component type it will hold it here for
-        easier access.
-    */
-    Component::Ptr component_;
 };
 
 
@@ -74,5 +87,7 @@ struct ModelEntry {
 
 Q_DECLARE_METATYPE(sempr::gui::ModelEntry)
 
+// also allow Component::Ptr
+Q_DECLARE_METATYPE(sempr::Component::Ptr)
 
 #endif /* include guard: SEMPR_GUI_MODELENTRY_HPP_ */

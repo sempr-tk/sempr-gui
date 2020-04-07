@@ -2,7 +2,6 @@
 #include <sstream>
 
 #include "DirectConnectionNode.hpp"
-#include "ModelEntry.hpp"
 
 namespace sempr { namespace gui {
 
@@ -28,27 +27,25 @@ void DirectConnectionNode::execute(
     component_->getValue(token, component);
 
     // construct a model entry
-    ModelEntry entry;
-    entry.componentId_ = rete::util::ptrToStr(component.get());
-    entry.entityId_ = entity->id();
+    ECData entry;
+    entry.componentId = rete::util::ptrToStr(component.get());
+    entry.entityId = entity->id();
 
     std::stringstream ss;
     {
         cereal::JSONOutputArchive ar(ss);
         ar(component);
     }
-    entry.componentJSON_ = ss.str();
-    cereal::JSONInputArchive ar(ss);
-    ar(entry.component_); // effectively create a copy of the component
+    entry.componentJSON = ss.str();
 
     // only if the component is also part of the entity (and not only associated
     // in the reasoner) can we modify it.
-    entry.mutable_ = false;
+    entry.isComponentMutable = false;
     for (auto c : entity->getComponents<Component>())
     {
         if (c == component)
         {
-            entry.mutable_ = true;
+            entry.isComponentMutable = true;
             break;
         }
     }
@@ -67,7 +64,8 @@ void DirectConnectionNode::execute(
     }
 
     // call the callback!
-    if (connection_->callback_) connection_->callback_(entry, n);
+    //if (connection_->callback_) connection_->callback_(entry, n);
+    connection_->triggerCallback(entry, n);
 }
 
 

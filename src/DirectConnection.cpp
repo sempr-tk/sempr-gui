@@ -8,6 +8,7 @@
 #include <sstream>
 #include <iostream>
 #include <typeinfo>
+#include <algorithm>
 
 #include "DirectConnection.hpp"
 
@@ -18,7 +19,7 @@ DirectConnection::DirectConnection(sempr::Core* core, std::mutex& m)
 {
 }
 
-std::vector<ModelEntry> DirectConnection::listEntityComponentPairs()
+std::vector<ECData> DirectConnection::listEntityComponentPairs()
 {
     std::vector<rete::WME::Ptr> wmes;
 
@@ -27,7 +28,7 @@ std::vector<ModelEntry> DirectConnection::listEntityComponentPairs()
         wmes = core_->reasoner().getCurrentState().getWMEs();
     }
 
-    std::vector<ModelEntry> entries;
+    std::vector<ECData> entries;
     for (auto wme : wmes)
     {
         auto ec = std::dynamic_pointer_cast<sempr::ECWME>(wme);
@@ -36,12 +37,12 @@ std::vector<ModelEntry> DirectConnection::listEntityComponentPairs()
             auto entity = std::get<0>(ec->value_);
             auto component = std::get<1>(ec->value_);
 
-            ModelEntry entry;
+            ECData entry;
             // populate the model entry with...
             // ... the component "id" (ptr to string)
-            entry.componentId_ = rete::util::ptrToStr(component.get());
+            entry.componentId = rete::util::ptrToStr(component.get());
             // entity id
-            entry.entityId_ = entity->id();
+            entry.entityId = entity->id();
             // whether it is mutable, i.e., if it is not inferred --
             // we can check this by trying to find the component in the entity.
             // If it is there, it is not inferred.
@@ -49,7 +50,7 @@ std::vector<ModelEntry> DirectConnection::listEntityComponentPairs()
             bool inferred =
                 (std::find(allComponents.begin(), allComponents.end(), component)
                  == allComponents.end());
-            entry.mutable_ = !inferred;
+            entry.isComponentMutable = !inferred;
 
 
             // create the serialized version of the component
@@ -58,19 +59,7 @@ std::vector<ModelEntry> DirectConnection::listEntityComponentPairs()
                 cereal::JSONOutputArchive ar(ss);
                 ar(std::get<1>(ec->value_));
             }
-            entry.componentJSON_ = ss.str();
-
-            // and try to deserialize it to effectively create a copy.
-            // (why try? must work, else serialization just before this would
-            // have failed alreay... just remember to *try* deserialization of
-            // the json representation in different implementations!)
-            try {
-                cereal::JSONInputArchive ar(ss);
-                ar(entry.component_);
-            } catch (cereal::Exception& e) {
-                std::cerr << e.what() << std::endl;
-                entry.component_ = nullptr;
-            }
+            entry.componentJSON = ss.str();
 
             // add the entry to the list
             entries.push_back(entry);
@@ -81,39 +70,37 @@ std::vector<ModelEntry> DirectConnection::listEntityComponentPairs()
 }
 
 
-std::string DirectConnection::addEntityComponentPair(const ModelEntry& entry)
+void DirectConnection::addEntityComponentPair(const ECData& entry)
 {
     std::lock_guard<std::mutex> lg(semprMutex_);
 
     // find the entity
-    auto entity = core_->getEntity(entry.entityId_);
+    auto entity = core_->getEntity(entry.entityId);
     if (!entity) throw std::exception(); // TODO: Better exceptions.
 
     // de-serialize the component
     Component::Ptr c;
 
     {
-        std::stringstream ss(entry.componentJSON_);
+        std::stringstream ss(entry.componentJSON);
         cereal::JSONInputArchive ar(ss);
         ar(c);
     } // exceptions?
 
     entity->addComponent(c);
-
-    return rete::util::ptrToStr(c.get());
 }
 
 
-void DirectConnection::removeEntityComponentPair(const ModelEntry& entry)
+void DirectConnection::removeEntityComponentPair(const ECData& entry)
 {
     std::lock_guard<std::mutex> lg(semprMutex_);
-    auto entity = core_->getEntity(entry.entityId_);
+    auto entity = core_->getEntity(entry.entityId);
     if (!entity) throw std::exception();
 
     auto components = entity->getComponents<Component>();
     for (auto c : components)
     {
-        if (rete::util::ptrToStr(c.get()) == entry.componentId_)
+        if (rete::util::ptrToStr(c.get()) == entry.componentId)
         {
             entity->removeComponent(c);
             return;
@@ -122,26 +109,26 @@ void DirectConnection::removeEntityComponentPair(const ModelEntry& entry)
 }
 
 
-void DirectConnection::modifyEntityComponentPair(const ModelEntry& entry)
+void DirectConnection::modifyEntityComponentPair(const ECData& entry)
 {
     std::lock_guard<std::mutex> lg(semprMutex_);
 
     // find the entity
-    auto entity = core_->getEntity(entry.entityId_);
+    auto entity = core_->getEntity(entry.entityId);
     if (!entity) throw std::exception(); // TODO: Better exceptions.
 
     // find the component
     auto components = entity->getComponents<Component>();
     for (auto c : components)
     {
-        if (rete::util::ptrToStr(c.get()) == entry.componentId_)
+        if (rete::util::ptrToStr(c.get()) == entry.componentId)
         {
             // update the component
             // this requires multiple steps:
             // The json we receive is that of a Component::Ptr. To check if
             // it is valid, and matches the type of the actual component, we
             // deserialize it first into a new component.
-            std::stringstream ss(entry.componentJSON_);
+            std::stringstream ss(entry.componentJSON);
             cereal::JSONInputArchive ar(ss);
 
             Component::Ptr tmp;
@@ -198,7 +185,7 @@ void DirectConnection::triggerCallback(
         callback_t::second_argument_type arg2)
 {
     std::lock_guard<std::mutex> lg(callbackMutex_);
-    callback_(arg1, arg2);
+    if (callback_) callback_(arg1, arg2);
 }
 
 }}

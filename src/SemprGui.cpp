@@ -35,19 +35,19 @@ SemprGui::SemprGui(AbstractInterface::Ptr interface)
 
     // connect incoming updates with the history
     connect(&dataModel_, &ECModel::gotEntryAdd, this,
-            [this](const ModelEntry& entry)
+            [this](const ECData& entry)
             {
                 this->logUpdate(entry, "ADD");
             });
 
     connect(&dataModel_, &ECModel::gotEntryRemove, this,
-            [this](const ModelEntry& entry)
+            [this](const ECData& entry)
             {
                 this->logUpdate(entry, "REM");
             });
 
     connect(&dataModel_, &ECModel::gotEntryUpdate, this,
-            [this](const ModelEntry& entry)
+            [this](const ECData& entry)
             {
                 this->logUpdate(entry, "UPD");
             });
@@ -71,13 +71,13 @@ SemprGui::~SemprGui()
 }
 
 
-void SemprGui::logUpdate(const ModelEntry& entry, const QString& mod)
+void SemprGui::logUpdate(const ECData& entry, const QString& mod)
 {
     QTreeWidgetItem* item = new QTreeWidgetItem();
 
     item->setText(0, mod);
-    item->setText(1, QString::fromStdString(entry.entityId_));
-    item->setText(2, QString::fromStdString(entry.componentId_));
+    item->setText(1, QString::fromStdString(entry.entityId));
+    item->setText(2, QString::fromStdString(entry.componentId));
 
     form_.historyList->insertTopLevelItem(0, item);
 }

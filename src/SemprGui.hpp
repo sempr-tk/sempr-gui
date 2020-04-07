@@ -34,7 +34,7 @@ private slots:
         Adds a entry to the history list that shows the latest updates from the
         sempr core. The second argument is prepended to the history entry.
     */
-    void logUpdate(const sempr::gui::ModelEntry&,
+    void logUpdate(const sempr::gui::ECData&,
                    const QString&);
 
 public:

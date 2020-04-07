@@ -19,15 +19,14 @@ class DirectConnection : public AbstractInterface {
 
     std::mutex callbackMutex_; // sync setting/clearing the callback-function
     callback_t callback_;
-    friend class DirectConnectionNode;
 public:
     using Ptr = std::shared_ptr<DirectConnection>;
     DirectConnection(sempr::Core* core, std::mutex& m);
 
-    std::vector<ModelEntry> listEntityComponentPairs() override;
-    std::string addEntityComponentPair(const ModelEntry&) override;
-    void removeEntityComponentPair(const ModelEntry&) override;
-    void modifyEntityComponentPair(const ModelEntry&) override;
+    std::vector<ECData> listEntityComponentPairs() override;
+    void addEntityComponentPair(const ECData&) override;
+    void removeEntityComponentPair(const ECData&) override;
+    void modifyEntityComponentPair(const ECData&) override;
 
     void setUpdateCallback(callback_t) override;
     void clearUpdateCallback() override;
