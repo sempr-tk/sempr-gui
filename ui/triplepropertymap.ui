@@ -77,16 +77,6 @@
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QPushButton" name="btnSave">
-       <property name="toolTip">
-        <string>Saves the component.</string>
-       </property>
-       <property name="text">
-        <string>save</string>
-       </property>
-      </widget>
-     </item>
     </layout>
    </item>
   </layout>
