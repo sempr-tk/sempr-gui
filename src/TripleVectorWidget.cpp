@@ -1,4 +1,5 @@
 #include "TripleVectorWidget.hpp"
+#include "CustomDataRoles.hpp"
 
 namespace sempr { namespace gui {
 
@@ -87,7 +88,7 @@ void TripleVectorWidget::save()
         okay = model_->setData(
                 currentIndex_,
                 QVariant::fromValue(std::static_pointer_cast<Component>(vector)),
-                ECModel::Role::ComponentPtrRole);
+                Role::ComponentPtrRole);
     }
 
     if (!okay)

@@ -2,6 +2,8 @@
 #define SEMPR_GUI_SINGLECOMPONENTWIDGET_HPP_
 
 #include "UsefulWidget.hpp"
+#include "CustomDataRoles.hpp"
+
 #include <sempr/Component.hpp>
 #include <memory>
 
@@ -44,7 +46,7 @@ protected:
     {
         if (!this->currentIndex_.isValid()) return nullptr;
 
-        auto ptr = this->model_->data(this->currentIndex_, ECModel::Role::ComponentPtrRole);
+        auto ptr = this->model_->data(this->currentIndex_, Role::ComponentPtrRole);
         if (ptr.template canConvert<Component::Ptr>())
         {
             auto cptr = ptr.template value<Component::Ptr>();
@@ -63,7 +65,7 @@ protected:
     {
         if (!this->currentIndex_.isValid()) return false;
 
-        auto isMutable = this->model_->data(this->currentIndex_, ECModel::Role::ComponentMutableRole);
+        auto isMutable = this->model_->data(this->currentIndex_, Role::ComponentMutableRole);
         if (isMutable.template canConvert<bool>())
         {
             return isMutable.template value<bool>();

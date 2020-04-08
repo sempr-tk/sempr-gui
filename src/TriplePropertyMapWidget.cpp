@@ -1,4 +1,5 @@
 #include "TriplePropertyMapWidget.hpp"
+#include "CustomDataRoles.hpp"
 
 namespace sempr { namespace gui {
 
@@ -103,7 +104,7 @@ void TriplePropertyMapWidget::save()
         okay = model_->setData(
                 currentIndex_,
                 QVariant::fromValue(std::static_pointer_cast<Component>(map)),
-                ECModel::Role::ComponentPtrRole);
+                Role::ComponentPtrRole);
 
         // Only set the data in the model.
         // When it is actually sent to the sempr core is not our business!

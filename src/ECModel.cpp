@@ -1,4 +1,5 @@
 #include "ECModel.hpp"
+#include "CustomDataRoles.hpp"
 
 #include <QColor>
 #include <thread>

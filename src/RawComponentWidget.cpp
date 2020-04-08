@@ -1,4 +1,5 @@
 #include "RawComponentWidget.hpp"
+#include "CustomDataRoles.hpp"
 
 namespace sempr { namespace gui {
 
@@ -18,7 +19,7 @@ void RawComponentWidget::save()
     if (!model_) return;
 
     bool ok = model_->setData(currentIndex_, form_.rawComponentEdit->toPlainText(),
-                              ECModel::Role::ComponentJsonRole);
+                              Role::ComponentJsonRole);
     // TODO: what to do when the json is not ok?
     // just ignore for now, might be that the component type is just not known
     // ... could add an info label, change the save buttons colour, whatever.
@@ -36,8 +37,8 @@ void RawComponentWidget::updateWidget()
 {
     if (currentIndex_.isValid())
     {
-        auto varJson = model_->data(currentIndex_, ECModel::Role::ComponentJsonRole);
-        auto varMut = model_->data(currentIndex_, ECModel::Role::ComponentMutableRole);
+        auto varJson = model_->data(currentIndex_, Role::ComponentJsonRole);
+        auto varMut = model_->data(currentIndex_, Role::ComponentMutableRole);
         if (varJson.canConvert<QString>() && varMut.canConvert<bool>())
         {
             bool mut = varMut.value<bool>();

@@ -120,22 +120,6 @@ private slots:
     void updateModelEntry(const ECData&);
 
 public:
-
-    /**
-        Custom roles definitions.
-    */
-    enum Role {
-        EntityIdRole = Qt::UserRole, // ro: EntityId from ModelEntry
-        ComponentIdRole,             // ro: ComponentId from ModelEntry
-        ComponentJsonRole,           // rw: json representation of component
-        ComponentPtrRole,            // rw: component pointer
-        ComponentMutableRole,        // ro: bool isComponentMutable
-        ModelEntryRole,              // ro: whole ModelEntry
-        FirstUnusedRole              // Just a marker to be used for further
-                                     // extensions
-    };
-
-
     ECModel(AbstractInterface::Ptr interface);
     ~ECModel();
 
