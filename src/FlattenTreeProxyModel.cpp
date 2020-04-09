@@ -17,9 +17,6 @@ void FlattenTreeProxyModel::rebuild()
     if (!model) return;
 
     addChildrenToList(QModelIndex());
-
-    qDebug() << "parents_ list:";
-    qDebug() << parents_;
 }
 
 
@@ -222,6 +219,8 @@ void FlattenTreeProxyModel::onSourceRowsAboutToBeInserted(
         const QModelIndex& sourceParent,
         int first, int last)
 {
+//    qDebug() << "before insert " << parents_;
+
     // find the position of the first source item in the proxy
     auto sourceFirst = sourceModel()->index(first, 0, sourceParent);
     auto proxyFirst = mapFromSource(sourceFirst);
@@ -256,6 +255,24 @@ void FlattenTreeProxyModel::onSourceRowsInserted(
     }
 
     endInsertRows();
+
+    // One more thing: The items inserted may have sub-items, that we totally
+    // missed so far! So, process them recursively, treat every inserted item
+    // as a parent.
+    for (int i = first; i <= last; i++)
+    {
+        auto sourceIndex = sourceModel()->index(first, 0, sourceParent);
+        if (!sourceIndex.isValid()) continue;
+
+        int childCount = sourceModel()->rowCount(sourceIndex);
+        if (childCount > 0)
+        {
+            onSourceRowsAboutToBeInserted(sourceIndex, 0, childCount-1);
+            onSourceRowsInserted(sourceIndex, 0, childCount-1);
+        }
+    }
+
+//    qDebug() << "after insert " << parents_;
 }
 
 
@@ -263,6 +280,8 @@ void FlattenTreeProxyModel::onSourceRowsAboutToBeRemoved(
         const QModelIndex& sourceParent,
         int first, int last)
 {
+//    qDebug() << "before remove " << parents_;
+
     // in order to get valid indices here we do all this in the
     // *AboutToBe*-removed method!
     auto sourceFirst = sourceModel()->index(first, 0, sourceParent);
@@ -322,6 +341,8 @@ void FlattenTreeProxyModel::onSourceRowsRemoved(
 
 
     endRemoveRows();
+
+//    qDebug() << "after remove " << parents_;
 }
 
 
