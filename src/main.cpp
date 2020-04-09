@@ -20,6 +20,11 @@
 #include <sempr/component/TripleVector.hpp>
 #include <sempr/component/TriplePropertyMap.hpp>
 #include <sempr/component/AffineTransform.hpp>
+#include <sempr/component/GeosGeometry.hpp>
+
+#include <geos/geom/Geometry.h>
+#include <geos/geom/GeometryFactory.h>
+#include <geos/io/WKTReader.h>
 
 #include <rete-reasoner/Reasoner.hpp>
 #include <rete-reasoner/RuleParser.hpp>
@@ -93,6 +98,18 @@ int main(int argc, char** args)
     // start the gui
     std::thread gui_thread(&runGUI, argc, args, connection);
 
+    // add an entity with a geometry
+    auto geoEntity = Entity::create();
+    // create a geos geometry
+    const geos::geom::GeometryFactory& factory = *geos::geom::GeometryFactory::getDefaultInstance();
+    geos::io::WKTReader reader(factory);
+    // with 4 coordinates (coord[0] == coord[3])
+    auto geosGeometry = reader.read("POLYGON((8.020405035544446 52.26796266283766,8.04975913100343 52.290857976112314,8.07670996718507 52.26554641241761,8.020405035544446 52.26796266283766))");
+    auto geometryComponent = std::make_shared<GeosGeometry>(geosGeometry);
+
+    geoEntity->addComponent(geometryComponent);
+    sempr.addEntity(geoEntity);
+
     // add an entity to test updating the gui
     auto entity = Entity::create();
     auto affine = std::make_shared<AffineTransform>();
@@ -102,6 +119,7 @@ int main(int argc, char** args)
         std::lock_guard<std::mutex> lg(semprMutex);
         sempr.addEntity(entity);
     }
+
 
 
     // just for testing:

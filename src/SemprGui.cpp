@@ -22,6 +22,9 @@ SemprGui::SemprGui(AbstractInterface::Ptr interface)
     form_.tabTriplePropertyMap->setModel(&dataModel_);
     form_.tabTriplePropertyMap->setSelectionModel(selectionModel);
 
+    // setup the GeoMapWidget
+    form_.geoMapWidget->setup(&dataModel_);
+
     // connection to hide/show tabs depending on selected component type
     connect(form_.tabRawComponent, &UsefulWidget::isUseful,
             this, &SemprGui::updateTabStatus);

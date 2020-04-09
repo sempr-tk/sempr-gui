@@ -37,7 +37,9 @@ set(GUI_SRC
     src/DirectConnectionNode.cpp
     src/DirectConnectionBuilder.cpp
     src/FlattenTreeProxyModel.cpp
+    src/GeometryFilterProxyModel.cpp
     src/GeoMapWidget.cpp
+    src/GeosQCoordinateTranform.cpp
     src/SemprGui.cpp
     src/RawComponentWidget.cpp
     src/RoleNameProxyModel.cpp
