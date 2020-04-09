@@ -36,6 +36,7 @@ set(GUI_SRC
     src/DirectConnection.cpp
     src/DirectConnectionNode.cpp
     src/DirectConnectionBuilder.cpp
+    src/FlattenTreeProxyModel.cpp
     src/GeoMapWidget.cpp
     src/SemprGui.cpp
     src/RawComponentWidget.cpp
