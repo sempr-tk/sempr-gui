@@ -1,7 +1,7 @@
-import QtQuick 2.0
-import QtLocation 5.6
-import QtPositioning 5.6
-import QtQuick 2.7
+import QtQml 2.2
+import QtQuick 2.9
+import QtLocation 5.9
+import QtPositioning 5.8
 import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
 
@@ -23,6 +23,19 @@ Item {
 
         // The Map. Obviously.
         Map {
+            // a small button to reset the view to the visible items
+            Button {
+                text: "reset view"
+                onClicked: {
+                    map.fitViewportToVisibleMapItems()
+                    if (!map.visibleChildren)
+                    {
+                        text: "nothing to display"
+                    }
+                }
+            }
+
+            id: map
             // Layout parameters that are used by the ColumnLayout
             Layout.preferredWidth: 200
             Layout.preferredHeight: 200
@@ -35,6 +48,19 @@ Item {
             center: QtPositioning.coordinate(52.283, 8.050)
             zoomLevel: 14
 
+            // since MapItemView does not work with MapItemGroups... :(
+            Instantiator {
+                model: geometryModel
+                delegate: CoordinateDelegate {}
+
+                onObjectAdded: {
+                    map.addMapItemGroup(object)
+                }
+                onObjectRemoved: {
+                    map.removeMapItemGroup(object)
+                }
+            }
+
             // This map view is responsible to display the data that is stored
             // in a model on the c++ side here in the qml map widget.
             // It creates a delegate for every data entry it gets, and this
@@ -46,11 +72,12 @@ Item {
             // specific delegates), and I guess on the c++ side I'll implement
             // different filer models that just pass the corresponding object
             // types and provide the methods for manipulating the data.
+            /*
             MapItemView {
                 // The "circle_model" variable is not defined in the qml. It
                 // is bound to the actual model in the c++ code before loading
                 // this qml file. Look for a "setContextProperty" call.
-                model: circle_model
+                model: geometryModel
 
                 // The definition of the delegate to use. In this (debug) case
                 // all we want is circles.
@@ -66,7 +93,7 @@ Item {
                     // enough, as qml creates a binding here so that the center
                     // variable is updated whenever model.coordinate_foo
                     // changes.
-                    center: model.coordinate_foo
+                    center: model.coordinates[1]
                     radius: 100.0
                     color: 'green'
                     border.width: 3
@@ -85,9 +112,10 @@ Item {
                         // and a display value. The TextInput allows changing
                         // the latter.
                         TextInput {
-                            text: model.display
+                            text: model.json
                             anchors.verticalCenter: parent.verticalCenter
                             anchors.horizontalCenter: parent.horizontalCenter
+
                             onEditingFinished: {
                                 // Normally, this would be the way to handle
                                 // changing the model, as it would automatically
@@ -101,8 +129,8 @@ Item {
                                 // So instead, we need to call
                                 // circle_model.setData(index, data, role)
                                 // directly:
-                                var modelIndex = circle_model.index(index, 0)
-                                var role = circle_model.roleId("display")
+                                var modelIndex = geometryModel.index(index, 0)
+                                var role = geometryModel.roleId("json")
                                 circle_model.setData(modelIndex, text, role)
                                 console.log("onEditingFinished - " + text)
                             }
@@ -120,7 +148,7 @@ Item {
                         }
                     }
                 }
-            }
+            }*/
         }
     }
 }

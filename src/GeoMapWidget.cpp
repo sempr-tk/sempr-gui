@@ -26,7 +26,7 @@ void GeoMapWidget::setup(QAbstractItemModel* model)
     form_.listView->setModel(&geometryProxy_);
 
     // make the model known before loading the qml
-    //rm_.quickWidget->rootContext()->setContextProperty("circle_model", circleProxy_);
+    form_.quickWidget->rootContext()->setContextProperty("geometryModel", &geometryProxy_);
     // load the qml
     //form_.quickWidget->setSource(QUrl::fromLocalFile(":/geomap.qml"));
     form_.quickWidget->setSource(QUrl::fromLocalFile("/home/nils/sempr-gui/ui/geomap.qml"));
