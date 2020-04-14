@@ -7,6 +7,14 @@ namespace sempr { namespace gui {
 GeometryFilterProxyModel::GeometryFilterProxyModel(QObject* parent)
     : QSortFilterProxyModel(parent)
 {
+    /*
+        From the Qt documentation:
+
+        > Note that you should not update the source model through the proxy model when dynamicSortFilter is true.
+        > [...]
+        > The default value is true.
+    */
+    this->setDynamicSortFilter(false);
 }
 
 std::shared_ptr<GeosGeometryInterface> GeometryFilterProxyModel::geomPointerFromIndex(const QModelIndex& index)
@@ -24,6 +32,7 @@ std::shared_ptr<GeosGeometryInterface> GeometryFilterProxyModel::geomPointerFrom
     }
     return nullptr;
 }
+
 
 
 bool GeometryFilterProxyModel::filterAcceptsRow(
