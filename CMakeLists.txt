@@ -51,6 +51,13 @@ set(GUI_SRC
     src/UsefulWidget.cpp
     src/main.cpp
     ui/main.ui
+    ui/raw_component.ui
+    ui/triplecontainer.ui
+    ui/triplepropertymap.ui
+    ui/triplevector.ui
+    ui/geomap.qml
+    ui/geomap.ui
+    ui/CoordinateDelegate.qml
     qrc/resources.qrc
 )
 
