@@ -17,7 +17,8 @@ void ReadCoordinates::read(const geos::geom::CoordinateSequence& sequence)
         auto& coordinate = sequence.getAt(i);
         coordinates_.push_back(
             QVariant::fromValue(
-                QGeoCoordinate(coordinate.x, coordinate.y, coordinate.z)
+                //                  lat         long        alt
+                QGeoCoordinate(coordinate.y, coordinate.x, coordinate.z)
             )
         );
     }
