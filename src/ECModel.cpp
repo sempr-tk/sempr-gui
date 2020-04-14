@@ -467,4 +467,19 @@ QModelIndex ECModel::parent(const QModelIndex& index) const
     return createIndex(row, 0, quintptr(0));
 }
 
+
+
+QHash<int, QByteArray> ECModel::roleNames() const
+{
+    auto hash = QAbstractItemModel::roleNames();
+    hash[Role::ComponentIdRole] = "componentId";
+    hash[Role::ComponentJsonRole] = "json";
+    hash[Role::ComponentMutableRole] = "isMutable";
+    hash[Role::ComponentPtrRole] = "component";
+    hash[Role::EntityIdRole] = "entityId";
+    hash[Role::ModelEntryRole] = "modelEntry";
+
+    return hash;
+}
+
 }}

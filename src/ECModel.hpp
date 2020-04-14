@@ -131,6 +131,7 @@ public:
     int columnCount(const QModelIndex& parent) const override;
     QModelIndex index(int row, int col, const QModelIndex& parent) const override;
     QModelIndex parent(const QModelIndex& index) const override;
+    QHash<int, QByteArray> roleNames() const override;
 
 public slots:
     /**
