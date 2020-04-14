@@ -201,9 +201,10 @@ void FlattenTreeProxyModel::onSourceDataChanged(
     for (int sourceRow = tl.row(); sourceRow <= br.row(); sourceRow++)
     {
         auto proxyTL = mapFromSource(tl.sibling(sourceRow, tl.column()));
-        auto proxyBR = proxyTL.sibling(sourceRow, br.column());
+        auto proxyBR = proxyTL.sibling(proxyTL.row(), br.column());
 
         emit dataChanged(proxyTL, proxyBR, roles);
+//        qDebug() << "FlattenTreeProxyModel onSourceDataChanged" << proxyTL << proxyBR << roles;
     }
 }
 
