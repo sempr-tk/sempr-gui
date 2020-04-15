@@ -48,10 +48,18 @@ Item {
             center: QtPositioning.coordinate(52.283, 8.050)
             zoomLevel: 14
 
-            // since MapItemView does not work with MapItemGroups... :(
+            // since MapItemView does not work with MapItemGroups, an Instantiator is used as
+            // a workaround
             Instantiator {
                 model: geometryModel
-                delegate: PolygonDelegate {}
+                delegate: Loader {
+                    source:
+                        // here we select what type of delegate we want
+                        if (model.geometryType === "Polygon")
+                            return "PolygonDelegate.qml"
+                        else
+                            return "CoordinateDelegate.qml"
+                }
 
                 onObjectAdded: {
                     map.addMapItemGroup(object)

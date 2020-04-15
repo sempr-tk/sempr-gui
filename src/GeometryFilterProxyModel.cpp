@@ -61,6 +61,16 @@ QVariant GeometryFilterProxyModel::data(const QModelIndex& index, int role) cons
             return filter.coordinates();
         }
     }
+    else if (role == Role::GeosGeometryTypeRole)
+    {
+        auto sourceIndex = this->mapToSource(index);
+        auto geo = GeometryFilterProxyModel::geomPointerFromIndex(sourceIndex);
+        if (geo && geo->geometry())
+        {
+            std::string type = geo->geometry()->getGeometryType();
+            return QString::fromStdString(type);
+        }
+    }
 
     return QSortFilterProxyModel::data(index, role);
 }
@@ -148,6 +158,7 @@ QHash<int, QByteArray> GeometryFilterProxyModel::roleNames() const
 {
     auto names = QSortFilterProxyModel::roleNames();
     names[Role::CoordinatesRole] = "coordinates";
+    names[Role::GeosGeometryTypeRole] = "geometryType";
     return names;
 }
 

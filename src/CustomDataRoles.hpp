@@ -18,7 +18,9 @@ enum Role {
     ComponentMutableRole,        // ro: bool isComponentMutable
     ModelEntryRole,              // ro: whole ModelEntry
     // provided by the GeometryFilterProxyModel:
-    CoordinatesRole              // rw: coordinates of the geos::geom::Geometry
+    CoordinatesRole,             // rw: coordinates of the geos::geom::Geometry
+    GeosGeometryTypeRole,        // ro: the type of the GeosGeometry
+    LastRole
 };
 
 
