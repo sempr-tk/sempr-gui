@@ -58,6 +58,7 @@ set(GUI_SRC
     ui/geomap.qml
     ui/geomap.ui
     ui/CoordinateDelegate.qml
+    ui/PolygonDelegate.qml
     qrc/resources.qrc
 )
 

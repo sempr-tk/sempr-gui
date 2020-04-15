@@ -51,7 +51,7 @@ Item {
             // since MapItemView does not work with MapItemGroups... :(
             Instantiator {
                 model: geometryModel
-                delegate: CoordinateDelegate {}
+                delegate: PolygonDelegate {}
 
                 onObjectAdded: {
                     map.addMapItemGroup(object)
