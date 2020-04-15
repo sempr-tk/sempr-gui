@@ -91,6 +91,16 @@ void SemprGui::logUpdate(const ECData& entry, const QString& mod)
     form_.historyList->insertTopLevelItem(0, item);
 }
 
+void SemprGui::logError(const QString& what)
+{
+    int num = form_.errorList->topLevelItemCount();
+    QTreeWidgetItem* item = new QTreeWidgetItem();
+    item->setText(0, QString::number(num));
+    item->setText(1, what);
+    form_.errorList->insertTopLevelItem(0, item);
+}
+
+
 void SemprGui::updateTabStatus(UsefulWidget* widget, bool visible)
 {
     if (visible)

@@ -42,7 +42,9 @@ bool ModelEntry::setJSON(const std::string& json)
     } catch (cereal::Exception& e) {
         std::cerr << "ModelEntry::setJSON: " << e.what() << std::endl;
         component_ = nullptr;
-        return false;
+        //return false;
+        // let the ECModel handle this.
+        throw;
     }
 
     return true;
@@ -63,6 +65,8 @@ void ModelEntry::componentPtrChanged()
     } catch (cereal::Exception& e) {
         std::cerr << "ModelEntry::setJSON: " << e.what() << std::endl;
         componentJSON_ = "";
+        // let the ECModel handle this.
+        throw;
     }
 }
 

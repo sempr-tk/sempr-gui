@@ -37,6 +37,11 @@ private slots:
     void logUpdate(const sempr::gui::ECData&,
                    const QString&);
 
+    /**
+        Adds an entry to the error list
+    */
+    void logError(const QString&);
+
 public:
     SemprGui(AbstractInterface::Ptr interface);
     ~SemprGui();

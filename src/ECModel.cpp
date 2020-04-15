@@ -230,7 +230,12 @@ void ECModel::reset()
         {
             if (entry.isModified())
             {
-                entry.setJSON(entry.coreData_.componentJSON);
+                try {
+                    entry.setJSON(entry.coreData_.componentJSON);
+                } catch (std::exception& e) {
+                    emit error(e.what());
+                }
+
                 auto index = findEntry(entry);
                 emit dataChanged(index, index);
             }
@@ -359,7 +364,12 @@ bool ECModel::setData(const QModelIndex& index, const QVariant& value, int role)
     auto& entry = data_[index.parent().row()].entries_[index.row()];
     if (role == Role::ComponentJsonRole && value.canConvert<QString>())
     {
-        entry.setJSON(value.value<QString>().toStdString());
+        try {
+            entry.setJSON(value.value<QString>().toStdString());
+        } catch (std::exception& e) {
+            emit error(e.what());
+        }
+
         emit dataChanged(index, index);
         return true;
     }
@@ -373,7 +383,12 @@ bool ECModel::setData(const QModelIndex& index, const QVariant& value, int role)
         if (ptr == entry.component_)
         {
             // only on pointer-equality, do something.
-            entry.componentPtrChanged();
+            try {
+                entry.componentPtrChanged();
+            } catch (std::exception& e) {
+                emit error(e.what());
+            }
+
             emit dataChanged(index, index);
             return true;
         }

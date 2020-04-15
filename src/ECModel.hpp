@@ -100,6 +100,9 @@ signals:
     void gotEntryUpdate(const sempr::gui::ECData&);
     void gotEntryRemove(const sempr::gui::ECData&);
 
+    // signal exceptions/errors, e.g. when parsing json
+    void error(const QString& what);
+
 private slots:
     /**
         Adds a model entry to the internal vector structure, created from
