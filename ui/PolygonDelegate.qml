@@ -14,7 +14,7 @@ CoordinateDelegate {
             property var lastPath: null
             anchors.fill: parent
             drag.target: parent
-            drag.axis: (model.isMutable ? Drag.XAndYAxis : Drag.None)
+            drag.axis: (model.isMutable && boxAllowEditing.checked ? Drag.XAndYAxis : Drag.None)
             drag.smoothed: false
 
             drag.onActiveChanged: {

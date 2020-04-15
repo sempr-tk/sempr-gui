@@ -6,7 +6,7 @@ import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
 
 Item {
-    objectName: "geoWidget"
+    id: geoWidget
 
     // The plugin definition we want to use for the map.
     // "osm" is OpenStreetMap, which is the only one you don't need any other
@@ -16,57 +16,85 @@ Item {
         name: "osm"
     }
 
-    // The ColumnLayout is just used to be able to add some debug stuff
-    // below the map.
-    ColumnLayout {
+    // The Map. Obviously.
+    Map {
+        id: map
         anchors.fill: parent
 
-        // The Map. Obviously.
-        Map {
-            // a small button to reset the view to the visible items
-            Button {
-                text: "reset view"
-                onClicked: {
-                    map.fitViewportToVisibleMapItems()
-                    if (!map.visibleChildren)
-                    {
-                        text: "nothing to display"
-                    }
-                }
+        // specify the plugin to use
+        plugin : mapPlugin
+        // on startup: center the view on osnabrück
+        center: QtPositioning.coordinate(52.283, 8.050)
+        zoomLevel: 14
+
+        // since MapItemView does not work with MapItemGroups, an Instantiator is used as
+        // a workaround
+
+        Instantiator {
+            model: geometryModel
+            delegate: Loader {
+                source:
+                    // here we select what type of delegate we want
+                    if (model.geometryType === "Polygon")
+                        return "PolygonDelegate.qml"
+                    else
+                        return "CoordinateDelegate.qml"
             }
 
-            id: map
-            // Layout parameters that are used by the ColumnLayout
-            Layout.preferredWidth: 200
-            Layout.preferredHeight: 200
-            Layout.fillWidth: true
-            Layout.fillHeight: true
+            onObjectAdded: {
+                map.addMapItemGroup(object)
+            }
+            onObjectRemoved: {
+                map.removeMapItemGroup(object)
+            }
+        }
+    } // map
 
-            // specify the plugin to use
-            plugin : mapPlugin
-            // on startup: center the view on osnabrück
-            center: QtPositioning.coordinate(52.283, 8.050)
-            zoomLevel: 14
+    // some controls, overlaying the map:
+    ColumnLayout {
+        // a button to reset the view to the visible items
+        Button {
+            id: btnResetView
+            text: "reset view"
+            font.pointSize: 10
 
-            // since MapItemView does not work with MapItemGroups, an Instantiator is used as
-            // a workaround
-            Instantiator {
-                model: geometryModel
-                delegate: Loader {
-                    source:
-                        // here we select what type of delegate we want
-                        if (model.geometryType === "Polygon")
-                            return "PolygonDelegate.qml"
-                        else
-                            return "CoordinateDelegate.qml"
+            onClicked: {
+                map.fitViewportToVisibleMapItems()
+                if (!map.visibleChildren)
+                {
+                    text: "nothing to display"
                 }
+            }
+        }
 
-                onObjectAdded: {
-                    map.addMapItemGroup(object)
-                }
-                onObjectRemoved: {
-                    map.removeMapItemGroup(object)
-                }
+        // a checkbox to toggle whether the vertex-circles shall be visible
+        CheckBox {
+            id: boxShowVertices
+            text: "show vertices"
+            font.pointSize: 10
+            checked: true
+        }
+
+        // a checkbox to globally disable editing
+        CheckBox {
+            id: boxAllowEditing
+            text: "allow editing"
+            font.pointSize: 10
+            checked: false
+        }
+
+        // a slider to control the vertex circles size
+        Slider {
+            id: sliderVertexSize
+            from: 1
+            to: 1000
+            value: 100
+            Text {
+                text: "vertex size"
+                font.pointSize: 10
+                anchors.left: parent.left
+                anchors.leftMargin: parent.leftPadding
+                anchors.bottom: parent.bottom
             }
         }
     }

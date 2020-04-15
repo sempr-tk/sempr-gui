@@ -21,10 +21,6 @@ void GeoMapWidget::setup(QAbstractItemModel* model)
     // connect the role name proxy
     roleNamesProxy_.setSourceModel(&geometryProxy_);
 
-
-    // debug: connect a list view
-    form_.listView->setModel(&roleNamesProxy_);
-
     // make the model known before loading the qml
     form_.quickWidget->rootContext()->setContextProperty("geometryModel", &roleNamesProxy_);
     // load the qml

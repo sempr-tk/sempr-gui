@@ -14,15 +14,15 @@ MapItemGroup {
         model: item.coordinates
         delegate: MapCircle {
             center: modelData
-            radius: 100.0
+            radius: sliderVertexSize.value
             color: "green"
             opacity: 0.5
-            visible: true
+            visible: boxShowVertices.checked
             parent: coordDelegate
             MouseArea {
                 anchors.fill: parent
                 drag.target: parent
-                drag.axis: (item.isMutable ? Drag.XAndYAxis : Drag.None)
+                drag.axis: (item.isMutable && boxAllowEditing.checked ? Drag.XAndYAxis : Drag.None)
                 drag.smoothed: false
 
                 drag.onActiveChanged: {

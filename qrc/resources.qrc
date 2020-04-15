@@ -1,5 +1,6 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
     <file alias="geomap.qml">../ui/geomap.qml</file>
+    <file alias="qtquickcontrols2.conf">../ui/qtquickcontrols2.conf</file>
 </qresource>
 </RCC>
