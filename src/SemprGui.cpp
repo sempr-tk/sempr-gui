@@ -55,6 +55,9 @@ SemprGui::SemprGui(AbstractInterface::Ptr interface)
                 this->logUpdate(entry, "UPD");
             });
 
+    // log errors
+    connect(&dataModel_, &ECModel::error, this, &SemprGui::logError);
+
     // hide all tabs in the beginning, as no data is selected yet.
     updateTabStatus(form_.tabRawComponent, false);
     updateTabStatus(form_.tabTripleContainer, false);
