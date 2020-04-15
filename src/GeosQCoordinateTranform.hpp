@@ -38,6 +38,23 @@ public:
 };
 
 
+/**
+    A coordinate filter that replaces the coordinate sequence of a geometry
+    with the given one.
+*/
+class WriteCoordinates : public geos::geom::CoordinateSequenceFilter {
+    QList<QGeoCoordinate> coordinates_;
+    bool done_;
+public:
+    WriteCoordinates(const QList<QGeoCoordinate>& coordinates);
+
+    void filter_rw(geos::geom::CoordinateSequence&, size_t index) override;
+    void filter_ro(const geos::geom::CoordinateSequence&, size_t index) override;
+    bool isDone() const override;
+    bool isGeometryChanged() const override;
+};
+
+
 }}
 
 #endif /* include guard: SEMPR_GUI_GEOSQCOORDINATETRANSFORM_HPP_ */

@@ -5,6 +5,10 @@
 
 namespace sempr { namespace gui {
 
+
+// -------------------------------------------------------------------------
+// ReadCoordinates
+// -------------------------------------------------------------------------
 ReadCoordinates::ReadCoordinates()
     : done_(false)
 {
@@ -55,6 +59,43 @@ void ReadCoordinates::reset()
 {
     coordinates_.clear();
     done_ = false;
+}
+
+// -------------------------------------------------------------------------
+// WriteCoordinates
+// -------------------------------------------------------------------------
+WriteCoordinates::WriteCoordinates(const QList<QGeoCoordinate>& coordinates)
+    : coordinates_(coordinates), done_(false)
+{
+}
+
+void WriteCoordinates::filter_ro(const geos::geom::CoordinateSequence&, size_t)
+{
+    // wtf are you doing?!
+    throw std::exception();
+}
+
+void WriteCoordinates::filter_rw(geos::geom::CoordinateSequence& sequence, size_t)
+{
+    std::vector<geos::geom::Coordinate> points;
+    for (auto& qcoord : coordinates_)
+    {
+        geos::geom::Coordinate coord(qcoord.longitude(), qcoord.latitude(), qcoord.altitude());
+        points.push_back(coord);
+    }
+
+    sequence.setPoints(points);
+    done_ = true;
+}
+
+bool WriteCoordinates::isDone() const
+{
+    return done_;
+}
+
+bool WriteCoordinates::isGeometryChanged() const
+{
+    return true;
 }
 
 

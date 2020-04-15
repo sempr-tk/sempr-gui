@@ -22,7 +22,7 @@ MapItemGroup {
             MouseArea {
                 anchors.fill: parent
                 drag.target: parent
-                drag.axis: Drag.XAndYAxis
+                drag.axis: (item.isMutable ? Drag.XAndYAxis : Drag.None)
                 drag.smoothed: false
 
                 drag.onActiveChanged: {
@@ -30,7 +30,7 @@ MapItemGroup {
                     {
                         // drop. update coordinate
                         console.log("coord index ", index, "val", center)
-                        var modelIndex = geometryModel.index(index, 0)
+                        var modelIndex = geometryModel.index(coordDelegate.index, 0)
                         var role = geometryModel.roleId("coordinates")
 
                         // copy
@@ -42,7 +42,7 @@ MapItemGroup {
                         {
                             // edge case, also update the other index
                             var otherIndex = (coordInstantiator.count-1) - index
-                            coords[index] = parent.center
+                            coords[otherIndex] = coords[index]
                         }
                         var ok = geometryModel.setData(modelIndex, coords, role)
 

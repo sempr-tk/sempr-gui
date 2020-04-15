@@ -2,6 +2,8 @@ import QtQuick 2.0
 import QtLocation 5.9
 
 CoordinateDelegate {
+    firstEqualsLast: true
+
     MapPolygon {
         path: model.coordinates
         color: "green"
@@ -12,7 +14,7 @@ CoordinateDelegate {
             property var lastPath: null
             anchors.fill: parent
             drag.target: parent
-            drag.axis: Drag.XAndYAxis
+            drag.axis: (model.isMutable ? Drag.XAndYAxis : Drag.None)
             drag.smoothed: false
 
             drag.onActiveChanged: {

@@ -36,7 +36,7 @@ public:
         of its type.
     */
     QVariant data(const QModelIndex& index, int role) const override;
-    //bool setData(const QModelIndex& index, const QVariant& value, int role) override;
+    bool setData(const QModelIndex& index, const QVariant& value, int role) override;
 };
 
 }}
