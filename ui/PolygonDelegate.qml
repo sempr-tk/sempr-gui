@@ -6,8 +6,8 @@ CoordinateDelegate {
 
     MapPolygon {
         path: model.coordinates
-        color: "green"
-        opacity: 0.2
+        color: "#60008000" // semi-transparent color
+        opacity: 1
 
         // enable shifting of the whole polygon
         MouseArea {
@@ -30,9 +30,7 @@ CoordinateDelegate {
                     var modelIndex = geometryModel.index(index, 0)
                     var role = geometryModel.roleId("coordinates")
                     var ok = geometryModel.setData(modelIndex, parent.path, role)
-                    if (ok)
-                        console.log("set polygon coordinates to:", path)
-                    else
+                    if (!ok)
                     {
                         console.log("failed setting coordinates")
                         parent.path = lastPath

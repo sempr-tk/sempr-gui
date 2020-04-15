@@ -16,7 +16,7 @@ MapItemGroup {
             center: modelData
             radius: 100.0
             color: "green"
-            opacity: 1
+            opacity: 0.5
             visible: true
             parent: coordDelegate
             MouseArea {
