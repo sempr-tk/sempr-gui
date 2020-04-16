@@ -107,7 +107,11 @@ int main(int argc, char** args)
     auto geosGeometry = reader.read("POLYGON((8.020405035544446 52.26796266283766,8.04975913100343 52.290857976112314,8.07670996718507 52.26554641241761,8.020405035544446 52.26796266283766))");
     auto geometryComponent = std::make_shared<GeosGeometry>(geosGeometry);
 
+    auto geosGeometry2 = reader.read("POLYGON((8.020405035544446 52.26796266283766,8.04975913100343 52.290857976112314,8.07670996718507 52.26554641241761,8.020405035544446 52.26796266283766))");
+    auto geometryComponent2 = std::make_shared<GeosGeometry>(geosGeometry2);
+
     geoEntity->addComponent(geometryComponent);
+    geoEntity->addComponent(geometryComponent2);
     sempr.addEntity(geoEntity);
 
     // add an entity to test updating the gui
