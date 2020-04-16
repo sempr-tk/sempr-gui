@@ -3,6 +3,7 @@ import QtLocation 5.9
 
 CoordinateDelegate {
     firstEqualsLast: true
+    minCoordinates: 4 // 3 unique, but last == first to close the ring
 
     MapPolygon {
         path: model.coordinates
