@@ -7,6 +7,7 @@
 #include <string>
 #include <functional>
 #include <memory>
+#include <mutex>
 
 //#include "ModelEntry.hpp"
 
@@ -90,18 +91,22 @@ public:
         Sets a callback that is triggered whenever an entity-component-pair
         in the core changes
     */
-    virtual void setUpdateCallback(callback_t) = 0;
+    void setUpdateCallback(callback_t);
 
     /**
         Removes the currently set callback
     */
-    virtual void clearUpdateCallback() = 0;
+    void clearUpdateCallback();
 
     /**
         Calls the internally stored callback
     */
-    virtual void triggerCallback(callback_t::first_argument_type,
-                                 callback_t::second_argument_type) = 0;
+    void triggerCallback(callback_t::first_argument_type,
+                                 callback_t::second_argument_type);
+
+private:
+    std::mutex callbackMutex_;
+    callback_t callback_;
 };
 
 

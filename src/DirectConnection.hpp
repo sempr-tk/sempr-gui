@@ -27,11 +27,6 @@ public:
     void addEntityComponentPair(const ECData&) override;
     void removeEntityComponentPair(const ECData&) override;
     void modifyEntityComponentPair(const ECData&) override;
-
-    void setUpdateCallback(callback_t) override;
-    void clearUpdateCallback() override;
-    void triggerCallback(callback_t::first_argument_type,
-                         callback_t::second_argument_type) override;
 };
 
 
