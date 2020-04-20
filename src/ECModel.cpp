@@ -244,11 +244,26 @@ void ECModel::addComponent(const ModelEntry& entry)
 {
     ECData data;
     data.entityId = entry.entityId();
-    data.componentId = entry.componentId();
     data.componentJSON = entry.json();
 
     semprInterface_->addEntityComponentPair(data);
 }
+
+void ECModel::addComponent(Component::Ptr component, const std::string& entityId)
+{
+    ECData data;
+    data.entityId = entityId;
+
+    std::stringstream ss;
+    {
+        cereal::JSONOutputArchive ar(ss);
+        ar(component);
+    }
+    data.componentJSON = ss.str();
+
+    semprInterface_->addEntityComponentPair(data);
+}
+
 
 void ECModel::removeComponent(const ModelEntry& entry)
 {
@@ -288,11 +303,12 @@ QVariant ECModel::data(const QModelIndex& index, int role) const
     // Qt::DisplayRole.
     if (!parent.isValid())
     {
-        if (role == Qt::DisplayRole)
+        if (role == Qt::DisplayRole || role == Role::EntityIdRole)
         {
             // top level -> entity id
             return QString::fromStdString(data_[index.row()].entityId_);
         }
+
         // no other roles served for top level items.
         return QVariant();
     }

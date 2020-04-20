@@ -103,7 +103,7 @@ signals:
     // signal exceptions/errors, e.g. when parsing json
     void error(const QString& what);
 
-private slots:
+public slots:
     /**
         Adds a model entry to the internal vector structure, created from
         the ECData given.
@@ -138,6 +138,9 @@ public:
 
 public slots:
     /**
+        Note: Unused so far. Rather look at
+              addComponent(Component::Ptr, const std::string&).
+
         Adds a component to an entity as specified in the ModelEntry,
         only remotely!
         The entityId is used to find the entity where the component needs to
@@ -145,6 +148,13 @@ public slots:
         component. All other field are discarded.
     */
     void addComponent(const ModelEntry&);
+
+    /**
+        Adds a component to an entity directly on the remote side.
+        Convenience method, creates a json representation of the component
+        and fills a ModelEntry.
+    */
+    void addComponent(Component::Ptr component, const std::string& entityId);
 
     /**
         Uses the componentId and the entityId to remove the component from the
@@ -156,6 +166,7 @@ public slots:
         Shortcut for removeComponent(ModelEntry) and addComponent(ModelEntry).
     */
     void updateComponent(const ModelEntry&);
+
 
     /**
         Sends all updates for all modified entries to the sempr core

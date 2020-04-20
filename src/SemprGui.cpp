@@ -30,6 +30,10 @@ SemprGui::SemprGui(AbstractInterface::Ptr interface)
     // setup the GeoMapWidget
     form_->geoMapWidget->setup(&dataModel_, selectionModel);
 
+    // setup component adder
+    form_->componentAdder->setModel(&dataModel_);
+    form_->componentAdder->setSelectionModel(selectionModel);
+
     // connection to hide/show tabs depending on selected component type
     connect(form_->tabRawComponent, &UsefulWidget::isUseful,
             this, &SemprGui::updateTabStatus);
@@ -74,6 +78,8 @@ SemprGui::SemprGui(AbstractInterface::Ptr interface)
             form_->tabWidget, &QWidget::setVisible);
     connect(form_->boxShowOSM, &QCheckBox::stateChanged,
             form_->geoMapWidget, &QWidget::setVisible);
+    connect(form_->boxShowCreator, &QCheckBox::stateChanged,
+            form_->componentAdder, &QWidget::setVisible);
 
     // connect the reset and commit buttons to the model
     connect(form_->btnReset, &QPushButton::clicked,

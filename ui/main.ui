@@ -100,6 +100,16 @@ selection-color: black;
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="boxShowCreator">
+         <property name="text">
+          <string>show component creator</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QTreeWidget" name="historyList">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -183,6 +193,16 @@ selection-color: black;
         </widget>
        </item>
        <item>
+        <widget class="sempr::gui::ComponentAdderWidget" name="componentAdder" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QTreeWidget" name="errorList">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
@@ -257,6 +277,12 @@ selection-color: black;
    <class>sempr::gui::ColoredBranchTreeView</class>
    <extends>QTreeView</extends>
    <header>../src/ColoredBranchTreeView.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>sempr::gui::ComponentAdderWidget</class>
+   <extends>QWidget</extends>
+   <header>../src/ComponentAdderWidget.hpp</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

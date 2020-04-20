@@ -47,6 +47,7 @@ set(GUI_SRC
     src/ECModel.cpp
     src/ModelEntry.cpp
     src/ColoredBranchTreeView.cpp
+    src/ComponentAdderWidget.cpp
     src/DirectConnection.cpp
     src/DirectConnectionNode.cpp
     src/DirectConnectionBuilder.cpp
@@ -70,6 +71,7 @@ set(GUI_SRC
     ui/triplecontainer.ui
     ui/triplepropertymap.ui
     ui/triplevector.ui
+    ui/componentadderwidget.ui
     ui/geomap.qml
     ui/geomap.ui
     ui/CoordinateDelegate.qml
