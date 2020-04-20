@@ -2,13 +2,17 @@ import QtQuick 2.0
 import QtLocation 5.9
 
 CoordinateDelegate {
+    id: coordDelegate
     firstEqualsLast: true
     minCoordinates: 4 // 3 unique, but last == first to close the ring
 
     MapPolygon {
+        id: poly
         path: model.coordinates
-        color: "#60008000" // semi-transparent color
+        color: (isCurrentItem ? "#60808000" : "#60008000") // semi-transparent color
         opacity: 1
+
+
 
         // enable shifting of the whole polygon
         MouseArea {
@@ -17,6 +21,9 @@ CoordinateDelegate {
             drag.target: parent
             drag.axis: (model.isMutable && boxAllowEditing.checked ? Drag.XAndYAxis : Drag.None)
             drag.smoothed: false
+
+            onClicked: geoWidget.geometryDelegateClicked(coordDelegate.geometryIndex)
+            //onPressed: geoWidget.geometryDelegateClicked(coordDelegate.geometryIndex)
 
             drag.onActiveChanged: {
                 if (drag.active)

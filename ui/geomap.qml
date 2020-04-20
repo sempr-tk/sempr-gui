@@ -8,6 +8,9 @@ import QtQuick.Layouts 1.3
 Item {
     id: geoWidget
 
+    // to be emitted when some map delegate was clicked
+    signal geometryDelegateClicked(int index)
+
     // The plugin definition we want to use for the map.
     // "osm" is OpenStreetMap, which is the only one you don't need any other
     // parameters for.

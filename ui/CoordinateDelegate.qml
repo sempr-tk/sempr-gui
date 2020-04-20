@@ -13,6 +13,17 @@ MapItemGroup {
     // prevents removing too many coordinates
     property int minCoordinates: 2
 
+    property bool isCurrentItem: false
+
+    Connections {
+        target: GeoMapWidget // set as root context property in c++
+        onCurrentRowChanged: { // ignore the warning, this is just because the editor doesn't know GeoMapWidget and its signals.
+            if (currentProxyIndex.row === coordDelegate.geometryIndex)
+                isCurrentItem = true
+            else isCurrentItem = false
+        }
+    }
+
     // create the handle that allows us to modify the existing coordinate
     Instantiator {
         id: coordInstantiator
@@ -20,13 +31,18 @@ MapItemGroup {
         delegate: MapCircle {
             center: modelData
             radius: sliderVertexSize.value
-            color: "green"
+            color: (isCurrentItem ? "yellow" : "green")
             opacity: 0.5
             visible: boxShowVertices.checked
             parent: coordDelegate
+
             MouseArea {
                 anchors.fill: parent
                 acceptedButtons: Qt.LeftButton
+
+                onClicked: geoWidget.geometryDelegateClicked(coordDelegate.geometryIndex)
+                //onPressed: geoWidget.geometryDelegateClicked(coordDelegate.geometryIndex)
+
                 drag.target: parent
                 drag.axis: (item.isMutable && boxAllowEditing.checked ? Drag.XAndYAxis : Drag.None)
                 drag.smoothed: false
