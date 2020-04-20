@@ -3,14 +3,29 @@
 #include <thread>
 #include <chrono>
 
-int main()
-{
-    sempr::gui::TCPConnectionClient client;
-    client.connect("tcp://localhost:4242", "tcp://localhost:4243");
-    client.start();
+#include "SemprGui.hpp"
+#include <QtCore>
+#include <QApplication>
 
-    while(true)
-    {
-        std::this_thread::sleep_for(std::chrono::seconds(10));
-    }
+int main(int argc, char** args)
+{
+    auto client = std::make_shared<sempr::gui::TCPConnectionClient>();
+    client->connect("tcp://localhost:4242", "tcp://localhost:4243");
+    client->start();
+
+    std::cout << "started client" << std::endl;
+
+    QApplication app(argc, args);
+
+    std::cout << "created app" << std::endl;
+
+    sempr::gui::SemprGui gui(client);
+
+    std::cout << "created gui" << std::endl;
+
+    gui.show();
+
+    std::cout << "showing gui, going into exec() loop" << std::endl;
+
+    app.exec();
 }

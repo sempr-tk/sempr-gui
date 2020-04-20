@@ -1,38 +1,43 @@
 #include "SemprGui.hpp"
+#include "../ui/ui_main.h"
 
 namespace sempr { namespace gui {
 
 SemprGui::SemprGui(AbstractInterface::Ptr interface)
-    : dataModel_(interface)
+    : dataModel_(interface), form_(new Ui_Form())
 {
-    form_.setupUi(this);
+    // register metatypes
+    qRegisterMetaType<ModelEntry>();
+    qRegisterMetaType<ECData>();
+
+    form_->setupUi(this);
     // both views use the same model
-    form_.treeView->setModel(&dataModel_);
-    auto selectionModel = form_.treeView->selectionModel();
+    form_->treeView->setModel(&dataModel_);
+    auto selectionModel = form_->treeView->selectionModel();
     // raw json editing
-    form_.tabRawComponent->setModel(&dataModel_);
-    form_.tabRawComponent->setSelectionModel(selectionModel);
+    form_->tabRawComponent->setModel(&dataModel_);
+    form_->tabRawComponent->setSelectionModel(selectionModel);
     // read-only triple container
-    form_.tabTripleContainer->setModel(&dataModel_);
-    form_.tabTripleContainer->setSelectionModel(selectionModel);
+    form_->tabTripleContainer->setModel(&dataModel_);
+    form_->tabTripleContainer->setSelectionModel(selectionModel);
     // triple vector
-    form_.tabTripleVector->setModel(&dataModel_);
-    form_.tabTripleVector->setSelectionModel(selectionModel);
+    form_->tabTripleVector->setModel(&dataModel_);
+    form_->tabTripleVector->setSelectionModel(selectionModel);
     // property maps
-    form_.tabTriplePropertyMap->setModel(&dataModel_);
-    form_.tabTriplePropertyMap->setSelectionModel(selectionModel);
+    form_->tabTriplePropertyMap->setModel(&dataModel_);
+    form_->tabTriplePropertyMap->setSelectionModel(selectionModel);
 
     // setup the GeoMapWidget
-    form_.geoMapWidget->setup(&dataModel_);
+    form_->geoMapWidget->setup(&dataModel_);
 
     // connection to hide/show tabs depending on selected component type
-    connect(form_.tabRawComponent, &UsefulWidget::isUseful,
+    connect(form_->tabRawComponent, &UsefulWidget::isUseful,
             this, &SemprGui::updateTabStatus);
-    connect(form_.tabTripleContainer, &UsefulWidget::isUseful,
+    connect(form_->tabTripleContainer, &UsefulWidget::isUseful,
             this, &SemprGui::updateTabStatus);
-    connect(form_.tabTripleVector, &UsefulWidget::isUseful,
+    connect(form_->tabTripleVector, &UsefulWidget::isUseful,
             this, &SemprGui::updateTabStatus);
-    connect(form_.tabTriplePropertyMap, &UsefulWidget::isUseful,
+    connect(form_->tabTriplePropertyMap, &UsefulWidget::isUseful,
             this, &SemprGui::updateTabStatus);
 
 
@@ -59,27 +64,28 @@ SemprGui::SemprGui(AbstractInterface::Ptr interface)
     connect(&dataModel_, &ECModel::error, this, &SemprGui::logError);
 
     // hide all tabs in the beginning, as no data is selected yet.
-    updateTabStatus(form_.tabRawComponent, false);
-    updateTabStatus(form_.tabTripleContainer, false);
-    updateTabStatus(form_.tabTriplePropertyMap, false);
-    updateTabStatus(form_.tabTripleVector, false);
+    updateTabStatus(form_->tabRawComponent, false);
+    updateTabStatus(form_->tabTripleContainer, false);
+    updateTabStatus(form_->tabTriplePropertyMap, false);
+    updateTabStatus(form_->tabTripleVector, false);
 
     // connect the checkboxes to show/hide the editors and the map
-    connect(form_.boxShowEditors, &QCheckBox::stateChanged,
-            form_.tabWidget, &QWidget::setVisible);
-    connect(form_.boxShowOSM, &QCheckBox::stateChanged,
-            form_.geoMapWidget, &QWidget::setVisible);
+    connect(form_->boxShowEditors, &QCheckBox::stateChanged,
+            form_->tabWidget, &QWidget::setVisible);
+    connect(form_->boxShowOSM, &QCheckBox::stateChanged,
+            form_->geoMapWidget, &QWidget::setVisible);
 
     // connect the reset and commit buttons to the model
-    connect(form_.btnReset, &QPushButton::clicked,
+    connect(form_->btnReset, &QPushButton::clicked,
             &dataModel_, &ECModel::reset);
-    connect(form_.btnCommit, &QPushButton::clicked,
+    connect(form_->btnCommit, &QPushButton::clicked,
             &dataModel_, &ECModel::commit);
 }
 
 
 SemprGui::~SemprGui()
 {
+    delete form_;
 }
 
 
@@ -91,16 +97,16 @@ void SemprGui::logUpdate(const ECData& entry, const QString& mod)
     item->setText(1, QString::fromStdString(entry.entityId));
     item->setText(2, QString::fromStdString(entry.componentId));
 
-    form_.historyList->insertTopLevelItem(0, item);
+    form_->historyList->insertTopLevelItem(0, item);
 }
 
 void SemprGui::logError(const QString& what)
 {
-    int num = form_.errorList->topLevelItemCount();
+    int num = form_->errorList->topLevelItemCount();
     QTreeWidgetItem* item = new QTreeWidgetItem();
     item->setText(0, QString::number(num));
     item->setText(1, what);
-    form_.errorList->insertTopLevelItem(0, item);
+    form_->errorList->insertTopLevelItem(0, item);
 }
 
 
@@ -108,19 +114,19 @@ void SemprGui::updateTabStatus(UsefulWidget* widget, bool visible)
 {
     if (visible)
     {
-        int index = form_.tabWidget->indexOf(widget);
+        int index = form_->tabWidget->indexOf(widget);
         if (index == -1)
         {
-            int index = form_.tabWidget->addTab(widget, widget->windowTitle());
-            form_.tabWidget->setCurrentIndex(index);
+            int index = form_->tabWidget->addTab(widget, widget->windowTitle());
+            form_->tabWidget->setCurrentIndex(index);
         }
     }
     else
     {
-        int index = form_.tabWidget->indexOf(widget);
+        int index = form_->tabWidget->indexOf(widget);
         if (index != -1)
         {
-            form_.tabWidget->removeTab(index);
+            form_->tabWidget->removeTab(index);
         }
     }
 }

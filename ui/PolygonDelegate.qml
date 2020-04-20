@@ -27,6 +27,9 @@ CoordinateDelegate {
 
                 if (!drag.active)
                 {
+                    console.log("END OF POLYGON DRAG")
+                    console.log("debug", pressed, pressedButtons, acceptedButtons)
+
                     // drop. update coordinates
                     var modelIndex = geometryModel.index(index, 0)
                     var role = geometryModel.roleId("coordinates")
@@ -39,5 +42,10 @@ CoordinateDelegate {
                 }
             }
         }
+
+        Component.onDestruction: {
+            console.log("POLYGON DESTRUCTION STARTED!")
+        }
+
     } // MapPolygon
 }

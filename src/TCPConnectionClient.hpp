@@ -2,9 +2,11 @@
 #define SEMPR_GUI_TCPCONNECTIONCLIENT_HPP_
 
 #include "AbstractInterface.hpp"
+#include "TCPConnectionRequest.hpp"
 
 #include <zmqpp/zmqpp.hpp>
 #include <thread>
+#include <atomic>
 
 namespace sempr { namespace gui {
 
@@ -21,6 +23,10 @@ class TCPConnectionClient : public AbstractInterface {
 
     // an extra thread handling messages incoming on updateSubscriber_
     std::thread updateWorker_;
+    std::atomic<bool> running_;
+
+    // convenience method to execute a request and get a response
+    TCPConnectionResponse execRequest(const TCPConnectionRequest&);
 public:
     using Ptr = std::shared_ptr<TCPConnectionClient>;
     TCPConnectionClient();
@@ -31,6 +37,7 @@ public:
 
     // handling updates in a separate thread
     void start();
+    void stop();
 
     std::vector<ECData> listEntityComponentPairs() override;
     void addEntityComponentPair(const ECData&) override;

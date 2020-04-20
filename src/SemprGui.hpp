@@ -8,7 +8,9 @@
 #include "AbstractInterface.hpp"
 #include "UsefulWidget.hpp"
 
-#include "../ui/ui_main.h"
+//#include "../ui/ui_main.h"
+
+class Ui_Form; // forward declaration
 
 namespace sempr { namespace gui {
 
@@ -22,7 +24,7 @@ class SemprGui : public QWidget {
     ECModel dataModel_;
 
     // the main ui form
-    Ui_Form form_;
+    Ui_Form* form_;
 
 private slots:
     /**

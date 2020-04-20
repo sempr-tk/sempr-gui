@@ -21,6 +21,7 @@
 #include <rete-reasoner/RuleParser.hpp>
 
 #include <iostream>
+#include <fstream>
 
 using namespace sempr;
 using namespace sempr::gui;
@@ -35,6 +36,8 @@ int main()
 
     // just creating it already serves updates, just not the requests yet
     TCPConnectionServer server(connection);
+    server.start();
+
     // but we still need to insert the connection into the reasoner
     rete::RuleParser parser;
     parser.registerNodeBuilder<ECNodeBuilder<Component>>();
@@ -79,20 +82,23 @@ int main()
     auto geosGeometry = reader.read("POLYGON((8.020405035544446 52.26796266283766,8.04975913100343 52.290857976112314,8.07670996718507 52.26554641241761,8.020405035544446 52.26796266283766))");
     auto geometryComponent = std::make_shared<GeosGeometry>(geosGeometry);
 
-    auto geosGeometry2 = reader.read("POLYGON((8.020405035544446 52.26796266283766,8.04975913100343 52.290857976112314,8.07670996718507 52.26554641241761,8.020405035544446 52.26796266283766))");
+    auto geosGeometry2 = reader.read("POLYGON((8.120405035544446 52.26796266283766,8.14975913100343 52.290857976112314,8.17670996718507 52.26554641241761,8.120405035544446 52.26796266283766))");
     auto geometryComponent2 = std::make_shared<GeosGeometry>(geosGeometry2);
 
     geoEntity->addComponent(geometryComponent);
     geoEntity->addComponent(geometryComponent2);
     sempr.addEntity(geoEntity);
 
+    {
+        std::ofstream("debug.dot") << sempr.reasoner().net().toDot();
+    }
 
     std::cout << "starting reasoning-loop" << std::endl;
     while (true)
     {
         sempr.performInference();
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-        geometryComponent->changed();
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        // there should probably be some kind of signalling system instead of
+        // this kind of polling...
     }
 }

@@ -13,6 +13,11 @@ MapItemGroup {
     // prevents removing too many coordinates
     property int minCoordinates: 2
 
+
+    Component.onDestruction: {
+        console.log("Destroyed MapItemGroup")
+    }
+
     // create the handle that allows us to modify the existing coordinate
     Instantiator {
         id: coordInstantiator
@@ -99,13 +104,16 @@ MapItemGroup {
                 }
             }
         }
+
         onObjectAdded: {
             // MapItemGroups are buggy. They just vanish when something is changed,
             // but removing and re-adding it seems to work... :/
             map.removeMapItemGroup(coordDelegate);
             map.addMapItemGroup(coordDelegate);
         }
+
     }
+
 
     // also, create handles in-between that allow us to add more coordinates
     Instantiator {
@@ -123,12 +131,8 @@ MapItemGroup {
             // index = -1 ... o.O
             sourceComponent: (index >= 0 && index+1 < coordDelegate.item.coordinates.length ? inBetweenDelegate : null)
         }
-
-        onObjectAdded: {
-            map.removeMapItemGroup(coordDelegate)
-            map.addMapItemGroup(coordDelegate)
-        }
     }
+
 
     // definition of the handler for in-between coordinates
     Component {
