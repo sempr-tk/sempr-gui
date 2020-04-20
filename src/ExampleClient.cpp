@@ -28,4 +28,6 @@ int main(int argc, char** args)
     std::cout << "showing gui, going into exec() loop" << std::endl;
 
     app.exec();
+
+    client->stop();
 }
