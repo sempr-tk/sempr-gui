@@ -76,7 +76,16 @@ void DirectConnection::addEntityComponentPair(const ECData& entry)
 
     // find the entity
     auto entity = core_->getEntity(entry.entityId);
-    if (!entity) throw std::exception(); // TODO: Better exceptions.
+
+    // create it if it does not exist yet
+    if (!entity)
+    {
+        entity = Entity::create();
+        // if the given id was not empty, use that
+        if (!entry.entityId.empty()) entity->setId(entry.entityId);
+        // and add it to the core
+        core_->addEntity(entity);
+    }
 
     // de-serialize the component
     Component::Ptr c;
