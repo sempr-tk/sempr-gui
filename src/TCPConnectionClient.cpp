@@ -60,7 +60,6 @@ void TCPConnectionClient::start()
                     std::this_thread::sleep_for(std::chrono::milliseconds(10));
                 }
             }
-            std::cout << "worker stopped" << std::endl;
         }
     );
 }
@@ -77,11 +76,8 @@ TCPConnectionResponse TCPConnectionClient::execRequest(const TCPConnectionReques
     zmqpp::message reqMsg, resMsg;
     reqMsg << request;
 
-    std::cout << "sending request..." << std::endl;
     requestSocket_.send(reqMsg);
-    std::cout << "receiving reply..." << std::endl;
     requestSocket_.receive(resMsg);
-    std::cout << "got reply." << std::endl;
 
     TCPConnectionResponse response;
     resMsg >> response;

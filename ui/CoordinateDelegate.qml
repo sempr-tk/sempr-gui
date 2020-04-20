@@ -13,11 +13,6 @@ MapItemGroup {
     // prevents removing too many coordinates
     property int minCoordinates: 2
 
-
-    Component.onDestruction: {
-        console.log("Destroyed MapItemGroup")
-    }
-
     // create the handle that allows us to modify the existing coordinate
     Instantiator {
         id: coordInstantiator

@@ -41,7 +41,7 @@ bool GeometryFilterProxyModel::filterAcceptsRow(
     auto index = sourceModel()->index(sourceRow, 0, sourceParent);
     auto geo = GeometryFilterProxyModel::geomPointerFromIndex(index);
 
-    qDebug() << "GeometryFilterProxyModel accept? " << (geo ? "yes" : "no");
+    // qDebug() << "GeometryFilterProxyModel accept? " << (geo ? "yes" : "no");
 
     if (geo) return true;
     return false;
@@ -82,26 +82,26 @@ bool GeometryFilterProxyModel::setData(
 {
     auto sourceIndex = this->mapToSource(index);
 
-    qDebug() << "index: " << index;
-    qDebug() << "sourceIndex: " << sourceIndex;
+    // qDebug() << "index: " << index;
+    // qDebug() << "sourceIndex: " << sourceIndex;
 
     if (role == Role::CoordinatesRole)
     {
-        qDebug() << value;
+        // qDebug() << value;
 
         auto geo = GeometryFilterProxyModel::geomPointerFromIndex(sourceIndex);
         if (!geo)
         {
-            qDebug() << "no component ptr!";
+            // qDebug() << "no component ptr!";
             return false;
         }
         if (!geo->geometry())
         {
-            qDebug() << "no geom in component!";
+            // qDebug() << "no geom in component!";
             return false;
         }
 
-        qDebug() << "QVariantList? " << value.canConvert<QVariantList>();
+        // qDebug() << "QVariantList? " << value.canConvert<QVariantList>();
         // qml <-> c++ provides automatic conversion between javascript arrays
         // and QVariantLists, but this method accepts only QVariants, so the
         // QVariant holds a QVariantList

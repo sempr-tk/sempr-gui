@@ -37,15 +37,12 @@ ECModel::ECModel(AbstractInterface::Ptr interface)
 
             switch (n) {
                 case AbstractInterface::ADDED:
-                    std::cout << "Dummy update callback add " << entry.componentId << std::endl;
                     this->emit gotEntryAdd(entry);
                     break;
                 case AbstractInterface::UPDATED:
-                    std::cout << "Dummy update callback updated " << entry.componentId << std::endl;
                     this->emit gotEntryUpdate(entry);
                     break;
                 case AbstractInterface::REMOVED:
-                    std::cout << "Dummy update callback removed " << entry.componentId << std::endl;
                     this->emit gotEntryRemove(entry);
                     break;
             }
@@ -70,7 +67,6 @@ ECModel::ECModel(AbstractInterface::Ptr interface)
 ECModel::~ECModel()
 {
     semprInterface_->clearUpdateCallback();
-    std::cout << "~ECModel" << std::endl;
 }
 
 QModelIndex ECModel::findEntry(const ModelEntry& entry) const
