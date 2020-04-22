@@ -5,6 +5,7 @@
 #include <sempr/nodes/AffineTransformBuilders.hpp>
 #include <sempr/nodes/InferECBuilder.hpp>
 #include <sempr/nodes/ExtractTriplesBuilder.hpp>
+#include <sempr/nodes/GeoDistanceBuilder.hpp>
 
 #include "DirectConnectionBuilder.hpp"
 #include "TCPConnectionServer.hpp"
@@ -65,10 +66,12 @@ int main(int argc, char** args)
     parser.registerNodeBuilder<ECNodeBuilder<TripleContainer>>();
     parser.registerNodeBuilder<ECNodeBuilder<TriplePropertyMap>>();
     parser.registerNodeBuilder<ECNodeBuilder<AffineTransform>>();
+    parser.registerNodeBuilder<ECNodeBuilder<GeosGeometry>>();
     parser.registerNodeBuilder<InferECBuilder<AffineTransform>>();
     parser.registerNodeBuilder<AffineTransformCreateBuilder>();
     parser.registerNodeBuilder<DirectConnectionBuilder>(connection);
     parser.registerNodeBuilder<ExtractTriplesBuilder>();
+    parser.registerNodeBuilder<GeoDistanceBuilder>();
 
     parser.parseRules(
         "[EC<Component>(?e ?c) -> DirectConnection(?e ?c)]\n", // connect to the gui
