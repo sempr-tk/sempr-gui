@@ -10,7 +10,7 @@ CoordinateDelegate {
         id: poly
         path: model.coordinates
         color: (isCurrentItem ? "#60808000" : "#60008000") // semi-transparent color
-        opacity: 1
+        //opacity: 1
 
 
 
@@ -44,6 +44,15 @@ CoordinateDelegate {
                         parent.path = lastPath
                     }
                 }
+            }
+
+            Text {
+                anchors.fill: parent
+                text: model.entityId
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+
+                visible: poly.width > 20
             }
         }
     } // MapPolygon
