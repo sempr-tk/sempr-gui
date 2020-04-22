@@ -23,7 +23,7 @@ void DirectConnectionNode::execute(
     // extract entity and component from the token
     Entity::Ptr entity;
     Component::Ptr component;
-    entity_->SpecificTypeAccessor::getValue(token, entity); // verbose -- forgot a "using SpecificTypeAccessor::getValue" in TokenWMEAccessor.
+    entity_->getValue(token, entity);
     component_->getValue(token, component);
 
     // construct a model entry
