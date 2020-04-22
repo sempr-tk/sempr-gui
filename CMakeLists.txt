@@ -40,6 +40,12 @@ find_package(Qt5 COMPONENTS Core Widgets Quick QuickWidgets Location QuickContro
 include_directories(${Qt5_INCLUDE_DIRS})
 link_directories(${Qt5_LIBRARY_DIRS})
 
+# boost filesystem, just to create a new folder for the database when needed
+# (example server)
+find_package(Boost REQUIRED COMPONENTS filesystem)
+include_directories(${Boost_INCLUDE_DIRS})
+link_directories(${Boost_LIBRARY_DIRS})
+
 include_directories(src)
 
 set(GUI_SRC
@@ -90,7 +96,7 @@ add_executable(main src/main.cpp)
 target_link_libraries(main sempr-gui)
 
 add_executable(example_server src/ExampleServer.cpp)
-target_link_libraries(example_server sempr-gui)
+target_link_libraries(example_server sempr-gui ${Boost_LIBRARIES})
 
 add_executable(example_client src/ExampleClient.cpp)
 target_link_libraries(example_client sempr-gui)

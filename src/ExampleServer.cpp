@@ -4,6 +4,8 @@
 #include <sempr/nodes/ECNodeBuilder.hpp>
 #include <sempr/nodes/AffineTransformBuilders.hpp>
 #include <sempr/nodes/InferECBuilder.hpp>
+#include <sempr/nodes/ExtractTriplesBuilder.hpp>
+
 #include "DirectConnectionBuilder.hpp"
 #include "TCPConnectionServer.hpp"
 
@@ -12,6 +14,8 @@
 #include <sempr/component/TriplePropertyMap.hpp>
 #include <sempr/component/AffineTransform.hpp>
 #include <sempr/component/GeosGeometry.hpp>
+
+#include <sempr/SeparateFileStorage.hpp>
 
 #include <geos/geom/Geometry.h>
 #include <geos/geom/GeometryFactory.h>
@@ -26,11 +30,28 @@
 using namespace sempr;
 using namespace sempr::gui;
 
-
-
-int main()
+int main(int argc, char** args)
 {
-    Core sempr;
+    std::string extraRules;
+    if (argc > 1)
+    {
+        // take first argument as path to rules file
+        std::stringstream ss;
+        ss << std::ifstream(args[1]).rdbuf();
+        extraRules = ss.str();
+    }
+
+    if (!fs::exists("./db")) fs::create_directory("./db");
+    auto db = std::make_shared<SeparateFileStorage>("./db");
+
+    Core sempr(db, db);
+    auto savedEntities = db->loadAll();
+    for (auto e : savedEntities)
+    {
+        sempr.addEntity(e);
+    }
+
+
     std::mutex semprMutex;
     auto connection = std::make_shared<DirectConnection>(&sempr, semprMutex);
 
@@ -47,14 +68,20 @@ int main()
     parser.registerNodeBuilder<InferECBuilder<AffineTransform>>();
     parser.registerNodeBuilder<AffineTransformCreateBuilder>();
     parser.registerNodeBuilder<DirectConnectionBuilder>(connection);
+    parser.registerNodeBuilder<ExtractTriplesBuilder>();
 
     parser.parseRules(
-        "[EC<Component>(?e ?c) -> DirectConnection(?e ?c)]\n" // connect to the gui
-        "[EC<TripleContainer>(?e ?c), tf:create(?tf 1 2 3 0 0 0 1) -> EC<Transform>(?e ?tf)]", // every entity with a triplecontainer gets a transform
+        "[EC<Component>(?e ?c) -> DirectConnection(?e ?c)]\n", // connect to the gui
         sempr.reasoner().net()
     );
 
+    if (!extraRules.empty())
+    {
+        parser.parseRules(extraRules, sempr.reasoner().net());
+    }
+
     // add some data
+    /*
     auto entity1 = Entity::create();
     auto prop = std::make_shared<TriplePropertyMap>();
     prop->map_["foo"] = "bar";
@@ -88,7 +115,9 @@ int main()
     geoEntity->addComponent(geometryComponent);
     geoEntity->addComponent(geometryComponent2);
     sempr.addEntity(geoEntity);
+    */
 
+    sempr.performInference();
     {
         std::ofstream("debug.dot") << sempr.reasoner().net().toDot();
     }
