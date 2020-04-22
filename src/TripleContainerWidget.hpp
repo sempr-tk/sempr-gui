@@ -4,12 +4,15 @@
 #include <QtCore>
 #include <QtWidgets>
 
-#include "../ui/ui_triplecontainer.h"
 #include "ECModel.hpp"
 #include "SingleComponentWidget.hpp"
 
 #include "StackedColumnsProxyModel.hpp"
 #include "UniqueFilterProxyModel.hpp"
+
+namespace Ui {
+    class TripleContainerWidget;
+}
 
 namespace sempr {
     class TripleContainer;
@@ -24,7 +27,7 @@ namespace sempr {
 class TripleContainerWidget : public SingleComponentWidget<TripleContainer> {
     Q_OBJECT
 
-    Ui_TripleContainerWidget form_;
+    Ui::TripleContainerWidget* form_;
 
     // two filters for the completer: 3 columns -> 1 column + remove duplicates
     StackedColumnsProxyModel* stackedColumnsProxy_;
@@ -43,6 +46,7 @@ protected slots:
     void updateFilter(const QString& text);
 public:
     TripleContainerWidget(QWidget* parent = nullptr);
+    ~TripleContainerWidget();
 };
 
 }}

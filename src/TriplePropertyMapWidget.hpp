@@ -7,16 +7,19 @@
 // needed ad SingleComponentWidget already implements a dynamic cast to this type
 #include <sempr/component/TriplePropertyMap.hpp>
 
-#include "../ui/ui_triplepropertymap.h"
 #include "ECModel.hpp"
 #include "SingleComponentWidget.hpp"
+
+namespace Ui {
+    class TriplePropertyMapWidget;
+}
 
 namespace sempr { namespace gui {
 
 class TriplePropertyMapWidget : public SingleComponentWidget<TriplePropertyMap> {
     Q_OBJECT
 
-    Ui_TriplePropertyMapWidget form_;
+    Ui::TriplePropertyMapWidget* form_;
 
     bool updateComponentWidget(std::shared_ptr<TriplePropertyMap> map, bool isMutable) override;
 
@@ -32,6 +35,7 @@ private slots:
 
 public:
     TriplePropertyMapWidget(QWidget* parent = nullptr);
+    ~TriplePropertyMapWidget();
 };
 
 }}

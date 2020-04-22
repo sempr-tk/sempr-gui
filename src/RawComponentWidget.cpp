@@ -1,24 +1,30 @@
 #include "RawComponentWidget.hpp"
 #include "CustomDataRoles.hpp"
 
+#include "../ui/ui_raw_component.h"
+
 namespace sempr { namespace gui {
 
 RawComponentWidget::RawComponentWidget(QWidget* parent)
-    : UsefulWidget(parent)
+    : UsefulWidget(parent), form_(new Ui::RawComponent)
 {
-    form_.setupUi(this);
+    form_->setupUi(this);
 
-    connect(form_.btnSave, &QPushButton::clicked,
+    connect(form_->btnSave, &QPushButton::clicked,
             this, &RawComponentWidget::save);
 }
 
+RawComponentWidget::~RawComponentWidget()
+{
+    delete form_;
+}
 
 void RawComponentWidget::save()
 {
     if (!currentIndex_.isValid()) return;
     if (!model_) return;
 
-    bool ok = model_->setData(currentIndex_, form_.rawComponentEdit->toPlainText(),
+    bool ok = model_->setData(currentIndex_, form_->rawComponentEdit->toPlainText(),
                               Role::ComponentJsonRole);
     // TODO: what to do when the json is not ok?
     // just ignore for now, might be that the component type is just not known
@@ -44,7 +50,7 @@ void RawComponentWidget::updateWidget()
             bool mut = varMut.value<bool>();
             QString json = varJson.value<QString>();
 
-            form_.rawComponentEdit->setPlainText(json);
+            form_->rawComponentEdit->setPlainText(json);
 
             // enable text entry and save button only if the component is
             // mutable!
@@ -55,8 +61,8 @@ void RawComponentWidget::updateWidget()
             // copy & paste is possible anymore. Instead, disable the button,
             // and set the edit to read only.
             this->setEnabled(true);
-            form_.btnSave->setEnabled(mut);
-            form_.rawComponentEdit->setReadOnly(!mut);
+            form_->btnSave->setEnabled(mut);
+            form_->rawComponentEdit->setReadOnly(!mut);
 
             // signal this this widget is useful right now
             setUseful(true);
@@ -65,7 +71,7 @@ void RawComponentWidget::updateWidget()
         {
             this->setEnabled(false);
             // couldn't get a model entry, so clear the edit
-            form_.rawComponentEdit->setPlainText("");
+            form_->rawComponentEdit->setPlainText("");
 
             // signal that his widget isn't useful right now
             setUseful(false);
@@ -74,7 +80,7 @@ void RawComponentWidget::updateWidget()
     else
     {
         // nothing selected.
-        form_.rawComponentEdit->setPlainText("");
+        form_->rawComponentEdit->setPlainText("");
         this->setEnabled(false);
 
         // signal that this widget isn't useful right now

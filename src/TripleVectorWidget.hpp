@@ -4,12 +4,14 @@
 #include <sempr/component/TripleVector.hpp>
 #include "SingleComponentWidget.hpp"
 
-#include "../ui/ui_triplevector.h"
-
 #include "StackedColumnsProxyModel.hpp"
 #include "UniqueFilterProxyModel.hpp"
 
 #include <QtWidgets>
+
+namespace Ui {
+    class TripleVectorWidget;
+}
 
 namespace sempr { namespace gui {
 
@@ -20,7 +22,7 @@ namespace sempr { namespace gui {
 class TripleVectorWidget : public SingleComponentWidget<TripleVector> {
     Q_OBJECT
 
-    Ui_TripleVectorWidget form_;
+    Ui::TripleVectorWidget* form_;
 
     // for the completion in the search bar
     StackedColumnsProxyModel* stackedColumnsProxy_;
@@ -44,6 +46,7 @@ protected slots:
 
 public:
     TripleVectorWidget(QWidget* parent = nullptr);
+    ~TripleVectorWidget();
 };
 
 

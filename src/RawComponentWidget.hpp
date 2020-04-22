@@ -4,15 +4,18 @@
 #include <QtCore>
 #include <QtWidgets>
 
-#include "../ui/ui_raw_component.h"
 #include "UsefulWidget.hpp"
+
+namespace Ui {
+    class RawComponent;
+}
 
 namespace sempr { namespace gui {
 
 class RawComponentWidget : public UsefulWidget {
     Q_OBJECT
 
-    Ui_RawComponent form_;
+    Ui::RawComponent* form_;
 
     /// Uses the currentIndex_ to access the data from the model and display it
     void updateWidget() override;
@@ -23,6 +26,7 @@ private slots:
 
 public:
     RawComponentWidget(QWidget* parent = nullptr);
+    ~RawComponentWidget();
 
 };
 

@@ -1,8 +1,7 @@
 #ifndef SEMPR_GUI_GEOMAPWIDGET_HPP_
 #define SEMPR_GUI_GEOMAPWIDGET_HPP_
 
-#include "../ui/ui_geomap.h"
-
+#include <QWidget>
 #include <QStandardItemModel>
 #include <QAbstractItemModel>
 
@@ -12,12 +11,16 @@
 #include "GeometryFilterProxyModel.hpp"
 #include "FlattenTreeProxyModel.hpp"
 
+namespace Ui {
+    class GeoMapWidget;
+}
+
 namespace sempr { namespace gui {
 
 class GeoMapWidget : public QWidget {
     Q_OBJECT
 
-    Ui_GeoMapWidget form_;
+    Ui::GeoMapWidget* form_;
 
     // the data model to connect to
     QAbstractItemModel* model_;
@@ -49,6 +52,7 @@ signals:
 
 public:
     GeoMapWidget(QWidget* parent = nullptr);
+    ~GeoMapWidget();
 
     /**
         Connects models, filters, and loads the qml.

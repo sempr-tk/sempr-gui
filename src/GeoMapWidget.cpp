@@ -1,4 +1,5 @@
 #include "GeoMapWidget.hpp"
+#include "../ui/ui_geomap.h"
 
 #include <QtQml>
 #include <QQuickItem>
@@ -7,9 +8,14 @@
 namespace sempr { namespace gui {
 
 GeoMapWidget::GeoMapWidget(QWidget* parent)
-    : QWidget(parent)
+    : QWidget(parent), form_(new Ui::GeoMapWidget)
 {
-    form_.setupUi(this);
+    form_->setupUi(this);
+}
+
+GeoMapWidget::~GeoMapWidget()
+{
+    delete form_;
 }
 
 void GeoMapWidget::setup(QAbstractItemModel* model, QItemSelectionModel* sourceSelectionModel)
@@ -22,13 +28,13 @@ void GeoMapWidget::setup(QAbstractItemModel* model, QItemSelectionModel* sourceS
     roleNamesProxy_.setSourceModel(&geometryProxy_);
 
     // make the model known before loading the qml
-    form_.quickWidget->rootContext()->setContextProperty("geometryModel", &roleNamesProxy_);
+    form_->quickWidget->rootContext()->setContextProperty("geometryModel", &roleNamesProxy_);
     // also, make *this* known, in oder to connect to signals
-    form_.quickWidget->rootContext()->setContextProperty("GeoMapWidget", this);
+    form_->quickWidget->rootContext()->setContextProperty("GeoMapWidget", this);
 
     // load the qml
     //form_.quickWidget->setSource(QUrl::fromLocalFile(":/geomap.qml"));
-    form_.quickWidget->setSource(QUrl::fromLocalFile("/home/nils/sempr-gui/ui/geomap.qml"));
+    form_->quickWidget->setSource(QUrl::fromLocalFile("/home/nils/sempr-gui/ui/geomap.qml"));
 
 
     // save the selection model, connect to its currentRowChanged signal to
@@ -37,7 +43,7 @@ void GeoMapWidget::setup(QAbstractItemModel* model, QItemSelectionModel* sourceS
     connect(sourceSelectionModel_, &QItemSelectionModel::currentRowChanged,
             this, &GeoMapWidget::onSourceCurrentRowChanged);
 
-    QObject* rootObject = form_.quickWidget->rootObject();
+    QObject* rootObject = form_->quickWidget->rootObject();
     connect(rootObject, SIGNAL(geometryDelegateClicked(int)),
             this, SLOT(onGeometryDelegateClicked(int)));
 }

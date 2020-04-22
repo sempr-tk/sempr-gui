@@ -1,34 +1,40 @@
 #include "TriplePropertyMapWidget.hpp"
+#include "../ui/ui_triplepropertymap.h"
 #include "CustomDataRoles.hpp"
 
 namespace sempr { namespace gui {
 
 TriplePropertyMapWidget::TriplePropertyMapWidget(QWidget* parent)
-    : SingleComponentWidget(parent)
+    : SingleComponentWidget(parent), form_(new Ui::TriplePropertyMapWidget)
 {
-    form_.setupUi(this);
+    form_->setupUi(this);
 
-    connect(form_.btnRemove, &QPushButton::clicked,
+    connect(form_->btnRemove, &QPushButton::clicked,
             this, &TriplePropertyMapWidget::remove);
-    connect(form_.btnAdd, &QPushButton::clicked,
+    connect(form_->btnAdd, &QPushButton::clicked,
             this, &TriplePropertyMapWidget::add);
 
     // update after every change of an item
-    connect(form_.tableWidget, &QTableWidget::cellChanged,
+    connect(form_->tableWidget, &QTableWidget::cellChanged,
             this, &TriplePropertyMapWidget::save);
+}
+
+TriplePropertyMapWidget::~TriplePropertyMapWidget()
+{
+    delete form_;
 }
 
 void TriplePropertyMapWidget::remove()
 {
 
-    auto rows = form_.tableWidget->selectionModel()->selectedRows();
+    auto rows = form_->tableWidget->selectionModel()->selectedRows();
     if (rows.size() > 0)
     {
-        form_.tableWidget->blockSignals(true);
+        form_->tableWidget->blockSignals(true);
         // only remove the first selected as I guess that the oder indices get
         // invalidated by this
-        form_.tableWidget->removeRow(rows[0].row());
-        form_.tableWidget->blockSignals(false);
+        form_->tableWidget->removeRow(rows[0].row());
+        form_->tableWidget->blockSignals(false);
     }
     else
     {
@@ -54,12 +60,12 @@ void TriplePropertyMapWidget::save()
         map->map_.clear();
 
         // then iterate over the table widget and add new data
-        size_t numRows = form_.tableWidget->rowCount();
+        size_t numRows = form_->tableWidget->rowCount();
         for (size_t i = 0; i < numRows; i++)
         {
-            QString key = form_.tableWidget->item(i, 0)->text();
-            QString value = form_.tableWidget->item(i, 1)->text();
-            auto cellWidget = form_.tableWidget->cellWidget(i, 2);
+            QString key = form_->tableWidget->item(i, 0)->text();
+            QString value = form_->tableWidget->item(i, 1)->text();
+            auto cellWidget = form_->tableWidget->cellWidget(i, 2);
             auto comboWidget = dynamic_cast<QComboBox*>(cellWidget);
             if (comboWidget)
             {
@@ -122,14 +128,14 @@ void TriplePropertyMapWidget::save()
 
 void TriplePropertyMapWidget::add()
 {
-    form_.tableWidget->blockSignals(true);
+    form_->tableWidget->blockSignals(true);
 
-    form_.tableWidget->setRowCount(form_.tableWidget->rowCount()+1);
+    form_->tableWidget->setRowCount(form_->tableWidget->rowCount()+1);
 
     QTableWidgetItem* keyItem = new QTableWidgetItem();
     QTableWidgetItem* valueItem = new QTableWidgetItem();
-    form_.tableWidget->setItem(form_.tableWidget->rowCount()-1, 0, keyItem);
-    form_.tableWidget->setItem(form_.tableWidget->rowCount()-1, 1, valueItem);
+    form_->tableWidget->setItem(form_->tableWidget->rowCount()-1, 0, keyItem);
+    form_->tableWidget->setItem(form_->tableWidget->rowCount()-1, 1, valueItem);
 
     QComboBox* typeCombo = new QComboBox();
     typeCombo->addItem("int", TriplePropertyMapEntry::INT);
@@ -143,9 +149,9 @@ void TriplePropertyMapWidget::add()
     connect(typeCombo, &QComboBox::currentTextChanged,
             this, &TriplePropertyMapWidget::save);
 
-    form_.tableWidget->setCellWidget(form_.tableWidget->rowCount()-1, 2, typeCombo);
+    form_->tableWidget->setCellWidget(form_->tableWidget->rowCount()-1, 2, typeCombo);
 
-    form_.tableWidget->blockSignals(false);
+    form_->tableWidget->blockSignals(false);
 
     // update the model
     save();
@@ -162,14 +168,14 @@ bool TriplePropertyMapWidget::updateComponentWidget(
     }
 
     // first, make sure that the current view is empty
-    form_.tableWidget->clear();
+    form_->tableWidget->clear();
     size_t numProps = map->map_.size();
-    form_.tableWidget->setColumnCount(3);
-    form_.tableWidget->setRowCount(numProps);
+    form_->tableWidget->setColumnCount(3);
+    form_->tableWidget->setRowCount(numProps);
 
     // block signals -- must not "save" to the model yet, that would result
     // in endless recursion.
-    form_.tableWidget->blockSignals(true);
+    form_->tableWidget->blockSignals(true);
 
     // then, add the entries: 3 for every property in the map.
     // 1: key
@@ -232,13 +238,13 @@ bool TriplePropertyMapWidget::updateComponentWidget(
         connect(typeCombo, &QComboBox::currentTextChanged,
                 this, &TriplePropertyMapWidget::save);
 
-        form_.tableWidget->setItem(currentRow, 0, keyItem);
-        form_.tableWidget->setItem(currentRow, 1, valueItem);
-        form_.tableWidget->setCellWidget(currentRow, 2, typeCombo);
+        form_->tableWidget->setItem(currentRow, 0, keyItem);
+        form_->tableWidget->setItem(currentRow, 1, valueItem);
+        form_->tableWidget->setCellWidget(currentRow, 2, typeCombo);
         currentRow++;
     } // end for every property in the map
 
-    form_.tableWidget->blockSignals(false);
+    form_->tableWidget->blockSignals(false);
 
     this->setEnabled(isMutable);
     return true;
