@@ -36,10 +36,13 @@ Item {
         Instantiator {
             model: geometryModel
             delegate: Loader {
+                property var mymap: map
                 source:
                     // here we select what type of delegate we want
                     if (model.geometryType === "Polygon")
                         return "PolygonDelegate.qml"
+                    else if (model.geometryType === "Point")
+                        return "PointDelegate.qml"
                     else
                         return "CoordinateDelegate.qml"
             }
