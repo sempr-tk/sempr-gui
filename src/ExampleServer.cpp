@@ -6,6 +6,7 @@
 #include <sempr/nodes/InferECBuilder.hpp>
 #include <sempr/nodes/ExtractTriplesBuilder.hpp>
 #include <sempr/nodes/GeoDistanceBuilder.hpp>
+#include <sempr/nodes/GeoConversionBuilders.hpp>
 
 #include "DirectConnectionBuilder.hpp"
 #include "TCPConnectionServer.hpp"
@@ -67,11 +68,13 @@ int main(int argc, char** args)
     parser.registerNodeBuilder<ECNodeBuilder<TriplePropertyMap>>();
     parser.registerNodeBuilder<ECNodeBuilder<AffineTransform>>();
     parser.registerNodeBuilder<ECNodeBuilder<GeosGeometry>>();
+    parser.registerNodeBuilder<ECNodeBuilder<GeosGeometryInterface>>();
     parser.registerNodeBuilder<InferECBuilder<AffineTransform>>();
     parser.registerNodeBuilder<AffineTransformCreateBuilder>();
     parser.registerNodeBuilder<DirectConnectionBuilder>(connection);
     parser.registerNodeBuilder<ExtractTriplesBuilder>();
     parser.registerNodeBuilder<GeoDistanceBuilder>();
+    parser.registerNodeBuilder<UTMFromWGSBuilder>();
 
     parser.parseRules(
         "[EC<Component>(?e ?c) -> DirectConnection(?e ?c)]\n", // connect to the gui
