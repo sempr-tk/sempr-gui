@@ -33,8 +33,8 @@ void GeoMapWidget::setup(QAbstractItemModel* model, QItemSelectionModel* sourceS
     form_->quickWidget->rootContext()->setContextProperty("GeoMapWidget", this);
 
     // load the qml
-    //form_.quickWidget->setSource(QUrl::fromLocalFile(":/geomap.qml"));
-    form_->quickWidget->setSource(QUrl::fromLocalFile("/home/nils/sempr-gui/ui/geomap.qml"));
+    form_->quickWidget->setSource(QUrl("qrc:/geomap.qml"));
+    // form_->quickWidget->setSource(QUrl::fromLocalFile("/home/nils/sempr-gui/ui/geomap.qml"));
 
 
     // save the selection model, connect to its currentRowChanged signal to

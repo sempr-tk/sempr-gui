@@ -80,8 +80,9 @@ set(GUI_SRC
     ui/componentadderwidget.ui
     ui/geomap.qml
     ui/geomap.ui
-    ui/CoordinateDelegate.qml
-    ui/PolygonDelegate.qml
+    ui/MapDelegates/CoordinateDelegate.qml
+    ui/MapDelegates/PolygonDelegate.qml
+    ui/MapDelegates/PointDelegate.qml
     qrc/resources.qrc
 )
 

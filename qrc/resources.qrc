@@ -1,10 +1,15 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource>
-    <file alias="geomap.qml">../ui/geomap.qml</file>
-    <file alias="PolygonDelegate.qml">../ui/PolygonDelegate.qml</file>
-    <file alias="PointDelegate.qml">../ui/PointDelegate.qml</file>
-    <file alias="CoordinateDelegate.qml">../ui/CoordinateDelegate.qml</file>
+<!DOCTYPE RCC>
+<RCC version="1.0">
 
+<qresource prefix="/MapDelegates">
+    <file alias="PolygonDelegate.qml">../ui/MapDelegates/PolygonDelegate.qml</file>
+    <file alias="PointDelegate.qml">../ui/MapDelegates/PointDelegate.qml</file>
+    <file alias="CoordinateDelegate.qml">../ui/MapDelegates/CoordinateDelegate.qml</file>
+</qresource>
+
+<qresource prefix="/">
+    <file alias="geomap.qml">../ui/geomap.qml</file>
     <file alias="qtquickcontrols2.conf">../ui/qtquickcontrols2.conf</file>
 </qresource>
+
 </RCC>

@@ -5,6 +5,8 @@ import QtPositioning 5.8
 import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
 
+import "./MapDelegates"
+
 Item {
     id: geoWidget
 
@@ -40,11 +42,11 @@ Item {
                 source:
                     // here we select what type of delegate we want
                     if (model.geometryType === "Polygon")
-                        return "PolygonDelegate.qml"
+                        return "./MapDelegates/PolygonDelegate.qml"
                     else if (model.geometryType === "Point")
-                        return "PointDelegate.qml"
+                        return "./MapDelegates/PointDelegate.qml"
                     else
-                        return "CoordinateDelegate.qml"
+                        return "./MapDelegates/CoordinateDelegate.qml"
             }
 
             onObjectAdded: {
