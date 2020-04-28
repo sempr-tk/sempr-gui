@@ -9,8 +9,14 @@
 
 int main(int argc, char** args)
 {
+    std::string ip = "localhost";
+    if (argc > 1)
+    {
+        ip = args[1];
+    }
+
     auto client = std::make_shared<sempr::gui::TCPConnectionClient>();
-    client->connect("tcp://localhost:4242", "tcp://localhost:4243");
+    client->connect("tcp://" + ip + ":4242", "tcp://" + ip + ":4243");
     client->start();
 
     std::cout << "started client" << std::endl;
