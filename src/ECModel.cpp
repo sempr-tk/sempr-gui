@@ -17,7 +17,7 @@ ECModel::ECModel(AbstractInterface::Ptr interface)
     connect(this, &ECModel::gotEntryRemove,
             this, &ECModel::removeModelEntry);
 
-    // TODO: Register callback for updates
+    // Register callback for updates
     semprInterface_->setUpdateCallback(
         [this](ECData entry, AbstractInterface::Notification n)
         {
@@ -286,10 +286,16 @@ void ECModel::updateComponent(const ModelEntry& entry)
 
 
 
-Qt::ItemFlags ECModel::flags(const QModelIndex&) const
+Qt::ItemFlags ECModel::flags(const QModelIndex& index) const
 {
     // All items are enabled and selectable.
     // Question is: How do we deal with editable?
+    if (index.isValid() && index.parent().isValid() && index.column() == 1)
+    {
+        // make tags editable
+        return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+    }
+
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
@@ -303,7 +309,8 @@ QVariant ECModel::data(const QModelIndex& index, int role) const
     // Qt::DisplayRole.
     if (!parent.isValid())
     {
-        if (role == Qt::DisplayRole || role == Role::EntityIdRole)
+        if (index.column() == 0 &&
+            (role == Qt::DisplayRole || role == Role::EntityIdRole))
         {
             // top level -> entity id
             return QString::fromStdString(data_[index.row()].entityId_);
@@ -315,6 +322,22 @@ QVariant ECModel::data(const QModelIndex& index, int role) const
 
     // --- only ModelEntry below this line ---
     auto& entry = data_[parent.row()].entries_[index.row()];
+
+    // special case for the second column, which we will use to show
+    // the components tag in the list view
+    if (index.column() == 1)
+    {
+        if (role == Qt::DisplayRole || role == Qt::EditRole)
+        {
+            return QString::fromStdString(entry.component()->getTag());
+        }
+        else
+        {
+            return QVariant();
+        }
+    }
+
+    // the first column is used for everything else, selected by different roles
     if (role == Qt::DisplayRole)
     {
         // "*" (if modified) + "Component_" + componentId.
@@ -374,48 +397,63 @@ bool ECModel::setData(const QModelIndex& index, const QVariant& value, int role)
     if (!index.parent().isValid()) return false;
 
     auto& entry = data_[index.parent().row()].entries_[index.row()];
-    if (role == Role::ComponentJsonRole && value.canConvert<QString>())
-    {
-        try {
-            entry.setJSON(value.value<QString>().toStdString());
-        } catch (std::exception& e) {
-            emit error(e.what());
-        }
 
-        emit dataChanged(index, index);
-        return true;
-    }
-    else if (role == Role::ComponentPtrRole && value.canConvert<Component::Ptr>())
+    if (role == Qt::EditRole && index.column() == 1)
     {
-        // TODO: Don't really *want* to change the pointer! Noone is supposed to
-        // do that! Only *update* the one that is already there.
-        // So, actually, this is only supposed to trigger a "hey I changed
-        // something that this pointer points to".
-        auto ptr = value.value<Component::Ptr>();
-        if (ptr == entry.component_)
+        // set a new tag
+        entry.component()->setTag(value.value<QString>().toStdString());
+        // since we actually changed the component, trigger an update of it
+        return setData(
+                index.sibling(index.row(), 0),
+                QVariant::fromValue(entry.component()),
+                Role::ComponentPtrRole);
+    }
+    else if (index.column() == 0)
+    {
+        if (role == Role::ComponentJsonRole && value.canConvert<QString>())
         {
-            // only on pointer-equality, do something.
             try {
-                entry.componentPtrChanged();
+                entry.setJSON(value.value<QString>().toStdString());
             } catch (std::exception& e) {
                 emit error(e.what());
             }
 
-            emit dataChanged(index, index);
+            emit dataChanged(index, index.sibling(index.row(), 1));
             return true;
         }
-        return false;
+        else if (role == Role::ComponentPtrRole && value.canConvert<Component::Ptr>())
+        {
+            // TODO: Don't really *want* to change the pointer! Noone is supposed to
+            // do that! Only *update* the one that is already there.
+            // So, actually, this is only supposed to trigger a "hey I changed
+            // something that this pointer points to".
+            auto ptr = value.value<Component::Ptr>();
+            if (ptr == entry.component_)
+            {
+                // only on pointer-equality, do something.
+                try {
+                    entry.componentPtrChanged();
+                } catch (std::exception& e) {
+                    emit error(e.what());
+                }
+
+                emit dataChanged(index, index.sibling(index.row(), 1));
+                return true;
+            }
+            return false;
+        }
     }
 
     return false;
 }
 
 
-QVariant ECModel::headerData(int, Qt::Orientation, int role) const
+QVariant ECModel::headerData(int column, Qt::Orientation, int role) const
 {
     if (role == Qt::DisplayRole)
     {
-        return "Id";
+        if (column == 0) return "id";
+        return "tag";
     }
 
     return QVariant();
@@ -446,9 +484,18 @@ int ECModel::rowCount(const QModelIndex& parent) const
     }
 }
 
-int ECModel::columnCount(const QModelIndex&) const
+int ECModel::columnCount(const QModelIndex& /*index*/) const
 {
+    return 2;
+    /*
+    if (index.isValid() && index.parent().isValid())
+    {
+        // component entry. second column is the tag.
+        return 2;
+    }
+
     return 1;
+    */
 }
 
 

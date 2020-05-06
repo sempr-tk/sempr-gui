@@ -35,7 +35,8 @@ void UsefulWidget::onDataChanged(
 
 void UsefulWidget::onCurrentRowChanged(const QModelIndex& current, const QModelIndex&)
 {
-    currentIndex_ = QPersistentModelIndex(current);
+    // always use column 0! 1 is an alias for only the tag
+    currentIndex_ = QPersistentModelIndex(current.sibling(current.row(), 0));
     updateWidget();
 }
 
