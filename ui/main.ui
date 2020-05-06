@@ -175,6 +175,11 @@ selection-color: black;
            <string>Raw</string>
           </attribute>
          </widget>
+         <widget class="sempr::gui::TextComponentWidget" name="tabTextComponent">
+          <attribute name="title">
+           <string>TextComponent</string>
+          </attribute>
+         </widget>
          <widget class="sempr::gui::TripleContainerWidget" name="tabTripleContainer">
           <attribute name="title">
            <string>TripleContainer</string>
@@ -282,6 +287,12 @@ selection-color: black;
    <class>sempr::gui::ComponentAdderWidget</class>
    <extends>QWidget</extends>
    <header>../src/ComponentAdderWidget.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>sempr::gui::TextComponentWidget</class>
+   <extends>QWidget</extends>
+   <header>../src/TextComponentWidget.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

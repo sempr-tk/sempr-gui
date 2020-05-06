@@ -66,6 +66,7 @@ set(GUI_SRC
     src/RoleNameProxyModel.cpp
     src/TCPConnectionClient.cpp
     src/TCPConnectionServer.cpp
+    src/TextComponentWidget.cpp
     src/TripleContainerWidget.cpp
     src/TriplePropertyMapWidget.cpp
     src/TripleVectorWidget.cpp
@@ -74,6 +75,7 @@ set(GUI_SRC
     src/UsefulWidget.cpp
     ui/main.ui
     ui/raw_component.ui
+    ui/textcomponent.ui
     ui/triplecontainer.ui
     ui/triplepropertymap.ui
     ui/triplevector.ui

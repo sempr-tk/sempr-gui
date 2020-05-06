@@ -8,6 +8,7 @@
 #include <sempr/component/TripleDocument.hpp>
 #include <sempr/component/TriplePropertyMap.hpp>
 #include <sempr/component/TripleVector.hpp>
+#include <sempr/component/TextComponent.hpp>
 #include <cereal/archives/json.hpp>
 #include <sstream>
 
@@ -23,6 +24,7 @@ ComponentAdderWidget::ComponentAdderWidget(QWidget *parent) :
     registerComponentType<TripleDocument>("TripleDocument");
     registerComponentType<TripleVector>("TripleVector");
     registerComponentType<TriplePropertyMap>("TriplePropertyMap");
+    registerComponentType<TextComponent>("TextComponent");
 
     connect(ui_->btnCreate, &QPushButton::clicked,
             this, &ComponentAdderWidget::createComponent);

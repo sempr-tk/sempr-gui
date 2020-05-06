@@ -17,6 +17,9 @@ SemprGui::SemprGui(AbstractInterface::Ptr interface)
     // raw json editing
     form_->tabRawComponent->setModel(&dataModel_);
     form_->tabRawComponent->setSelectionModel(selectionModel);
+    // simple text component
+    form_->tabTextComponent->setModel(&dataModel_);
+    form_->tabTextComponent->setSelectionModel(selectionModel);
     // read-only triple container
     form_->tabTripleContainer->setModel(&dataModel_);
     form_->tabTripleContainer->setSelectionModel(selectionModel);
@@ -36,6 +39,8 @@ SemprGui::SemprGui(AbstractInterface::Ptr interface)
 
     // connection to hide/show tabs depending on selected component type
     connect(form_->tabRawComponent, &UsefulWidget::isUseful,
+            this, &SemprGui::updateTabStatus);
+    connect(form_->tabTextComponent, &UsefulWidget::isUseful,
             this, &SemprGui::updateTabStatus);
     connect(form_->tabTripleContainer, &UsefulWidget::isUseful,
             this, &SemprGui::updateTabStatus);
@@ -69,6 +74,7 @@ SemprGui::SemprGui(AbstractInterface::Ptr interface)
 
     // hide all tabs in the beginning, as no data is selected yet.
     updateTabStatus(form_->tabRawComponent, false);
+    updateTabStatus(form_->tabTextComponent, false);
     updateTabStatus(form_->tabTripleContainer, false);
     updateTabStatus(form_->tabTriplePropertyMap, false);
     updateTabStatus(form_->tabTripleVector, false);
