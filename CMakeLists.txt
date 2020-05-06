@@ -63,6 +63,7 @@ set(GUI_SRC
     src/GeosQCoordinateTranform.cpp
     src/SemprGui.cpp
     src/RawComponentWidget.cpp
+    src/ReteVisualSerialization.cpp
     src/RoleNameProxyModel.cpp
     src/TCPConnectionClient.cpp
     src/TCPConnectionServer.cpp
