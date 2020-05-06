@@ -2,6 +2,7 @@
 #include "ECDataZMQ.hpp"
 #include "TCPConnectionRequest.hpp"
 
+#include <cereal/archives/json.hpp>
 #include <iostream>
 
 namespace sempr { namespace gui {
@@ -75,6 +76,19 @@ void TCPConnectionServer::start()
 }
 
 
+std::string TCPConnectionServer::getReteNetwork()
+{
+    auto graph = semprConnection_->getReteNetworkRepresentation();
+
+    std::stringstream ss;
+    {
+        cereal::JSONOutputArchive ar(ss);
+        ar(graph);
+    }
+
+    return ss.str();
+}
+
 TCPConnectionResponse TCPConnectionServer::handleRequest(const TCPConnectionRequest& request)
 {
     TCPConnectionResponse response;
@@ -92,6 +106,9 @@ TCPConnectionResponse TCPConnectionServer::handleRequest(const TCPConnectionRequ
                 break;
             case TCPConnectionRequest::REMOVE_EC_PAIR:
                 semprConnection_->removeEntityComponentPair(request.data);
+                break;
+            case TCPConnectionRequest::GET_RETE_NETWORK:
+                response.reteNetwork = getReteNetwork();
                 break;
         }
         response.success = true;

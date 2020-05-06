@@ -16,7 +16,8 @@ struct TCPConnectionRequest {
         LIST_ALL_EC_PAIRS = 0,
         ADD_EC_PAIR,
         MODIFY_EC_PAIR,
-        REMOVE_EC_PAIR
+        REMOVE_EC_PAIR,
+        GET_RETE_NETWORK
     };
 
     Action action;
@@ -32,6 +33,7 @@ struct TCPConnectionResponse {
     bool success;
     std::string msg; // in case of errors, here could be some description.
     std::vector<ECData> data; // just for the LIST_ALL_EC_PAIRS action, contains all the EC pairs.
+    std::string reteNetwork; // just for GET_RETE_NETWORK action, json representation of a Graph
 };
 
 
@@ -77,6 +79,7 @@ inline zmqpp::message& operator << (zmqpp::message& msg, const TCPConnectionResp
     {
         msg << data;
     }
+    msg << response.reteNetwork;
     return msg;
 }
 
@@ -93,6 +96,7 @@ inline zmqpp::message& operator >> (zmqpp::message& msg, TCPConnectionResponse& 
         msg >> d;
         response.data.push_back(d);
     }
+    msg >> response.reteNetwork;
     return msg;
 }
 

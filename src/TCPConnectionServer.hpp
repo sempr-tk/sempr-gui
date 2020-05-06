@@ -39,6 +39,10 @@ class TCPConnectionServer {
         Handling a request
     */
     TCPConnectionResponse handleRequest(const TCPConnectionRequest& request);
+
+    // helper: get the rete network, serialize it to json
+    std::string getReteNetwork();
+
 public:
     TCPConnectionServer(
         DirectConnection::Ptr con,

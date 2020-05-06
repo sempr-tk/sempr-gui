@@ -19,6 +19,17 @@ DirectConnection::DirectConnection(sempr::Core* core, std::mutex& m)
 {
 }
 
+
+Graph DirectConnection::getReteNetworkRepresentation()
+{
+    std::lock_guard<std::recursive_mutex> lg(core_->reasonerMutex());
+
+    CreateVisualGraphVisitor visitor;
+    static_cast<rete::Node*>(core_->reasoner().net().getRoot().get())->accept(visitor);
+
+    return visitor.graph();
+}
+
 std::vector<ECData> DirectConnection::listEntityComponentPairs()
 {
     std::vector<rete::WME::Ptr> wmes;

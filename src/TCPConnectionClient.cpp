@@ -2,6 +2,7 @@
 #include "TCPConnectionRequest.hpp"
 #include "ECDataZMQ.hpp"
 
+#include <cereal/archives/json.hpp>
 #include <iostream>
 #include <exception>
 
@@ -84,6 +85,28 @@ TCPConnectionResponse TCPConnectionClient::execRequest(const TCPConnectionReques
     return response;
 }
 
+
+Graph TCPConnectionClient::getReteNetworkRepresentation()
+{
+    TCPConnectionRequest request;
+    request.action = TCPConnectionRequest::GET_RETE_NETWORK;
+    auto response = execRequest(request);
+
+    if (response.success)
+    {
+        std::stringstream ss(response.reteNetwork);
+        cereal::JSONInputArchive ar(ss);
+
+        Graph g;
+        ar >> g;
+
+        return g;
+    }
+    else
+    {
+        throw std::runtime_error(response.msg); // TODO better exceptions...
+    }
+}
 
 std::vector<ECData> TCPConnectionClient::listEntityComponentPairs()
 {

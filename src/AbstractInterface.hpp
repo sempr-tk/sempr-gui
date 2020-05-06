@@ -9,7 +9,7 @@
 #include <memory>
 #include <mutex>
 
-//#include "ModelEntry.hpp"
+#include "ReteVisualSerialization.hpp"
 
 namespace sempr { namespace gui {
 
@@ -60,6 +60,12 @@ public:
     // for the callback
     enum Notification { ADDED, UPDATED, REMOVED };
     typedef std::function<void(ECData, Notification)> callback_t;
+
+
+    /**
+        Returns a simplified representation of the internal rete network
+    */
+    virtual Graph getReteNetworkRepresentation() = 0;
 
     /**
         Lists all entity-component pairs present in the reasoner.
