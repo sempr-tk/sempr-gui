@@ -24,7 +24,7 @@ std::vector<ECData> DirectConnection::listEntityComponentPairs()
     std::vector<rete::WME::Ptr> wmes;
 
     {
-        std::lock_guard<std::mutex> lg(core_->reasonerMutex());
+        std::lock_guard<std::recursive_mutex> lg(core_->reasonerMutex());
         wmes = core_->reasoner().getCurrentState().getWMEs();
     }
 
