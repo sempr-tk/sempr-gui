@@ -7,10 +7,13 @@
 #include <sempr/nodes/ExtractTriplesBuilder.hpp>
 #include <sempr/nodes/GeoDistanceBuilder.hpp>
 #include <sempr/nodes/GeoConversionBuilders.hpp>
+#include <sempr/nodes/ConstructRulesBuilder.hpp>
+#include <sempr/nodes/TextComponentTextBuilder.hpp>
 
 #include "DirectConnectionBuilder.hpp"
 #include "TCPConnectionServer.hpp"
 
+#include <sempr/component/TextComponent.hpp>
 #include <sempr/component/TripleContainer.hpp>
 #include <sempr/component/TripleVector.hpp>
 #include <sempr/component/TriplePropertyMap.hpp>
@@ -42,6 +45,15 @@ int main(int argc, char** args)
         ss << std::ifstream(args[1]).rdbuf();
         extraRules = ss.str();
     }
+    else
+    {
+        // if no rules are explicitely given, add a single rule to allow
+        // adding rules like data
+        extraRules = "[inferRules: (?a <type> <Rules>), EC<TextComponent>(?a ?c), text:value(?text ?c) -> constructRules(?text)]";
+        // actually, we need one more: The basic "Extract Triples" thing to get
+        // the "(?a <type> <Rules>)" condition fulfilled.
+        extraRules += "[extractTriples: EC<TripleContainer>(?e ?c) -> ExtractTriples(?c)]";
+    }
 
     if (!fs::exists("./db")) fs::create_directory("./db");
     auto db = std::make_shared<SeparateFileStorage>("./db");
@@ -64,11 +76,14 @@ int main(int argc, char** args)
     // but we still need to insert the connection into the reasoner
     rete::RuleParser parser;
     parser.registerNodeBuilder<ECNodeBuilder<Component>>();
+    parser.registerNodeBuilder<ECNodeBuilder<TextComponent>>();
     parser.registerNodeBuilder<ECNodeBuilder<TripleContainer>>();
     parser.registerNodeBuilder<ECNodeBuilder<TriplePropertyMap>>();
     parser.registerNodeBuilder<ECNodeBuilder<AffineTransform>>();
     parser.registerNodeBuilder<ECNodeBuilder<GeosGeometry>>();
     parser.registerNodeBuilder<ECNodeBuilder<GeosGeometryInterface>>();
+    parser.registerNodeBuilder<TextComponentTextBuilder>();
+    parser.registerNodeBuilder<ConstructRulesBuilder>(&sempr);
     parser.registerNodeBuilder<InferECBuilder<AffineTransform>>();
     parser.registerNodeBuilder<AffineTransformCreateBuilder>();
     parser.registerNodeBuilder<DirectConnectionBuilder>(connection);
