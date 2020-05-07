@@ -61,10 +61,11 @@ set(GUI_SRC
     src/GeometryFilterProxyModel.cpp
     src/GeoMapWidget.cpp
     src/GeosQCoordinateTranform.cpp
-    src/SemprGui.cpp
+    src/ReteWidget.cpp
     src/RawComponentWidget.cpp
     src/ReteVisualSerialization.cpp
     src/RoleNameProxyModel.cpp
+    src/SemprGui.cpp
     src/TCPConnectionClient.cpp
     src/TCPConnectionServer.cpp
     src/TextComponentWidget.cpp

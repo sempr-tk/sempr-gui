@@ -235,13 +235,17 @@ selection-color: black;
        </item>
       </layout>
      </widget>
-     <widget class="sempr::gui::GeoMapWidget" name="geoMapWidget" native="true">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-        <horstretch>1</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
+     <widget class="QTabWidget" name="tabWidget_2">
+      <widget class="sempr::gui::GeoMapWidget" name="geoMapWidget">
+       <attribute name="title">
+        <string>Tab 1</string>
+       </attribute>
+      </widget>
+      <widget class="sempr::gui::ReteWidget" name="reteWidget">
+       <attribute name="title">
+        <string>Tab 2</string>
+       </attribute>
+      </widget>
      </widget>
     </widget>
    </item>
@@ -293,6 +297,12 @@ selection-color: black;
    <class>sempr::gui::TextComponentWidget</class>
    <extends>QWidget</extends>
    <header>../src/TextComponentWidget.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>sempr::gui::ReteWidget</class>
+   <extends>QWidget</extends>
+   <header>../src/ReteWidget.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

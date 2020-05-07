@@ -173,7 +173,7 @@ void CreateVisualGraphVisitor::visit(rete::ProductionNode* node)
     if (visited_.find(id) != visited_.end()) return;
     visited_.insert(id);
 
-    std::string label = node->getName();
+    std::string label = static_cast<rete::Node*>(node)->getDOTAttr();
 
     // add this node
     addNode(id, label);

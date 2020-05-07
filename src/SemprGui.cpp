@@ -33,6 +33,9 @@ SemprGui::SemprGui(AbstractInterface::Ptr interface)
     // setup the GeoMapWidget
     form_->geoMapWidget->setup(&dataModel_, selectionModel);
 
+    // setup ReteWidget
+    form_->reteWidget->setConnection(interface);
+
     // setup component adder
     form_->componentAdder->setModel(&dataModel_);
     form_->componentAdder->setSelectionModel(selectionModel);

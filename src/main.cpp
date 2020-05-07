@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <thread>
 
 #include <QtCore>
@@ -94,6 +95,10 @@ int main(int argc, char** args)
     entity1->addComponent(vector);
 
     sempr.performInference();
+
+    {
+        std::ofstream("main.dot") << sempr.reasoner().net().toDot();
+    }
 
     // start the gui
     std::thread gui_thread(&runGUI, argc, args, connection);
