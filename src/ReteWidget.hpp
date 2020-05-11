@@ -33,6 +33,9 @@ class ReteWidget : public QWidget {
     // a list of graphics items that were added to the scene
     std::map<std::string, ReteNodeItem*> nodes_;
 
+    // store the graph, non-visual, abstract representation
+    Graph graph_;
+
     /**
         Requests the network information from the sempr core and re-builds the
         visual representation the in graphics scene
@@ -41,12 +44,18 @@ class ReteWidget : public QWidget {
 
 public:
     ReteWidget(QWidget* parent = nullptr);
-    ~ReteWidget();
+    virtual ~ReteWidget();
 
     /**
         Initializes the connection to sempr
     */
     void setConnection(AbstractInterface::Ptr);
+
+
+    /**
+        Resets the layout of the nodes
+    */
+    virtual void resetLayout();
 };
 
 }}
