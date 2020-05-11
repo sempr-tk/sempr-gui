@@ -63,6 +63,8 @@ set(GUI_SRC
     src/GeosQCoordinateTranform.cpp
     src/ReteWidget.cpp
     src/RawComponentWidget.cpp
+    src/ReteNodeItem.cpp
+    src/ReteEdgeItem.cpp
     src/ReteVisualSerialization.cpp
     src/RoleNameProxyModel.cpp
     src/SemprGui.cpp

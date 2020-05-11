@@ -2,6 +2,9 @@
 #include "../ui/ui_retewidget.h"
 
 #include "ReteVisualSerialization.hpp"
+#include "ReteNodeItem.hpp"
+#include "ReteEdgeItem.hpp"
+
 #include <QRectF>
 #include <cmath>
 
@@ -43,9 +46,24 @@ void ReteWidget::rebuild()
         float y = radius * cos((float)i/numNodes * 2 * M_PI);
         i++;
 
-        auto item = scene_.addEllipse({x, y, 100, 50});
+        auto item = new ReteNodeItem(QString::fromStdString(node.label));
+        nodes_[node.id] = item;
+
+        item->setPos({x, y});
+        scene_.addItem(item); // scene takes ownership
+
         item->setFlag(QGraphicsItem::ItemIsMovable);
-        items_[node.id] = item;
+        nodes_[node.id] = item;
+    }
+
+    for (auto edge : graph.edges)
+    {
+        auto from = nodes_[edge.from];
+        auto to = nodes_[edge.to];
+
+        auto edgeItem = new ReteEdgeItem(from, to);
+        edgeItem->adjust();
+        scene_.addItem(edgeItem);
     }
 }
 

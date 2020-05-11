@@ -10,6 +10,7 @@
 #include <map>
 
 #include "AbstractInterface.hpp"
+#include "ReteNodeItem.hpp"
 
 namespace Ui {
     class ReteWidget;
@@ -30,7 +31,7 @@ class ReteWidget : public QWidget {
     AbstractInterface::Ptr sempr_;
 
     // a list of graphics items that were added to the scene
-    std::map<std::string, QGraphicsItem*> items_;
+    std::map<std::string, ReteNodeItem*> nodes_;
 
     /**
         Requests the network information from the sempr core and re-builds the
