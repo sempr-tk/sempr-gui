@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QGraphicsView" name="graphicsView"/>
+    <widget class="sempr::gui::ZoomGraphicsView" name="graphicsView"/>
    </item>
    <item>
     <widget class="QPushButton" name="btnUpdate">
@@ -26,6 +26,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>sempr::gui::ZoomGraphicsView</class>
+   <extends>QGraphicsView</extends>
+   <header>../src/ZoomGraphicsView.hpp</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -38,10 +38,8 @@ void ReteNodeItem::addEdge(ReteEdgeItem* edge)
 
 QVariant ReteNodeItem::itemChange(GraphicsItemChange change, const QVariant& value)
 {
-    std::cout << "some change -- " << change << std::endl;
     if (change == ItemPositionHasChanged)
     {
-        std::cout << "node has changed position! " << value.toString().toStdString() << std::endl;
         for (auto edge : edges_)
         {
             edge->adjust();

@@ -77,6 +77,7 @@ set(GUI_SRC
     src/StackedColumnsProxyModel.cpp
     src/UniqueFilterProxyModel.cpp
     src/UsefulWidget.cpp
+    src/ZoomGraphicsView.cpp
     ui/main.ui
     ui/raw_component.ui
     ui/textcomponent.ui
