@@ -48,7 +48,7 @@ void CreateVisualGraphVisitor::visit(rete::AlphaNode* node)
     if (visited_.find(id) != visited_.end()) return;
     visited_.insert(id);
 
-    std::string label = static_cast<rete::Node*>(node)->getDOTAttr();
+    std::string label = static_cast<rete::Node*>(node)->toString();
 
     // add this node
     addNode(id, label);
@@ -82,7 +82,7 @@ void CreateVisualGraphVisitor::visit(rete::AlphaMemory* node)
     if (visited_.find(id) != visited_.end()) return;
     visited_.insert(id);
 
-    std::string label = static_cast<rete::Node*>(node)->getDOTAttr();
+    std::string label = static_cast<rete::Node*>(node)->toString();
 
     // add this node
     addNode(id, label);
@@ -108,7 +108,7 @@ void CreateVisualGraphVisitor::visit(rete::BetaNode* node)
     if (visited_.find(id) != visited_.end()) return;
     visited_.insert(id);
 
-    std::string label = static_cast<rete::Node*>(node)->getDOTAttr();
+    std::string label = static_cast<rete::Node*>(node)->toString();
 
     // add this node
     addNode(id, label);
@@ -128,7 +128,7 @@ void CreateVisualGraphVisitor::visit(rete::BetaMemory* node)
     if (visited_.find(id) != visited_.end()) return;
     visited_.insert(id);
 
-    std::string label = static_cast<rete::Node*>(node)->getDOTAttr();
+    std::string label = static_cast<rete::Node*>(node)->toString();
 
     // add this node
     addNode(id, label);
@@ -173,7 +173,7 @@ void CreateVisualGraphVisitor::visit(rete::ProductionNode* node)
     if (visited_.find(id) != visited_.end()) return;
     visited_.insert(id);
 
-    std::string label = static_cast<rete::Node*>(node)->getDOTAttr();
+    std::string label = static_cast<rete::Node*>(node)->toString();
 
     // add this node
     addNode(id, label);
