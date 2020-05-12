@@ -3,13 +3,25 @@
 namespace sempr { namespace gui {
 
 ReteEdgeItem::ReteEdgeItem(ReteNodeItem* from, ReteNodeItem* to)
-    : fromNode_(from), toNode_(to)
+    : fromNode_(from), toNode_(to), localHighlight_(false), globalHighlight_(false)
 {
     setAcceptedMouseButtons(Qt::NoButton);
     setZValue(-2);
 
     if (fromNode_) fromNode_->addEdge(this);
     if (toNode_) toNode_->addEdge(this);
+}
+
+void ReteEdgeItem::setLocalHighlighted(bool on)
+{
+    localHighlight_ = on;
+    update();
+}
+
+void ReteEdgeItem::setGlobalHighlighted(bool on)
+{
+    globalHighlight_ = on;
+    update();
 }
 
 void ReteEdgeItem::adjust()
@@ -37,8 +49,29 @@ void ReteEdgeItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWi
 {
     if (!fromNode_ || !toNode_) return;
 
+    QColor solBlack(7, 54, 66);
+    QColor solWhite(238, 232, 213);
+    QColor solBrWhite(253, 246, 227);
+    QColor solBlue(38, 139, 210);
+    QColor solGreen(133, 153, 0);
+    QColor solRed(220, 50, 47);
+
+
     painter->setRenderHint(QPainter::RenderHint::HighQualityAntialiasing);
-    QPen pen(Qt::black, 2);
+
+    QPen pen(solBlue, 2);
+
+    if (globalHighlight_)
+    {
+        pen.setColor(solRed);
+    }
+
+    if (localHighlight_)
+    {
+        pen.setWidth(4);
+    }
+
+    painter->setPen(pen);
     painter->drawLine(fromPoint_, toPoint_);
 }
 

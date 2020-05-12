@@ -42,6 +42,17 @@ class ReteWidget : public QWidget {
     */
     void rebuild();
 
+
+    /**
+        Highlights the part of the graph connected to the given node
+    */
+    void highlight(const std::string& id);
+    void highlight(ReteNodeItem* node);
+
+private slots:
+    // highlight selected items
+    void onSelectionChanged();
+
 public:
     ReteWidget(QWidget* parent = nullptr);
     virtual ~ReteWidget();

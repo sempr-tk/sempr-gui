@@ -48,9 +48,12 @@ void ZoomGraphicsView::mousePressEvent(QMouseEvent* event)
     {
         moving_ = true;
         lastPoint_ = event->pos();
+        event->accept();
     }
-
-    QGraphicsView::mousePressEvent(event);
+    else
+    {
+        QGraphicsView::mousePressEvent(event);
+    }
 }
 
 void ZoomGraphicsView::mouseReleaseEvent(QMouseEvent* event)

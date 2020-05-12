@@ -15,11 +15,16 @@ namespace sempr { namespace gui {
 class ReteEdgeItem : public QGraphicsItem {
     ReteNodeItem *fromNode_, *toNode_;
     QPointF fromPoint_, toPoint_;
+
+    bool localHighlight_, globalHighlight_;
 public:
     ReteEdgeItem(ReteNodeItem* from, ReteNodeItem* to);
 
     /// re-compute start and end points
     void adjust();
+
+    void setLocalHighlighted(bool);
+    void setGlobalHighlighted(bool);
 
     QRectF boundingRect() const override;
     void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*) override;

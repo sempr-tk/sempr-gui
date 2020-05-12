@@ -20,6 +20,9 @@ ReteWidget::ReteWidget(QWidget* parent)
 
     connect(form_->btnUpdate, &QPushButton::clicked,
             this, &ReteWidget::rebuild);
+
+    connect(&scene_, &QGraphicsScene::selectionChanged,
+            this, &ReteWidget::onSelectionChanged);
 }
 
 ReteWidget::~ReteWidget()
@@ -31,6 +34,72 @@ ReteWidget::~ReteWidget()
 void ReteWidget::setConnection(AbstractInterface::Ptr conn)
 {
     sempr_ = conn;
+}
+
+void ReteWidget::onSelectionChanged()
+{
+    auto selectedItems = scene_.selectedItems();
+    if (selectedItems.empty())
+    {
+        highlight("");
+    }
+    else
+    {
+        auto first = selectedItems[0];
+        auto node = dynamic_cast<ReteNodeItem*>(first);
+        if (node) highlight(node);
+    }
+}
+
+
+void ReteWidget::highlight(ReteNodeItem* node)
+{
+    for (auto entry : nodes_)
+    {
+        if (entry.second == node)
+        {
+            highlight(entry.first);
+            return;
+        }
+    }
+}
+
+void ReteWidget::highlight(const std::string& id)
+{
+    // un-highlight all
+    for (auto entry : nodes_)
+    {
+        entry.second->setHighlighted(false);
+    }
+
+    // highlight not only the one node, but all its ancestors and decendants,
+    // too.
+    std::set<std::pair<std::string, bool>> visited;
+    std::vector<std::pair<std::string, bool>> toVisit; // which node to visit, and in which direction (only up / only down)
+    toVisit.push_back({id, false});
+    toVisit.push_back({id, true});
+
+    while (!toVisit.empty())
+    {
+        auto entry = toVisit.back();
+        toVisit.pop_back();
+
+        if (visited.find(entry) != visited.end()) continue;
+
+        // TODO highlight this node.
+        auto node = nodes_.find(entry.first);
+        if (node != nodes_.end()) node->second->setHighlighted(true);
+
+        // dont visit this node again.
+        visited.insert(entry);
+
+        // find all ancestors and decendants
+        for (auto edge : graph_.edges)
+        {
+            if (!entry.second && edge.from == entry.first) toVisit.push_back({edge.to, false});
+            if (entry.second && edge.to == entry.first) toVisit.push_back({edge.from, true});
+        }
+    }
 }
 
 

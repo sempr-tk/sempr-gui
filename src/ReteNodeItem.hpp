@@ -16,6 +16,12 @@ namespace sempr { namespace gui {
 class ReteNodeItem : public QGraphicsItem {
     QString text_;
 
+    // whether to highlight this node or not
+    bool highlight_;
+
+    // highlight used internally, for this node and its edges on hover
+    bool localHighlight_;
+
     std::vector<ReteEdgeItem*> edges_;
 public:
     ReteNodeItem(const QString& text);
@@ -26,7 +32,13 @@ public:
     // will call ReteEdgeItem::adjust when the nodes position changed
     void addEdge(ReteEdgeItem* edge);
 
+    void setHighlighted(bool);
+
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
+
+    // highlighth node locally on hover
+    void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
 };
 
 }}
