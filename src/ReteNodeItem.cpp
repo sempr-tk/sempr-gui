@@ -18,7 +18,10 @@ ReteNodeItem::ReteNodeItem(const QString& text)
 QRectF ReteNodeItem::boundingRect() const
 {
     auto fm = QApplication::fontMetrics();
-    return fm.boundingRect(text_).adjusted(-20, -20, 20, 20);
+    auto rect = fm.boundingRect(text_);
+    rect.moveCenter({0, 0});
+    rect.adjust(-20, -20, 20, 20);
+    return rect;
 }
 
 void ReteNodeItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*)
@@ -26,6 +29,8 @@ void ReteNodeItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWi
     auto rect = boundingRect();
     QPen pen(Qt::black, 3);
     painter->setPen(pen);
+    painter->setRenderHint(QPainter::RenderHint::HighQualityAntialiasing);
+    painter->fillRect(rect, QBrush(Qt::white));
     painter->drawRect(rect);
     painter->drawText(rect, Qt::AlignCenter, text_);
 }

@@ -132,8 +132,9 @@ void ReteWidget::resetLayout()
         // set the nodes position
         for (auto node : levelToNodes[level])
         {
+            x += node->boundingRect().width()/2.;
             node->setPos(x, y);
-            x += node->boundingRect().width() + xOffset;
+            x += node->boundingRect().width()/2. + xOffset;
         }
 
         y += yOffset;

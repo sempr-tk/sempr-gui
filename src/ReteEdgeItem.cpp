@@ -6,6 +6,7 @@ ReteEdgeItem::ReteEdgeItem(ReteNodeItem* from, ReteNodeItem* to)
     : fromNode_(from), toNode_(to)
 {
     setAcceptedMouseButtons(Qt::NoButton);
+    setZValue(-2);
 
     if (fromNode_) fromNode_->addEdge(this);
     if (toNode_) toNode_->addEdge(this);
@@ -36,7 +37,8 @@ void ReteEdgeItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWi
 {
     if (!fromNode_ || !toNode_) return;
 
-    QPen pen(Qt::black, 1);
+    painter->setRenderHint(QPainter::RenderHint::HighQualityAntialiasing);
+    QPen pen(Qt::black, 2);
     painter->drawLine(fromPoint_, toPoint_);
 }
 
