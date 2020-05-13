@@ -105,6 +105,9 @@ void ReteWidget::highlight(const std::string& id)
 
 void ReteWidget::rebuild()
 {
+    nodes_.clear();
+    scene_.clear();
+
     graph_ = sempr_->getReteNetworkRepresentation();
 
     for (auto node : graph_.nodes)
