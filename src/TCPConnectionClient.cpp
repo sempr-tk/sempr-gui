@@ -108,6 +108,24 @@ Graph TCPConnectionClient::getReteNetworkRepresentation()
     }
 }
 
+
+std::vector<Rule> TCPConnectionClient::getRulesRepresentation()
+{
+    TCPConnectionRequest request;
+    request.action = TCPConnectionRequest::GET_RULES;
+    auto response = execRequest(request);
+
+    if (response.success)
+    {
+        return response.rules;
+    }
+    else
+    {
+        throw std::runtime_error(response.msg); // TODO better exceptions...
+    }
+}
+
+
 std::vector<ECData> TCPConnectionClient::listEntityComponentPairs()
 {
     TCPConnectionRequest request;

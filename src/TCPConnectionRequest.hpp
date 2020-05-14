@@ -3,7 +3,10 @@
 
 #include "AbstractInterface.hpp"
 #include "ECDataZMQ.hpp"
+#include "Rule.hpp"
+
 #include <zmqpp/zmqpp.hpp>
+#include <cereal/archives/json.hpp>
 
 namespace sempr { namespace gui {
 
@@ -17,7 +20,8 @@ struct TCPConnectionRequest {
         ADD_EC_PAIR,
         MODIFY_EC_PAIR,
         REMOVE_EC_PAIR,
-        GET_RETE_NETWORK
+        GET_RETE_NETWORK,
+        GET_RULES
     };
 
     Action action;
@@ -34,7 +38,35 @@ struct TCPConnectionResponse {
     std::string msg; // in case of errors, here could be some description.
     std::vector<ECData> data; // just for the LIST_ALL_EC_PAIRS action, contains all the EC pairs.
     std::string reteNetwork; // just for GET_RETE_NETWORK action, json representation of a Graph
+    std::vector<Rule> rules; // just for GET_RULES
 };
+
+
+// helper: write sempr::gui::Rule to the message type
+inline zmqpp::message& operator << (zmqpp::message& msg, Rule r)
+{
+    std::stringstream ss;
+    {
+        cereal::JSONOutputArchive ar(ss);
+        ar(r);
+    }
+
+    msg << ss.str();
+    return msg;
+}
+
+// helper: read sempr::gui::Rule from message type
+inline zmqpp::message& operator >> (zmqpp::message& msg, Rule& r)
+{
+    std::string s;
+    msg >> s;
+
+    std::stringstream ss(s);
+    cereal::JSONInputArchive ar(ss);
+    ar >> r;
+
+    return msg;
+}
 
 
 // next, we need operators to read and write requests and responses from/to
@@ -80,6 +112,13 @@ inline zmqpp::message& operator << (zmqpp::message& msg, const TCPConnectionResp
         msg << data;
     }
     msg << response.reteNetwork;
+
+    msg << response.rules.size();
+    for (auto& rule : response.rules)
+    {
+        msg << rule;
+    }
+
     return msg;
 }
 
@@ -97,6 +136,16 @@ inline zmqpp::message& operator >> (zmqpp::message& msg, TCPConnectionResponse& 
         response.data.push_back(d);
     }
     msg >> response.reteNetwork;
+
+    size_t numRules;
+    msg >> numRules;
+    for (size_t i = 0; i < numRules; i++)
+    {
+        Rule r;
+        msg >> r;
+        response.rules.push_back(r);
+    }
+
     return msg;
 }
 

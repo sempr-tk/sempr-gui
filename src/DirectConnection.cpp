@@ -30,6 +30,33 @@ Graph DirectConnection::getReteNetworkRepresentation()
     return visitor.graph();
 }
 
+
+std::vector<Rule> DirectConnection::getRulesRepresentation()
+{
+    std::vector<rete::ParsedRule::Ptr> reteRules;
+    {
+        std::lock_guard<std::mutex> lg(semprMutex_);
+        reteRules = core_->rules();
+    }
+
+    std::vector<Rule> rules;
+    for (auto r : reteRules)
+    {
+        Rule rule;
+        rule.id = r->id();
+        rule.name = r->name();
+        rule.ruleString = r->ruleString();
+
+        for (auto effect : r->effectNodes())
+        {
+            rule.effectNodes.push_back(effect->getDOTId());
+        }
+    }
+
+    return rules;
+}
+
+
 std::vector<ECData> DirectConnection::listEntityComponentPairs()
 {
     std::vector<rete::WME::Ptr> wmes;

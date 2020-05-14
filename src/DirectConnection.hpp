@@ -24,6 +24,7 @@ public:
     DirectConnection(sempr::Core* core, std::mutex& m);
 
     Graph getReteNetworkRepresentation() override;
+    std::vector<Rule> getRulesRepresentation() override;
     std::vector<ECData> listEntityComponentPairs() override;
     void addEntityComponentPair(const ECData&) override;
     void removeEntityComponentPair(const ECData&) override;

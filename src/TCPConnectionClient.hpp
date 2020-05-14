@@ -40,6 +40,7 @@ public:
     void stop();
 
     Graph getReteNetworkRepresentation() override;
+    std::vector<Rule> getRulesRepresentation() override;
     std::vector<ECData> listEntityComponentPairs() override;
     void addEntityComponentPair(const ECData&) override;
     void modifyEntityComponentPair(const ECData&) override;

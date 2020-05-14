@@ -10,6 +10,7 @@
 #include <mutex>
 
 #include "ReteVisualSerialization.hpp"
+#include "Rule.hpp"
 
 namespace sempr { namespace gui {
 
@@ -63,9 +64,17 @@ public:
 
 
     /**
-        Returns a simplified representation of the internal rete network
+        Returns a simplified representation of the internal rete network --
+        just IDs with labels.
     */
     virtual Graph getReteNetworkRepresentation() = 0;
+
+    /**
+        Returns a list of the currently implemented rules:
+        Textual representation + a list of node IDs which implement the
+        rules effects.
+    */
+    virtual std::vector<Rule> getRulesRepresentation() = 0;
 
     /**
         Lists all entity-component pairs present in the reasoner.

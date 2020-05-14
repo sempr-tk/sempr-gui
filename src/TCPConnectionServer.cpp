@@ -110,6 +110,9 @@ TCPConnectionResponse TCPConnectionServer::handleRequest(const TCPConnectionRequ
             case TCPConnectionRequest::GET_RETE_NETWORK:
                 response.reteNetwork = getReteNetwork();
                 break;
+            case TCPConnectionRequest::GET_RULES:
+                response.rules = semprConnection_->getRulesRepresentation();
+                break;
         }
         response.success = true;
     } catch (std::exception& e) {
