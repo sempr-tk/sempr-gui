@@ -24,6 +24,16 @@ void ReteEdgeItem::setGlobalHighlighted(bool on)
     update();
 }
 
+ReteNodeItem* ReteEdgeItem::from() const
+{
+    return fromNode_;
+}
+
+ReteNodeItem* ReteEdgeItem::to() const
+{
+    return toNode_;
+}
+
 void ReteEdgeItem::adjust()
 {
     if (!fromNode_ || !toNode_) return;

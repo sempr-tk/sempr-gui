@@ -17,12 +17,23 @@ ReteWidget::ReteWidget(QWidget* parent)
 {
     form_->setupUi(this);
     form_->graphicsView->setScene(&scene_);
+    form_->rulesTree->setColumnCount(2);
+    form_->rulesTree->setHeaderLabels({"ID", "Name"});
+    form_->ruleEdit->setReadOnly(true);
+    form_->ruleEdit->setWordWrapMode(QTextOption::NoWrap);
 
     connect(form_->btnUpdate, &QPushButton::clicked,
             this, &ReteWidget::rebuild);
+    connect(form_->btnUpdate, &QPushButton::clicked,
+            this, &ReteWidget::populateTreeWidget);
 
     connect(&scene_, &QGraphicsScene::selectionChanged,
             this, &ReteWidget::onSelectionChanged);
+
+    connect(form_->rulesTree, &QTreeWidget::currentItemChanged,
+            this, &ReteWidget::onSelectedRuleChanged);
+    connect(form_->rulesTree, &QTreeWidget::itemChanged,
+            this, &ReteWidget::updateGraphVisibility);
 }
 
 ReteWidget::~ReteWidget()
@@ -52,6 +63,14 @@ void ReteWidget::onSelectionChanged()
 }
 
 
+void ReteWidget::onSelectedRuleChanged(QTreeWidgetItem* current)
+{
+    auto& rule = rules_[current];
+    form_->ruleEdit->setText(QString::fromStdString(rule.ruleString));
+}
+
+
+
 void ReteWidget::highlight(ReteNodeItem* node)
 {
     for (auto entry : nodes_)
@@ -70,6 +89,10 @@ void ReteWidget::highlight(const std::string& id)
     for (auto entry : nodes_)
     {
         entry.second->setHighlighted(false);
+        for (auto e : entry.second->edges())
+        {
+            e->setGlobalHighlighted(false);
+        }
     }
 
     // highlight not only the one node, but all its ancestors and decendants,
@@ -86,9 +109,21 @@ void ReteWidget::highlight(const std::string& id)
 
         if (visited.find(entry) != visited.end()) continue;
 
-        // TODO highlight this node.
         auto node = nodes_.find(entry.first);
-        if (node != nodes_.end()) node->second->setHighlighted(true);
+        if (node != nodes_.end())
+        {
+            node->second->setHighlighted(true);
+
+            // highlight its edges?
+            auto edges = node->second->edges();
+            for (auto e : edges)
+            {
+                e->setGlobalHighlighted(
+                    e->from()->isHighlighted() &&
+                    e->to()->isHighlighted()
+                );
+            }
+        }
 
         // dont visit this node again.
         visited.insert(entry);
@@ -132,6 +167,70 @@ void ReteWidget::rebuild()
 
 
     resetLayout();
+}
+
+
+void ReteWidget::updateGraphVisibility()
+{
+    // hide all
+    for (auto& entry : nodes_)
+    {
+        entry.second->hide();
+        for (auto edge : entry.second->edges())
+        {
+            edge->setVisible(false);
+        }
+    }
+
+    // start at the production nodes and enable all their ancestors
+    std::vector<std::string> toVisit;
+    for (auto& entry : rules_)
+    {
+        if (entry.first->checkState(0) == Qt::Checked)
+        {
+            toVisit.insert(toVisit.end(), entry.second.effectNodes.begin(),
+                                          entry.second.effectNodes.end());
+        }
+    }
+
+    while (!toVisit.empty())
+    {
+        auto toShow = toVisit.back(); toVisit.pop_back();
+        auto item = nodes_[toShow];
+        item->show();
+
+        for (auto& e : item->edges())
+        {
+            if (e->to() == item) e->setVisible(true);
+        }
+
+        for (auto& e : graph_.edges)
+        {
+            if (e.to == toShow) toVisit.push_back(e.from);
+        }
+    }
+}
+
+
+void ReteWidget::populateTreeWidget()
+{
+    form_->rulesTree->clear();
+    form_->ruleEdit->clear();
+    rules_.clear();
+
+    auto rules = sempr_->getRulesRepresentation();
+
+    for (auto& rule : rules)
+    {
+        auto item = new QTreeWidgetItem();
+        item->setText(0, QString::number(rule.id));
+        item->setText(1, QString::fromStdString(rule.name));
+        //item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+        item->setCheckState(0, Qt::Checked);
+        rules_[item] = rule;
+
+        form_->rulesTree->addTopLevelItem(item);
+    }
 }
 
 

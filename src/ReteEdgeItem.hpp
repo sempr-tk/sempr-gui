@@ -26,6 +26,9 @@ public:
     void setLocalHighlighted(bool);
     void setGlobalHighlighted(bool);
 
+    ReteNodeItem* from() const;
+    ReteNodeItem* to() const;
+
     QRectF boundingRect() const override;
     void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*) override;
 };

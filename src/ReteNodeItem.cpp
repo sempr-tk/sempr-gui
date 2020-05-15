@@ -21,11 +21,11 @@ void ReteNodeItem::setHighlighted(bool on)
 {
     highlight_ = on;
     update();
+}
 
-    for (auto e : edges_)
-    {
-        e->setGlobalHighlighted(on);
-    }
+bool ReteNodeItem::isHighlighted() const
+{
+    return highlight_;
 }
 
 QRectF ReteNodeItem::boundingRect() const
@@ -101,6 +101,11 @@ void ReteNodeItem::addEdge(ReteEdgeItem* edge)
     edges_.push_back(edge);
 }
 
+
+std::vector<ReteEdgeItem*> ReteNodeItem::edges() const
+{
+    return edges_;
+}
 
 QVariant ReteNodeItem::itemChange(GraphicsItemChange change, const QVariant& value)
 {

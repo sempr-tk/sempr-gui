@@ -35,12 +35,24 @@ class ReteWidget : public QWidget {
 
     // store the graph, non-visual, abstract representation
     Graph graph_;
+    std::map<QTreeWidgetItem*, Rule> rules_;
 
     /**
         Requests the network information from the sempr core and re-builds the
         visual representation the in graphics scene
     */
     void rebuild();
+
+    /**
+        Updates the visibility of graph nodes based on the checke items in
+        the rules tree widget.
+    */
+    void updateGraphVisibility();
+
+    /**
+        Requests the rules from the sempr core and rebuilds the tree widget
+    */
+    void populateTreeWidget();
 
 
     /**
@@ -50,8 +62,11 @@ class ReteWidget : public QWidget {
     void highlight(ReteNodeItem* node);
 
 private slots:
-    // highlight selected items
+    // highlight selected items (clicks in graph!)
     void onSelectionChanged();
+
+    // highlight a selected rule
+    void onSelectedRuleChanged(QTreeWidgetItem* current);
 
 public:
     ReteWidget(QWidget* parent = nullptr);

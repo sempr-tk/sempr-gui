@@ -31,8 +31,10 @@ public:
     // adds the edge item to the nodes list.
     // will call ReteEdgeItem::adjust when the nodes position changed
     void addEdge(ReteEdgeItem* edge);
+    std::vector<ReteEdgeItem*> edges() const;
 
     void setHighlighted(bool);
+    bool isHighlighted() const;
 
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
