@@ -51,6 +51,8 @@ std::vector<Rule> DirectConnection::getRulesRepresentation()
         {
             rule.effectNodes.push_back(effect->getDOTId());
         }
+
+        rules.push_back(rule);
     }
 
     return rules;
