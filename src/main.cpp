@@ -71,7 +71,7 @@ int main(int argc, char** args)
 
     auto rules = sempr.addRules(
         "[EC<Component>(?e ?c) -> DirectConnection(?e ?c)]\n" // connect to the gui
-        "[EC<TripleContainer>(?e ?c), tf:create(?tf 1 2 3 0 0 0 1) -> EC<Transform>(?e ?tf)]" // every entity with a triplecontainer gets a transform
+        //"[EC<TripleContainer>(?e ?c), tf:create(?tf 1 2 3 0 0 0 1) -> EC<Transform>(?e ?tf)]" // every entity with a triplecontainer gets a transform
     );
 
     // add an entity to test initialization of the gui

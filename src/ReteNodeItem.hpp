@@ -38,9 +38,17 @@ public:
 
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 
-    // highlighth node locally on hover
+    // highlight node locally on hover
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
+
+
+    // test dynamic positioning through forces between nodes and edges,
+    // see the qt elastic nodes example
+    void calculateForces();
+    bool advancePosition();
+private:
+    QPointF dynamicNewPos_;
 };
 
 }}

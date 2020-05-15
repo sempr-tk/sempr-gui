@@ -15,6 +15,13 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
+    <widget class="QCheckBox" name="boxDynamicPositioning">
+     <property name="text">
+      <string>dynamic force positioning</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="sempr::gui::ZoomGraphicsView" name="graphicsView"/>
    </item>
    <item>

@@ -37,6 +37,10 @@ class ReteWidget : public QWidget {
     Graph graph_;
     std::map<QTreeWidgetItem*, Rule> rules_;
 
+
+    // timer for dynamic updates of the nodes position
+    int timerId_;
+
     /**
         Requests the network information from the sempr core and re-builds the
         visual representation the in graphics scene
@@ -68,6 +72,9 @@ private slots:
 
     // highlight a selected rule
     void onSelectedRuleChanged(QTreeWidgetItem* current);
+
+    // animate graph
+    void timerEvent(QTimerEvent* event) override;
 
 public:
     ReteWidget(QWidget* parent = nullptr);

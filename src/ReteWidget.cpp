@@ -13,7 +13,8 @@ namespace sempr { namespace gui {
 
 ReteWidget::ReteWidget(QWidget* parent)
     : QWidget(parent),
-      form_(new Ui::ReteWidget)
+      form_(new Ui::ReteWidget),
+      timerId_(0)
 {
     form_->setupUi(this);
     form_->graphicsView->setScene(&scene_);
@@ -34,11 +35,38 @@ ReteWidget::ReteWidget(QWidget* parent)
             this, &ReteWidget::onSelectedRuleChanged);
     connect(form_->rulesTree, &QTreeWidget::itemChanged,
             this, &ReteWidget::updateGraphVisibility);
+    connect(form_->boxDynamicPositioning, &QCheckBox::stateChanged,
+            this, [this]()
+            {
+                if (this->form_->boxDynamicPositioning->isChecked())
+                {
+                    timerId_ = startTimer(1000 / 25);
+                }
+                else if (timerId_)
+                {
+                    killTimer(timerId_);
+                    timerId_ = 0;
+                }
+            });
 }
 
 ReteWidget::~ReteWidget()
 {
     delete form_;
+}
+
+
+void ReteWidget::timerEvent(QTimerEvent* /*event*/)
+{
+    for (auto node : nodes_)
+    {
+        node.second->calculateForces();
+    }
+
+    for  (auto node : nodes_)
+    {
+        node.second->advancePosition();
+    }
 }
 
 
