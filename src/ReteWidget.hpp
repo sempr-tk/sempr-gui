@@ -60,6 +60,7 @@ class ReteWidget : public QWidget {
     */
     void highlight(const std::string& id);
     void highlight(ReteNodeItem* node);
+    void highlight(const std::vector<std::string>& ids);
 
 private slots:
     // highlight selected items (clicks in graph!)

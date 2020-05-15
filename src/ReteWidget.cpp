@@ -67,6 +67,8 @@ void ReteWidget::onSelectedRuleChanged(QTreeWidgetItem* current)
 {
     auto& rule = rules_[current];
     form_->ruleEdit->setText(QString::fromStdString(rule.ruleString));
+
+    highlight(rule.effectNodes);
 }
 
 
@@ -85,6 +87,13 @@ void ReteWidget::highlight(ReteNodeItem* node)
 
 void ReteWidget::highlight(const std::string& id)
 {
+    std::vector<std::string> ids;
+    ids.push_back(id);
+    highlight(ids);
+}
+
+void ReteWidget::highlight(const std::vector<std::string>& ids)
+{
     // un-highlight all
     for (auto entry : nodes_)
     {
@@ -99,8 +108,12 @@ void ReteWidget::highlight(const std::string& id)
     // too.
     std::set<std::pair<std::string, bool>> visited;
     std::vector<std::pair<std::string, bool>> toVisit; // which node to visit, and in which direction (only up / only down)
-    toVisit.push_back({id, false});
-    toVisit.push_back({id, true});
+
+    for (auto& id : ids)
+    {
+        toVisit.push_back({id, false});
+        toVisit.push_back({id, true});
+    }
 
     while (!toVisit.empty())
     {
