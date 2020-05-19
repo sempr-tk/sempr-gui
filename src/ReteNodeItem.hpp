@@ -30,6 +30,12 @@ class ReteNodeItem : public QGraphicsItem {
     std::vector<ReteEdgeItem*> edges_;
 
     QFont font() const;
+
+    // helper for some distance calculations:
+    // given an axis-aligned ellipse centered at 0,0 with parameters a,b,
+    // calculate the radius where it intersects the vector (or extended vector,
+    // its just about the direction) given by dx, dy.
+    static double ellipseRadiusAtVectorIntersection(double a, double b, double dx, double dy);
 public:
     ReteNodeItem(Node::Type type, const QString& text);
 

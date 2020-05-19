@@ -194,6 +194,21 @@ QVariant ReteNodeItem::itemChange(GraphicsItemChange change, const QVariant& val
 }
 
 
+double ReteNodeItem::ellipseRadiusAtVectorIntersection(double a, double b, double dx, double dy)
+{
+    if (abs(dx * dy) < 10e-10)
+    {
+        if (abs(dy) < 10e-7) return a;
+        if (abs(dx) < 10e-7) return b;
+    }
+
+    double tana = dy/dx;
+    double xsq = (a*a*b*b)/(b*b+a*a*tana*tana);
+    double ysq = tana*tana * xsq;
+
+    return sqrt(xsq+ysq);
+}
+
 void ReteNodeItem::calculateForces()
 {
     if (!scene() || scene()->mouseGrabberItem() == this)
@@ -201,6 +216,13 @@ void ReteNodeItem::calculateForces()
         dynamicNewPos_ = pos();
         return;
     }
+
+    if (text_ == "Root")
+    {
+        dynamicNewPos_ = pos();
+        return;
+    }
+
 
     auto thisRect = boundingRect();
 
@@ -214,56 +236,54 @@ void ReteNodeItem::calculateForces()
 
     for (auto item : items)
     {
-        ReteNodeItem* node = qgraphicsitem_cast<ReteNodeItem*>(item);
+        if (item == this) continue;
+
+        ReteNodeItem* node = dynamic_cast<ReteNodeItem*>(item);
         if (!node) continue;
+
 
         QPointF vec = mapToItem(node, 0, 0);
         qreal dx = vec.x();
         qreal dy = vec.y();
         double l = (dx*dx + dy*dy);
-        double alpha = atan2(dy, dx);
 
-        // adjust the length by taking the shape of the nodes in account!
-        // at least approximately.
-        // -- length inside the rectangle of this item
-        /*
-        double distTopDown = fabs(thisRect.width()/(2.*cos(alpha)));
-        double distLeftRight = fabs(thisRect.height()/(2.*sin(alpha)));
-        double distInsideThis = std::min(distTopDown, distLeftRight);
-        distInsideThis = distInsideThis * distInsideThis;
 
-        // -- length inside the rectangle of the other item
-        alpha += M_PI;
-        distTopDown = fabs(otherRect.width()/(2.*cos(alpha)));
-        distLeftRight = fabs(otherRect.height()/(2.*sin(alpha)));
-        double distInsideOther = std::min(distTopDown, distLeftRight);
-        distInsideOther = distInsideOther * distInsideOther;
-        */
+        // subtract the length of the connecting lines inside the objects.
+        // -> dont push centers away, but borders!
+        // approximated by ellipses.
+        //
+        auto thisRect = boundingRect();
         auto otherRect = node->boundingRect();
-        //double distInsideThis = std::max(thisRect.width(), thisRect.height())/2.;
-        //double distInsideOther = std::max(otherRect.width(), otherRect.height())/2.;
-        //double distInsideThis = (thisRect.width() + thisRect.height())/2.;
-        //double distInsideOther = (otherRect.width() + otherRect.height())/2.;
-        double distInsideThis = thisRect.height()/2.;
-        double distInsideOther = otherRect.height()/2.;
 
-        distInsideThis = distInsideThis * distInsideThis;
-        distInsideOther = distInsideOther * distInsideOther;
+        double lengthInsideThis = ellipseRadiusAtVectorIntersection(
+                                    thisRect.width()/2., thisRect.height()/2.,
+                                    dx, dy);
+        double lengthInsideOther = ellipseRadiusAtVectorIntersection(
+                                    otherRect.width()/2., otherRect.height()/2.,
+                                    -dx, -dy);
 
-        // subtract length of edge inside nodes from the distance of the
-        // midpoints
-        //l = l - distInsideThis - distInsideOther;
+        double lengthInside = lengthInsideThis + lengthInsideOther;
+        // if lengthInside >= length: contact.
+        // actual distance: length - lengthInside.
+        double lengthDiff = l - lengthInside*lengthInside;
+        if (lengthDiff < 0)
+        {
+            l = 1./(abs(lengthDiff)+10.);
+        }
+        else
+            l = lengthDiff;
+
         distances[node] = l;
 
-        if (l < 0)
+        //if (l > 0)// && l < 200*200)
         {
-//            qDebug() << this->text_ << "contact with" << node->text_;
-        }
+            double dxvel = (dx*30.)/(abs(l)+10);
+            double dyvel = (dy*30.)/(abs(l)+10);
 
-        if (l > 0 && l < 100*100)
-        {
-            xvel += (dx * 50.)/l;
-            yvel += (dy * 50.)/l;
+            xvel += dxvel*abs(dxvel);
+            yvel += dyvel*abs(dyvel);
+//            xvel += (dxvel*dxvel);
+//            yvel += (dyvel*dyvel);
         }
     }
 
@@ -278,20 +298,14 @@ void ReteNodeItem::calculateForces()
 
         QPointF vec = mapToItem(other, 0, 0);
 
-        if (distances[other] > 20)
-        {
-            xvel -= vec.x() / weight;
-            yvel -= vec.y() / weight;
-        }
-        else
-        {
-            xvel += vec.x() / weight;
-            yvel += vec.y() / weight;
-        }
+        xvel -= vec.x() / weight;
+        yvel -= vec.y() / weight;
     }
 
-    if (qAbs(xvel) < 0.1 && qAbs(yvel) < 0.1)
-        xvel = yvel = 0;
+    if (qAbs(xvel) < 0.1) xvel = 0;
+    if (qAbs(yvel) < 0.1) yvel = 0;
+    if (qAbs(xvel) > 5.0) xvel = 5. * (xvel < 0 ? -1. : 1.);
+    if (qAbs(yvel) > 5.0) yvel = 5. * (yvel < 0 ? -1. : 1.);
 
     dynamicNewPos_ = pos() + QPointF(xvel, yvel);
 
