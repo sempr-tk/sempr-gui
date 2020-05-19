@@ -11,6 +11,7 @@
 
 #include "ReteVisualSerialization.hpp"
 #include "Rule.hpp"
+#include <sempr/component/TripleContainer.hpp> // for sempr::Triple
 
 namespace sempr { namespace gui {
 
@@ -61,6 +62,7 @@ public:
     // for the callback
     enum Notification { ADDED, UPDATED, REMOVED };
     typedef std::function<void(ECData, Notification)> callback_t;
+    typedef std::function<void(sempr::Triple, Notification)> triple_callback_t;
 
 
     /**
@@ -107,21 +109,27 @@ public:
         in the core changes
     */
     void setUpdateCallback(callback_t);
+    void setTripleUpdateCallback(triple_callback_t);
 
     /**
         Removes the currently set callback
     */
     void clearUpdateCallback();
+    void clearTripleUpdateCallback();
 
     /**
         Calls the internally stored callback
     */
     void triggerCallback(callback_t::first_argument_type,
-                                 callback_t::second_argument_type);
+                         callback_t::second_argument_type);
+
+    void triggerTripleCallback(triple_callback_t::first_argument_type,
+                               triple_callback_t::second_argument_type);
 
 private:
     std::mutex callbackMutex_;
     callback_t callback_;
+    triple_callback_t tripleCallback_;
 };
 
 
