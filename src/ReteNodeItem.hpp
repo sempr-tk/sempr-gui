@@ -6,6 +6,8 @@
 #include <QPainter>
 #include <vector>
 
+#include "ReteVisualSerialization.hpp"
+
 namespace sempr { namespace gui {
     class ReteEdgeItem;
 
@@ -14,6 +16,9 @@ namespace sempr { namespace gui {
     Ellipse + Text.
 */
 class ReteNodeItem : public QGraphicsItem {
+    // memory, condition, or production node?
+    Node::Type type_;
+
     QString text_;
 
     // whether to highlight this node or not
@@ -23,9 +28,16 @@ class ReteNodeItem : public QGraphicsItem {
     bool localHighlight_;
 
     std::vector<ReteEdgeItem*> edges_;
+
+    QFont font() const;
 public:
-    ReteNodeItem(const QString& text);
-    QRectF boundingRect() const override;
+    ReteNodeItem(Node::Type type, const QString& text);
+
+    QRectF boundingRect() const override; // region to update
+
+    QRectF drawingRect() const; // region to draw in, slightly smaller than boundingRect
+    QRectF textRect() const; // size the text will occupy
+
     void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*) override;
 
     // adds the edge item to the nodes list.

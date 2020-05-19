@@ -188,7 +188,7 @@ void ReteWidget::rebuild()
 
     for (auto node : graph_.nodes)
     {
-        auto item = new ReteNodeItem(QString::fromStdString(node.label));
+        auto item = new ReteNodeItem(node.type, QString::fromStdString(node.label));
         nodes_[node.id] = item;
         scene_.addItem(item); // scene takes ownership
 

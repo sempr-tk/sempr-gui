@@ -20,6 +20,8 @@
 namespace sempr { namespace gui {
 
 struct Node {
+    enum Type { CONDITION, MEMORY, PRODUCTION };
+    Type type;
     std::string id;
     std::string label;
 
@@ -29,7 +31,8 @@ struct Node {
     void serialize(Archive& ar)
     {
         ar( cereal::make_nvp<Archive>("id", id),
-            cereal::make_nvp<Archive>("label", label) );
+            cereal::make_nvp<Archive>("label", label),
+            cereal::make_nvp<Archive>("type", type) );
     }
 };
 
@@ -66,7 +69,7 @@ class CreateVisualGraphVisitor : public rete::NodeVisitor {
     // a set of already visited nodes, to not visit them twice
     std::set<std::string> visited_;
 
-    void addNode(const std::string& id, const std::string& label);
+    void addNode(Node::Type type, const std::string& id, const std::string& label);
     void addEdge(const std::string& from, const std::string& to);
 public:
     void visit(rete::AlphaNode*) override;

@@ -22,10 +22,11 @@ bool Edge::operator<(const Edge& other) const
 
 
 void CreateVisualGraphVisitor::addNode(
+        Node::Type type,
         const std::string& id,
         const std::string& label)
 {
-    graph_.nodes.insert({id, label});
+    graph_.nodes.insert({type, id, label});
 }
 
 void CreateVisualGraphVisitor::addEdge(
@@ -51,7 +52,7 @@ void CreateVisualGraphVisitor::visit(rete::AlphaNode* node)
     std::string label = static_cast<rete::Node*>(node)->toString();
 
     // add this node
-    addNode(id, label);
+    addNode(Node::CONDITION, id, label);
 
     // add edges to the children and visit them
     std::vector<rete::AlphaNode::Ptr> children;
@@ -85,7 +86,7 @@ void CreateVisualGraphVisitor::visit(rete::AlphaMemory* node)
     std::string label = static_cast<rete::Node*>(node)->toString();
 
     // add this node
-    addNode(id, label);
+    addNode(Node::MEMORY, id, label);
 
     // visit children
     std::vector<rete::BetaNode::Ptr> children;
@@ -111,7 +112,7 @@ void CreateVisualGraphVisitor::visit(rete::BetaNode* node)
     std::string label = static_cast<rete::Node*>(node)->toString();
 
     // add this node
-    addNode(id, label);
+    addNode(Node::CONDITION, id, label);
 
     // visit child node
     if (node->getBetaMemory())
@@ -131,7 +132,7 @@ void CreateVisualGraphVisitor::visit(rete::BetaMemory* node)
     std::string label = static_cast<rete::Node*>(node)->toString();
 
     // add this node
-    addNode(id, label);
+    addNode(Node::MEMORY, id, label);
 
     // visit beta node children
     std::vector<rete::BetaNode::Ptr> betaChildren;
@@ -176,7 +177,7 @@ void CreateVisualGraphVisitor::visit(rete::ProductionNode* node)
     std::string label = static_cast<rete::Node*>(node)->toString();
 
     // add this node
-    addNode(id, label);
+    addNode(Node::PRODUCTION, id, label);
 }
 
 
