@@ -39,4 +39,57 @@ rete::Production::Ptr DirectConnectionBuilder::buildEffect(rete::ArgumentList& a
     return node;
 }
 
+
+
+
+// -------------------------------------------
+// sibling: for triple updates
+// -------------------------------------------
+DirectConnectionTripleBuilder::DirectConnectionTripleBuilder(DirectConnection::Ptr conn)
+    : rete::NodeBuilder("DirectConnectionTriple",
+                        rete::NodeBuilder::BuilderType::EFFECT),
+      connection_(conn)
+{
+}
+
+
+rete::Production::Ptr DirectConnectionTripleBuilder::buildEffect(rete::ArgumentList& args) const
+{
+    if (!connection_) throw rete::NodeBuilderException("No DirectConnection set in the builder!");
+
+    // must get exactly three arguments: StringAccessors for (?s ?p ?o)
+    if (args.size() != 3) throw rete::NodeBuilderException("Wrong number of arguments (!= 3)");
+
+    std::unique_ptr<rete::StringAccessor> tripleParts[3];
+    for (int i = 0; i < 3; i++)
+    {
+        if (args[i].isConst())
+        {
+            tripleParts[i].reset(new rete::ConstantStringAccessor(args[i].getAST()));
+            tripleParts[i]->index() = 0;
+        }
+        else
+        {
+            if (!args[i].getAccessor()->canAs<rete::StringAccessor>())
+            {
+                throw rete::NodeBuilderException("Argument " + args[i].getVariableName() +
+                        " is not compatible with StringAccessor");
+            }
+
+            tripleParts[i].reset(args[i].getAccessor()->clone()->as<rete::StringAccessor>());
+        }
+    }
+
+    // build the node
+    auto node = std::make_shared<DirectConnectionTripleNode>(
+            connection_,
+            std::move(tripleParts[0]),
+            std::move(tripleParts[1]),
+            std::move(tripleParts[2]));
+
+    return node;
+
+}
+
+
 }}

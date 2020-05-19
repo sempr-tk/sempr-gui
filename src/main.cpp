@@ -68,9 +68,12 @@ int main(int argc, char** args)
     parser.registerNodeBuilder<InferECBuilder<AffineTransform>>();
     parser.registerNodeBuilder<AffineTransformCreateBuilder>();
     parser.registerNodeBuilder<DirectConnectionBuilder>(connection);
+    parser.registerNodeBuilder<DirectConnectionTripleBuilder>(connection);
 
     auto rules = sempr.addRules(
-        "[EC<Component>(?e ?c) -> DirectConnection(?e ?c)]\n" // connect to the gui
+        // connect to the gui
+        "[connectionEC: EC<Component>(?e ?c) -> DirectConnection(?e ?c)]\n" \
+        "[connectionTriples: (?s ?p ?o) -> DirectConnectionTriple(?s ?p ?o)]"
         //"[EC<TripleContainer>(?e ?c), tf:create(?tf 1 2 3 0 0 0 1) -> EC<Transform>(?e ?tf)]" // every entity with a triplecontainer gets a transform
     );
 

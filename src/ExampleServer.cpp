@@ -87,12 +87,15 @@ int main(int argc, char** args)
     parser.registerNodeBuilder<InferECBuilder<AffineTransform>>();
     parser.registerNodeBuilder<AffineTransformCreateBuilder>();
     parser.registerNodeBuilder<DirectConnectionBuilder>(connection);
+    parser.registerNodeBuilder<DirectConnectionTripleBuilder>(connection);
     parser.registerNodeBuilder<ExtractTriplesBuilder>();
     parser.registerNodeBuilder<GeoDistanceBuilder>();
     parser.registerNodeBuilder<UTMFromWGSBuilder>();
 
     auto rules = sempr.addRules(
-        "[EC<Component>(?e ?c) -> DirectConnection(?e ?c)]\n" // connect to the gui
+        // connect to the gui
+        "[connectionEC: EC<Component>(?e ?c) -> DirectConnection(?e ?c)]\n"
+        "[connectionTriple: (?s ?p ?o) -> DirectConnectionTriple(?s ?p ?o)]"
     );
 
     if (!extraRules.empty())

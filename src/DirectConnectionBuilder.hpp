@@ -18,6 +18,17 @@ public:
     rete::Production::Ptr buildEffect(rete::ArgumentList& args) const override;
 };
 
+/**
+    Constructs the DirectConnectionTripleNode that triggers a callback for
+    all triples it gets.
+*/
+class DirectConnectionTripleBuilder : public rete::NodeBuilder {
+    DirectConnection::Ptr connection_;
+public:
+    DirectConnectionTripleBuilder(DirectConnection::Ptr);
+    rete::Production::Ptr buildEffect(rete::ArgumentList& args) const override;
+};
+
 }}
 
 #endif /* include guard: SEMPR_GUI_DIRECTCONNECTIONBUILDER_HPP_ */

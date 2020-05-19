@@ -1,5 +1,6 @@
 #include <cereal/archives/json.hpp>
 #include <sstream>
+#include <sempr/component/TripleContainer.hpp>
 
 #include "DirectConnectionNode.hpp"
 
@@ -72,6 +73,50 @@ void DirectConnectionNode::execute(
 std::string DirectConnectionNode::toString() const
 {
     return "DirectConnection-Update(" + entity_->toString() + ", " + component_->toString() + ")";
+}
+
+
+// -------------------------------------------
+// sibling: DirectConnection*TRIPLE*Node
+// -------------------------------------------
+DirectConnectionTripleNode::DirectConnectionTripleNode(
+            DirectConnection::Ptr con,
+            std::unique_ptr<rete::StringAccessor> s,
+            std::unique_ptr<rete::StringAccessor> p,
+            std::unique_ptr<rete::StringAccessor> o)
+    : connection_(con),
+      s_(std::move(s)),
+      p_(std::move(p)),
+      o_(std::move(o))
+{
+}
+
+void DirectConnectionTripleNode::execute(
+        rete::Token::Ptr token,
+        rete::PropagationFlag flag,
+        std::vector<rete::WME::Ptr>&)
+{
+    DirectConnection::Notification n;
+    if (flag == rete::PropagationFlag::ASSERT) n = DirectConnection::ADDED;
+    else if (flag == rete::PropagationFlag::UPDATE) n = DirectConnection::UPDATED;
+    else /*if (n == rete::PropagationFlag::RETRACT)*/ n = DirectConnection::REMOVED;
+
+    // get the data
+    sempr::Triple triple(
+        s_->getString(token),
+        p_->getString(token),
+        o_->getString(token)
+    );
+
+    // trigger the callback
+    connection_->triggerTripleCallback(triple, n);
+}
+
+
+std::string DirectConnectionTripleNode::toString() const
+{
+    return "DirectConnection-TripleUpdate\n" +
+            s_->toString() + ", " + p_->toString() + ", " + o_->toString();
 }
 
 }}

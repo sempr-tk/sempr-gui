@@ -17,8 +17,6 @@ class DirectConnection : public AbstractInterface {
     sempr::Core* core_;
     std::mutex& semprMutex_;
 
-    std::mutex callbackMutex_; // sync setting/clearing the callback-function
-    callback_t callback_;
 public:
     using Ptr = std::shared_ptr<DirectConnection>;
     DirectConnection(sempr::Core* core, std::mutex& m);
