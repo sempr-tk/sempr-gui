@@ -28,8 +28,10 @@ ReteWidget::ReteWidget(QWidget* parent)
     connect(form_->btnUpdate, &QPushButton::clicked,
             this, &ReteWidget::populateTreeWidget);
 
+    /* // this is rather distracting. Instead, only highlight selected *rules*.
     connect(&scene_, &QGraphicsScene::selectionChanged,
             this, &ReteWidget::onSelectionChanged);
+    */
 
     connect(form_->rulesTree, &QTreeWidget::currentItemChanged,
             this, &ReteWidget::onSelectedRuleChanged);
