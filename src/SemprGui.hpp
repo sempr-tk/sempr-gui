@@ -3,6 +3,7 @@
 
 #include <QtCore>
 #include <QWidget>
+#include <QTabWidget>
 
 #include "ECModel.hpp"
 #include "AbstractInterface.hpp"
@@ -43,6 +44,14 @@ private slots:
         Adds an entry to the error list
     */
     void logError(const QString&);
+
+
+    /**
+        Changes the layout of the extra-utility-widgets
+    */
+    void changeWidgetLayout(const QString& layout);
+    // helper, moves the content to a visible tabwidget
+    void emptyUtilTabWidget(QTabWidget*);
 
 public:
     SemprGui(AbstractInterface::Ptr interface);

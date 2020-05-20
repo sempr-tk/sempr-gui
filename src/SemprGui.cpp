@@ -1,6 +1,8 @@
 #include "SemprGui.hpp"
 #include "../ui/ui_main.h"
 
+#include "DragDropTabBar.hpp"
+
 namespace sempr { namespace gui {
 
 SemprGui::SemprGui(AbstractInterface::Ptr interface)
@@ -11,6 +13,12 @@ SemprGui::SemprGui(AbstractInterface::Ptr interface)
     qRegisterMetaType<ECData>();
 
     form_->setupUi(this);
+
+    form_->utilTabWidget_21->hide();
+    form_->utilTabWidget_22->hide();
+    changeWidgetLayout("1 x 2");
+    form_->comboLayout->setCurrentText("1 x 2");
+
     // both views use the same model
     form_->treeView->setModel(&dataModel_);
     auto selectionModel = form_->treeView->selectionModel();
@@ -37,7 +45,7 @@ SemprGui::SemprGui(AbstractInterface::Ptr interface)
     form_->reteWidget->setConnection(interface);
 
     // and the query widget
-    form_->semanticQueryWidget->setConnection(interface);
+    form_->tripleLiveViewWidget->setConnection(interface);
 
     // setup component adder
     form_->componentAdder->setModel(&dataModel_);
@@ -85,13 +93,8 @@ SemprGui::SemprGui(AbstractInterface::Ptr interface)
     updateTabStatus(form_->tabTriplePropertyMap, false);
     updateTabStatus(form_->tabTripleVector, false);
 
-    // connect the checkboxes to show/hide the editors and the map
-    connect(form_->boxShowEditors, &QCheckBox::stateChanged,
-            form_->tabWidget, &QWidget::setVisible);
-    connect(form_->boxShowOSM, &QCheckBox::stateChanged,
-            form_->geoMapWidget, &QWidget::setVisible);
-    connect(form_->boxShowCreator, &QCheckBox::stateChanged,
-            form_->componentAdder, &QWidget::setVisible);
+    connect(form_->comboLayout, &QComboBox::currentTextChanged,
+            this, &SemprGui::changeWidgetLayout);
 
     // connect the reset and commit buttons to the model
     connect(form_->btnReset, &QPushButton::clicked,
@@ -145,6 +148,73 @@ void SemprGui::updateTabStatus(UsefulWidget* widget, bool visible)
         if (index != -1)
         {
             form_->tabWidget->removeTab(index);
+        }
+    }
+}
+
+
+void SemprGui::changeWidgetLayout(const QString& layout)
+{
+    if (layout == "1 x 1")
+    {
+        form_->utilTabWidget_12->hide();
+        form_->utilTabWidget_21->hide();
+        form_->utilTabWidget_22->hide();
+
+        emptyUtilTabWidget(form_->utilTabWidget_12);
+        emptyUtilTabWidget(form_->utilTabWidget_21);
+        emptyUtilTabWidget(form_->utilTabWidget_22);
+    }
+    else if (layout == "1 x 2")
+    {
+        form_->utilTabWidget_12->show();
+        form_->utilTabWidget_21->hide();
+        form_->utilTabWidget_22->hide();
+
+        emptyUtilTabWidget(form_->utilTabWidget_21);
+        emptyUtilTabWidget(form_->utilTabWidget_22);
+    }
+    else if (layout == "2 x 1")
+    {
+        form_->utilTabWidget_21->show();
+        form_->utilTabWidget_12->hide();
+        form_->utilTabWidget_22->hide();
+
+        emptyUtilTabWidget(form_->utilTabWidget_12);
+        emptyUtilTabWidget(form_->utilTabWidget_22);
+    }
+    else if (layout == "2 x 2")
+    {
+        form_->utilTabWidget_12->show();
+        form_->utilTabWidget_21->show();
+        form_->utilTabWidget_22->show();
+    }
+}
+
+
+
+void SemprGui::emptyUtilTabWidget(QTabWidget* widget)
+{
+    QTabWidget* target = nullptr;
+    if      (widget == form_->utilTabWidget_12) target = form_->utilTabWidget_11;
+    else if (widget == form_->utilTabWidget_21) target = form_->utilTabWidget_11;
+    else if (widget == form_->utilTabWidget_22)
+    {
+        if      (form_->utilTabWidget_12->isVisible()) target = form_->utilTabWidget_12;
+        else if (form_->utilTabWidget_21->isVisible()) target = form_->utilTabWidget_21;
+        else                                           target = form_->utilTabWidget_11;
+    }
+
+    if (target)
+    {
+        int numTabs = widget->count();
+        for (int i = numTabs-1; i >= 0; i--)
+        {
+            auto tab = widget->widget(i);
+            auto label = widget->tabText(i);
+
+            widget->removeTab(i);
+            target->addTab(tab, label);
         }
     }
 }
