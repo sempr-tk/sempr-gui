@@ -40,20 +40,38 @@ void TCPConnectionClient::start()
                 bool msgAvailable = updateSubscriber_.receive(msg, true);
                 if (msgAvailable)
                 {
-                    ECData data;
-                    Notification action;
-                    msg >> data >> action;
+                    UpdateType type;
+                    msg >> type;
+                    if (type == UpdateType::EntityComponent)
+                    {
+                        ECData data;
+                        Notification action;
 
-                    this->triggerCallback(data, action);
+                        msg >> data >> action;
 
-                    /*
-                    std::cout << "got an update!" << std::endl
-                              << data.entityId << " - " << data.componentId << std::endl
-                              << data.componentJSON << std::endl
-                              << "mutable? " << data.isComponentMutable << std::endl
-                              << "action: " << action
-                              << std::endl << std::endl;
-                    */
+                        this->triggerCallback(data, action);
+                    }
+                    else if (type == UpdateType::Triple)
+                    {
+                        std::cout << "TCPConnectionClient - trigger triple update callback" << std::endl;
+
+                        std::string tripleString;
+                        Notification action;
+
+                        msg >> tripleString >> action;
+
+                        std::stringstream ss(tripleString);
+                        cereal::JSONInputArchive ar(ss);
+                        sempr::Triple triple;
+                        ar(triple);
+
+                        this->triggerTripleCallback(triple, action);
+                    }
+                    else
+                    {
+                        std::cerr << "unknown update message type"
+                                  << static_cast<int>(type) << std::endl;
+                    }
                 }
                 else
                 {

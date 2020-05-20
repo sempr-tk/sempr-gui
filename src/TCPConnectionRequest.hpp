@@ -30,6 +30,15 @@ struct TCPConnectionRequest {
 
 
 /**
+    To differ between types of updates (EC or Triple)
+*/
+enum struct UpdateType {
+    EntityComponent = 0,
+    Triple
+};
+
+
+/**
     Well, when there is a "Request" type, there should also be a "Response", right?
     This is just a very crude wrapper. Contains more than it should.
 */
@@ -84,6 +93,20 @@ inline zmqpp::message& operator >> (zmqpp::message& msg, TCPConnectionRequest::A
     int tmp;
     msg >> tmp;
     action = static_cast<TCPConnectionRequest::Action>(tmp);
+    return msg;
+}
+
+inline zmqpp::message& operator << (zmqpp::message& msg, UpdateType type)
+{
+    msg << static_cast<int>(type);
+    return msg;
+}
+
+inline zmqpp::message& operator >> (zmqpp::message& msg, UpdateType& type)
+{
+    int tmp;
+    msg >> tmp;
+    type = static_cast<UpdateType>(tmp);
     return msg;
 }
 

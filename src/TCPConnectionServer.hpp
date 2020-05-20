@@ -36,6 +36,13 @@ class TCPConnectionServer {
                         AbstractInterface::callback_t::second_argument_type);
 
     /**
+        Same as above, but for triples
+    */
+    void tripleUpdateCallback(
+            AbstractInterface::triple_callback_t::first_argument_type,
+            AbstractInterface::triple_callback_t::second_argument_type);
+
+    /**
         Handling a request
     */
     TCPConnectionResponse handleRequest(const TCPConnectionRequest& request);

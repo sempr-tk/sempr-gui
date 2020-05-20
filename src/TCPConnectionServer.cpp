@@ -29,12 +29,31 @@ void TCPConnectionServer::updateCallback(
     // construct the message -- just all the data entries in the ECData struct,
     // plus the action.
     zmqpp::message msg;
-    msg << data << action;
+    msg << UpdateType::EntityComponent << data << action;
 
     // and send it to all subscribers
     updatePublisher_.send(msg);
 }
 
+void TCPConnectionServer::tripleUpdateCallback(
+        AbstractInterface::triple_callback_t::first_argument_type value,
+        AbstractInterface::triple_callback_t::second_argument_type action)
+{
+
+    std::cout << "TCPConnectionServer::tripleUpdateCallback" << std::endl;
+
+    zmqpp::message msg;
+
+    std::stringstream ss;
+    {
+        cereal::JSONOutputArchive ar(ss);
+        ar(value);
+    }
+
+    msg << UpdateType::Triple << ss.str() << action;
+
+    updatePublisher_.send(msg);
+}
 
 void TCPConnectionServer::start()
 {
@@ -42,6 +61,15 @@ void TCPConnectionServer::start()
     semprConnection_->setUpdateCallback(
         std::bind(
             &TCPConnectionServer::updateCallback,
+            this,
+            std::placeholders::_1,
+            std::placeholders::_2
+        )
+    );
+
+    semprConnection_->setTripleUpdateCallback(
+        std::bind(
+            &TCPConnectionServer::tripleUpdateCallback,
             this,
             std::placeholders::_1,
             std::placeholders::_2
