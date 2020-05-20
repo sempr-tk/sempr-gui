@@ -141,6 +141,9 @@ TCPConnectionResponse TCPConnectionServer::handleRequest(const TCPConnectionRequ
             case TCPConnectionRequest::GET_RULES:
                 response.rules = semprConnection_->getRulesRepresentation();
                 break;
+            case TCPConnectionRequest::LIST_ALL_TRIPLES:
+                response.triples = semprConnection_->listTriples();
+                break;
         }
         response.success = true;
     } catch (std::exception& e) {

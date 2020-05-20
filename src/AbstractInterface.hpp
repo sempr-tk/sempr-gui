@@ -84,6 +84,11 @@ public:
     virtual std::vector<ECData> listEntityComponentPairs() = 0;
 
     /**
+        Lists all triples present in the reasoner
+    */
+    virtual std::vector<sempr::Triple> listTriples() = 0;
+
+    /**
         Adds a new component to the entity. The only relevant parameters are
         the entityId and componentJSON -- the component will be mutable by
         construction, and the componentId will be chosen by the core.

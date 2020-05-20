@@ -161,6 +161,23 @@ std::vector<ECData> TCPConnectionClient::listEntityComponentPairs()
     }
 }
 
+std::vector<sempr::Triple> TCPConnectionClient::listTriples()
+{
+    TCPConnectionRequest request;
+    request.action = TCPConnectionRequest::LIST_ALL_TRIPLES;
+    auto response = execRequest(request);
+
+    if (response.success)
+    {
+        return response.triples;
+    }
+    else
+    {
+        throw std::runtime_error(response.msg); // TODO better exceptions...
+    }
+}
+
+
 void TCPConnectionClient::addEntityComponentPair(const ECData& data)
 {
     TCPConnectionRequest request;

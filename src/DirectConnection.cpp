@@ -58,6 +58,31 @@ std::vector<Rule> DirectConnection::getRulesRepresentation()
     return rules;
 }
 
+std::vector<sempr::Triple> DirectConnection::listTriples()
+{
+    std::vector<sempr::Triple> triples;
+    std::vector<rete::WME::Ptr> wmes;
+
+    {
+        std::lock_guard<std::recursive_mutex> lg(core_->reasonerMutex());
+        wmes = core_->reasoner().getCurrentState().getWMEs();
+    }
+
+    for (auto wme : wmes)
+    {
+        auto triple = std::dynamic_pointer_cast<rete::Triple>(wme);
+        if (triple)
+        {
+            sempr::Triple st(triple->subject,
+                             triple->predicate,
+                             triple->object);
+
+            triples.push_back(st);
+        }
+    }
+
+    return triples;
+}
 
 std::vector<ECData> DirectConnection::listEntityComponentPairs()
 {

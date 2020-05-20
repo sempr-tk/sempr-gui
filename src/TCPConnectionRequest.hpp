@@ -7,6 +7,7 @@
 
 #include <zmqpp/zmqpp.hpp>
 #include <cereal/archives/json.hpp>
+#include <cereal/types/vector.hpp>
 
 namespace sempr { namespace gui {
 
@@ -21,7 +22,8 @@ struct TCPConnectionRequest {
         MODIFY_EC_PAIR,
         REMOVE_EC_PAIR,
         GET_RETE_NETWORK,
-        GET_RULES
+        GET_RULES,
+        LIST_ALL_TRIPLES
     };
 
     Action action;
@@ -48,6 +50,7 @@ struct TCPConnectionResponse {
     std::vector<ECData> data; // just for the LIST_ALL_EC_PAIRS action, contains all the EC pairs.
     std::string reteNetwork; // just for GET_RETE_NETWORK action, json representation of a Graph
     std::vector<Rule> rules; // just for GET_RULES
+    std::vector<sempr::Triple> triples; // just for LIST_ALL_TRIPLES
 };
 
 
@@ -142,6 +145,13 @@ inline zmqpp::message& operator << (zmqpp::message& msg, const TCPConnectionResp
         msg << rule;
     }
 
+    std::stringstream ss;
+    {
+        cereal::JSONOutputArchive ar(ss);
+        ar(response.triples);
+    }
+    msg << ss.str();
+
     return msg;
 }
 
@@ -168,6 +178,13 @@ inline zmqpp::message& operator >> (zmqpp::message& msg, TCPConnectionResponse& 
         msg >> r;
         response.rules.push_back(r);
     }
+
+    std::string triples;
+    msg >> triples;
+
+    std::stringstream ss(triples);;
+    cereal::JSONInputArchive ar(ss);
+    ar(response.triples);
 
     return msg;
 }

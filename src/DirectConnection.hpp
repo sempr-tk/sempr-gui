@@ -24,6 +24,7 @@ public:
     Graph getReteNetworkRepresentation() override;
     std::vector<Rule> getRulesRepresentation() override;
     std::vector<ECData> listEntityComponentPairs() override;
+    std::vector<sempr::Triple> listTriples() override;
     void addEntityComponentPair(const ECData&) override;
     void removeEntityComponentPair(const ECData&) override;
     void modifyEntityComponentPair(const ECData&) override;
