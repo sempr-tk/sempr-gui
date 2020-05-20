@@ -36,6 +36,9 @@ SemprGui::SemprGui(AbstractInterface::Ptr interface)
     // setup ReteWidget
     form_->reteWidget->setConnection(interface);
 
+    // and the query widget
+    form_->semanticQueryWidget->setConnection(interface);
+
     // setup component adder
     form_->componentAdder->setModel(&dataModel_);
     form_->componentAdder->setSelectionModel(selectionModel);

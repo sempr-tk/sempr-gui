@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>899</width>
+    <width>1133</width>
     <height>747</height>
    </rect>
   </property>
@@ -236,14 +236,22 @@ selection-color: black;
       </layout>
      </widget>
      <widget class="QTabWidget" name="tabWidget_2">
+      <property name="currentIndex">
+       <number>2</number>
+      </property>
       <widget class="sempr::gui::GeoMapWidget" name="geoMapWidget">
        <attribute name="title">
-        <string>Tab 1</string>
+        <string>OpenStreetMap</string>
        </attribute>
       </widget>
       <widget class="sempr::gui::ReteWidget" name="reteWidget">
        <attribute name="title">
-        <string>Tab 2</string>
+        <string>Rete-Network</string>
+       </attribute>
+      </widget>
+      <widget class="sempr::gui::TripleLiveViewWidget" name="semanticQueryWidget">
+       <attribute name="title">
+        <string>Triple Live-View</string>
        </attribute>
       </widget>
      </widget>
@@ -303,6 +311,12 @@ selection-color: black;
    <class>sempr::gui::ReteWidget</class>
    <extends>QWidget</extends>
    <header>../src/ReteWidget.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>sempr::gui::TripleLiveViewWidget</class>
+   <extends>QWidget</extends>
+   <header>../src/TripleLiveViewWidget.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

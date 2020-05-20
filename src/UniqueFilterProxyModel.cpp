@@ -76,6 +76,12 @@ void UniqueFilterProxyModel::setSourceModel(QAbstractItemModel* source)
                    this, &UniqueFilterProxyModel::buildMap);
         disconnect(sourceModel(), &QAbstractItemModel::dataChanged,
                    this, &UniqueFilterProxyModel::buildMap);
+        disconnect(source, &QAbstractItemModel::rowsInserted,
+                   this, &UniqueFilterProxyModel::buildMap);
+        disconnect(source, &QAbstractItemModel::rowsInserted,
+                   this, &UniqueFilterProxyModel::buildMap);
+        disconnect(source, &QAbstractItemModel::rowsRemoved,
+                   this, &UniqueFilterProxyModel::buildMap);
     }
 
     QSortFilterProxyModel::setSourceModel(source);
@@ -85,6 +91,12 @@ void UniqueFilterProxyModel::setSourceModel(QAbstractItemModel* source)
     connect(source, &QAbstractItemModel::modelReset,
             this, &UniqueFilterProxyModel::buildMap);
     connect(source, &QAbstractItemModel::dataChanged,
+            this, &UniqueFilterProxyModel::buildMap);
+    connect(source, &QAbstractItemModel::rowsInserted,
+            this, &UniqueFilterProxyModel::buildMap);
+    connect(source, &QAbstractItemModel::rowsInserted,
+            this, &UniqueFilterProxyModel::buildMap);
+    connect(source, &QAbstractItemModel::rowsRemoved,
             this, &UniqueFilterProxyModel::buildMap);
 
     buildMap();

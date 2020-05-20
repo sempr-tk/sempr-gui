@@ -50,6 +50,7 @@ include_directories(src)
 
 set(GUI_SRC
     src/AbstractInterface.cpp
+    src/AnyColumnFilterProxyModel.cpp
     src/ECModel.cpp
     src/ModelEntry.cpp
     src/ColoredBranchTreeView.cpp
@@ -74,6 +75,7 @@ set(GUI_SRC
     src/TripleContainerWidget.cpp
     src/TriplePropertyMapWidget.cpp
     src/TripleVectorWidget.cpp
+    src/TripleLiveViewWidget.cpp
     src/StackedColumnsProxyModel.cpp
     src/UniqueFilterProxyModel.cpp
     src/UsefulWidget.cpp
@@ -85,6 +87,7 @@ set(GUI_SRC
     ui/triplepropertymap.ui
     ui/triplevector.ui
     ui/componentadderwidget.ui
+    ui/tripleliveviewwidget.ui
     ui/geomap.qml
     ui/geomap.ui
     ui/MapDelegates/CoordinateDelegate.qml
