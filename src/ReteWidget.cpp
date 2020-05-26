@@ -75,6 +75,8 @@ void ReteWidget::timerEvent(QTimerEvent* /*event*/)
 void ReteWidget::setConnection(AbstractInterface::Ptr conn)
 {
     sempr_ = conn;
+    rebuild();
+    populateTreeWidget();
 }
 
 void ReteWidget::onSelectionChanged()
