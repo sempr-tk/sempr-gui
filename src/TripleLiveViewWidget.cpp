@@ -30,36 +30,6 @@ TripleLiveViewWidget::TripleLiveViewWidget(QWidget* parent)
 }
 
 
-void TripleLiveViewWidget::setConnection(AbstractInterface::Ptr con)
-{
-    if (sempr_) sempr_->clearTripleUpdateCallback();
-
-    allTriplesModel_.clear();
-    allTriplesModel_.setHorizontalHeaderLabels({"subject", "predicate", "object"});
-
-    sempr_ = con;
-
-    if (sempr_)
-    {
-        sempr_->setTripleUpdateCallback(
-                std::bind(
-                    &TripleLiveViewWidget::tripleUpdate,
-                    this,
-                    std::placeholders::_1,
-                    std::placeholders::_2
-                )
-        );
-
-        // initialize with data, the callback will only be called for changes
-        auto triples = sempr_->listTriples();
-        for (auto& t : triples)
-        {
-            tripleUpdate(t, AbstractInterface::Notification::ADDED);
-        }
-    }
-}
-
-
 void TripleLiveViewWidget::tripleUpdate(
         sempr::Triple triple,
         AbstractInterface::Notification flag)

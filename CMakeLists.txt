@@ -70,6 +70,8 @@ set(GUI_SRC
     src/ReteVisualSerialization.cpp
     src/RoleNameProxyModel.cpp
     src/SemprGui.cpp
+    src/SPARQLItem.cpp
+    src/SPARQLWidget.cpp
     src/TCPConnectionClient.cpp
     src/TCPConnectionServer.cpp
     src/TextComponentWidget.cpp
@@ -83,6 +85,7 @@ set(GUI_SRC
     src/ZoomGraphicsView.cpp
     ui/main.ui
     ui/raw_component.ui
+    ui/sparqlwidget.ui
     ui/textcomponent.ui
     ui/triplecontainer.ui
     ui/triplepropertymap.ui

@@ -44,9 +44,6 @@ SemprGui::SemprGui(AbstractInterface::Ptr interface)
     // setup ReteWidget
     form_->reteWidget->setConnection(interface);
 
-    // and the query widget
-    form_->tripleLiveViewWidget->setConnection(interface);
-
     // setup component adder
     form_->componentAdder->setModel(&dataModel_);
     form_->componentAdder->setSelectionModel(selectionModel);
@@ -101,6 +98,22 @@ SemprGui::SemprGui(AbstractInterface::Ptr interface)
             &dataModel_, &ECModel::reset);
     connect(form_->btnCommit, &QPushButton::clicked,
             &dataModel_, &ECModel::commit);
+
+    // initialize the triple live widget and the sparql widget
+    auto triples = interface->listTriples();
+    for (auto& triple : triples)
+    {
+        form_->tripleLiveViewWidget->tripleUpdate(triple, AbstractInterface::Notification::ADDED);
+        form_->sparqlWidget->update(triple, AbstractInterface::Notification::ADDED);
+    }
+
+    interface->setTripleUpdateCallback(
+        [this](sempr::Triple triple, AbstractInterface::Notification action) -> void
+        {
+            this->form_->tripleLiveViewWidget->tripleUpdate(triple, action);
+            this->form_->sparqlWidget->update(triple, action);
+        }
+    );
 }
 
 

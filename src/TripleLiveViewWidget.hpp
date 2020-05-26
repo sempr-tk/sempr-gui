@@ -24,12 +24,9 @@ namespace sempr { namespace gui {
     can be filtered, and is updated live while the data in the sempr core
     changes. Very similar to the entity-component view; though, this is a
     strictly read-only thing.
-    Aside from a plain list of triples, this widget includes a form for
-    SPARQL SELECT queries.
 */
 class TripleLiveViewWidget : public QWidget {
     Ui::TripleLiveViewWidget* form_;
-    AbstractInterface::Ptr sempr_;
 
     // stack columns & filter duplicates, for the completer
     StackedColumnsProxyModel stackModel_;
@@ -43,15 +40,11 @@ class TripleLiveViewWidget : public QWidget {
 
     std::map<rete::Triple, int> tripleToIndex_;
 
-
-    void tripleUpdate(sempr::Triple, AbstractInterface::Notification);
 public:
     TripleLiveViewWidget(QWidget* parent = nullptr);
     ~TripleLiveViewWidget();
 
-    // stores the connection object and sets its triple callback to update
-    // this widget
-    void setConnection(AbstractInterface::Ptr);
+    void tripleUpdate(sempr::Triple, AbstractInterface::Notification);
 };
 
 }}
