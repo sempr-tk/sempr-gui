@@ -15,16 +15,15 @@ before_script:
     # install dependencies
     - apt update -qq
     - apt install -y -qq git g++ cmake
-      #    - apt install -y -qq libcereal-dev
-      #    - apt install -y -qq libgeos-dev libgeos++-dev
-      #    - apt install -y -qq libgeographic-dev libeigen3-dev
-      #    - apt install -y -qq libboost-all-dev
+    - apt install -y -qq libcereal-dev
+    - apt install -y -qq libgeos-dev libgeos++-dev
+    - apt install -y -qq libgeographic-dev libeigen3-dev
+    - apt install -y -qq libboost-all-dev
     - apt install -y -qq libzmqpp-dev libzmq3-dev
     - apt install -y -qq qtbase5-dev qtdeclarative5-dev qtlocation5-dev qtpositioning5-dev qtquickcontrols2-5-dev
 
 stages:
     - build
-    - test
     - deploy
 
 
@@ -49,6 +48,7 @@ build-bionic:
 
 deploy-deb:
     stage: deploy
+    image: buildpack-deps:bionic
     only:
         - tags
     script:
