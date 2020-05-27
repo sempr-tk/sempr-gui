@@ -13,6 +13,11 @@ if (CMAKE_VERSION VERSION_LESS "3.7.0")
     set(CMAKE_INCLUDE_CURRENT_DIR ON)
 endif()
 
+# needed for dpkg-shlibdeps to find the libsempr-gui.so as a dependency of
+# the example client/server
+list(APPEND CMAKE_INSTALL_RPATH "${CMAKE_CURRENT_BINARY_DIR}")
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
 
 add_definitions(-std=c++11 -Wall -Wextra -pedantic -Wnon-virtual-dtor)
 
@@ -105,13 +110,49 @@ target_link_libraries(sempr-gui
     ${sempr_LIBRARIES} ${zmq_LIBRARIES} ${ZeroMQPP_LIBRARIES}
     Qt5::Core Qt5::Widgets Qt5::Quick Qt5::QuickWidgets Qt5::QuickControls2
     Qt5::Location Threads::Threads)
+set_target_properties(sempr-gui PROPERTIES VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
 
 
 add_executable(main src/main.cpp)
 target_link_libraries(main sempr-gui)
 
-add_executable(example_server src/ExampleServer.cpp)
-target_link_libraries(example_server sempr-gui ${Boost_LIBRARIES})
+set(server_name sempr-gui-example-server)
+set(client_name sempr-gui-example-client)
 
-add_executable(example_client src/ExampleClient.cpp)
-target_link_libraries(example_client sempr-gui)
+add_executable(${server_name} src/ExampleServer.cpp)
+target_link_libraries(${server_name} sempr-gui ${Boost_LIBRARIES})
+
+add_executable(${client_name} src/ExampleClient.cpp)
+target_link_libraries(${client_name} sempr-gui)
+
+
+# install stuff
+install(
+    TARGETS sempr-gui
+    LIBRARY DESTINATION lib
+)
+install(
+    DIRECTORY src/.
+    DESTINATION include/sempr-gui
+    FILES_MATCHING PATTERN *.hpp
+)
+install(
+    TARGETS ${client_name} ${server_name}
+    RUNTIME DESTINATION bin
+)
+
+
+# configure cpack
+set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "GUI library for sempr, including an example client using a tcp connection to the sempr-core.")
+set(CPACK_GENERATOR "DEB")
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Nils Niemann <nils.niemann@dfki.de>")
+set(CPACK_DEB_COMPONENT_INSTALL ON)
+set(CPACK_COMPONENTS_ALL_IN_ONE_PACKAGE ON)
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
+set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS_POLICY ">=")
+
+include(CPack)
