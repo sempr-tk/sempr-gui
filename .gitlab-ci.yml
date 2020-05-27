@@ -1,6 +1,3 @@
-default:
-    image: buildpack-deps:xenial
-
 before_script:
     # setup private key to access nniemann/debian-pkgs
     - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
@@ -23,31 +20,13 @@ before_script:
       #    - apt install -y -qq libgeographic-dev libeigen3-dev
       #    - apt install -y -qq libboost-all-dev
     - apt install -y -qq libzmqpp-dev libzmq3-dev
-    - apt install -y -qq qt5-base-dev qtdeclarative5-dev qtlocation5-dev qtpositioning5-dev qtquickcontrols2-5-dev
+    - apt install -y -qq qtbase5-dev qtdeclarative5-dev qtlocation5-dev qtpositioning5-dev qtquickcontrols2-5-dev
 
 stages:
     - build
     - test
     - deploy
 
-
-build-xenial:
-    stage: build
-    image: buildpack-deps:xenial
-    script:
-        # get and install sempr
-        - echo "deb [trusted=yes] file:/tmp/debian-pkgs/xenial ./" >> /etc/apt/sources.list
-        - apt update -qq
-        - apt install -y -qq sempr
-        # build sempr-gui
-        - mkdir build_xenial && cd build_xenial
-        - cmake ..
-        - make -j8
-        - make package
-    artifacts:
-        paths:
-            - build_xenial
-        expire_in: 1 hour
 
 build-bionic:
     stage: build
@@ -73,7 +52,6 @@ deploy-deb:
     only:
         - tags
     script:
-        - cp build_xenial/sempr*.deb /tmp/debian-pkgs/xenial/
         - cp build_bionic/sempr*.deb /tmp/debian-pkgs/bionic/
         - cd /tmp/debian-pkgs
         - ./update-pkg-list
