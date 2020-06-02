@@ -126,6 +126,42 @@ Graph TCPConnectionClient::getReteNetworkRepresentation()
     }
 }
 
+ExplanationGraph TCPConnectionClient::getExplanation(const ECData& ec)
+{
+    TCPConnectionRequest request;
+    request.action = TCPConnectionRequest::GET_EXPLANATION_ECWME;
+    request.data = ec;
+
+    auto response = execRequest(request);
+
+    if (response.success)
+    {
+        return response.explanationGraph;
+    }
+    else
+    {
+        throw std::runtime_error(response.msg); // TODO better exceptions...
+    }
+}
+
+ExplanationGraph TCPConnectionClient::getExplanation(sempr::Triple::Ptr triple)
+{
+    TCPConnectionRequest request;
+    request.action = TCPConnectionRequest::GET_EXPLANATION_TRIPLE;
+    request.toExplain = *triple;
+
+    auto response = execRequest(request);
+
+    if (response.success)
+    {
+        return response.explanationGraph;
+    }
+    else
+    {
+        throw std::runtime_error(response.msg); // TODO better exceptions...
+    }
+}
+
 
 std::vector<Rule> TCPConnectionClient::getRulesRepresentation()
 {

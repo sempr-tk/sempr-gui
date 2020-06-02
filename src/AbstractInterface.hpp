@@ -12,6 +12,8 @@
 #include "ReteVisualSerialization.hpp"
 #include "Rule.hpp"
 #include <sempr/component/TripleContainer.hpp> // for sempr::Triple
+#include <sempr/ECWME.hpp>
+#include "ExplanationNode.hpp"
 
 namespace sempr { namespace gui {
 
@@ -70,6 +72,13 @@ public:
         just IDs with labels.
     */
     virtual Graph getReteNetworkRepresentation() = 0;
+
+    /**
+        Returns a simplified representation of an explanation -- again,
+        basically ids with labels.
+    */
+    virtual ExplanationGraph getExplanation(sempr::Triple::Ptr triple) = 0;
+    virtual ExplanationGraph getExplanation(const ECData& ec) = 0;
 
     /**
         Returns a list of the currently implemented rules:

@@ -144,6 +144,15 @@ TCPConnectionResponse TCPConnectionServer::handleRequest(const TCPConnectionRequ
             case TCPConnectionRequest::LIST_ALL_TRIPLES:
                 response.triples = semprConnection_->listTriples();
                 break;
+            case TCPConnectionRequest::GET_EXPLANATION_TRIPLE:
+                {
+                auto triple = std::make_shared<sempr::Triple>(request.toExplain);
+                response.explanationGraph = semprConnection_->getExplanation(triple);
+                break;
+                }
+            case TCPConnectionRequest::GET_EXPLANATION_ECWME:
+                response.explanationGraph = semprConnection_->getExplanation(request.data);
+                break;
         }
         response.success = true;
     } catch (std::exception& e) {

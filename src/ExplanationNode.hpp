@@ -28,7 +28,7 @@ struct ExplanationNode {
     std::string id;
     std::string str;
 
-    bool operator < (const ExplanationNode& other)
+    bool operator < (const ExplanationNode& other) const
     {
         return id < other.id;
     }

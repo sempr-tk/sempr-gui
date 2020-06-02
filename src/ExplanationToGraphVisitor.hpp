@@ -14,6 +14,8 @@ public:
     void visit(rete::Evidence::Ptr, size_t depth) override;
     void visit(rete::InferredEvidence::Ptr, size_t depth) override;
     void visit(rete::AssertedEvidence::Ptr, size_t depth) override;
+
+    ExplanationGraph graph() const;
 };
 
 }}

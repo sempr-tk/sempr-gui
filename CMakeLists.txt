@@ -64,6 +64,7 @@ set(GUI_SRC
     src/DirectConnectionNode.cpp
     src/DirectConnectionBuilder.cpp
     src/DragDropTabBar.cpp
+    src/ExplanationToGraphVisitor.cpp
     src/FlattenTreeProxyModel.cpp
     src/GeometryFilterProxyModel.cpp
     src/GeoMapWidget.cpp

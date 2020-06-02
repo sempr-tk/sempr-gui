@@ -17,11 +17,16 @@ class DirectConnection : public AbstractInterface {
     sempr::Core* core_;
     std::mutex& semprMutex_;
 
+protected:
+    ExplanationGraph getExplanationGeneric(rete::WME::Ptr wme);
+
 public:
     using Ptr = std::shared_ptr<DirectConnection>;
     DirectConnection(sempr::Core* core, std::mutex& m);
 
     Graph getReteNetworkRepresentation() override;
+    ExplanationGraph getExplanation(const ECData &ec) override;
+    ExplanationGraph getExplanation(sempr::Triple::Ptr triple) override;
     std::vector<Rule> getRulesRepresentation() override;
     std::vector<ECData> listEntityComponentPairs() override;
     std::vector<sempr::Triple> listTriples() override;

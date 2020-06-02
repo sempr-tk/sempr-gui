@@ -40,6 +40,8 @@ public:
     void stop();
 
     Graph getReteNetworkRepresentation() override;
+    ExplanationGraph getExplanation(const ECData &ec) override;
+    ExplanationGraph getExplanation(sempr::Triple::Ptr triple) override;
     std::vector<Rule> getRulesRepresentation() override;
     std::vector<ECData> listEntityComponentPairs() override;
     std::vector<sempr::Triple> listTriples() override;

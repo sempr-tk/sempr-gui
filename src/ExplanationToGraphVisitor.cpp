@@ -7,6 +7,11 @@
 
 namespace sempr { namespace gui {
 
+ExplanationGraph ExplanationToGraphVisitor::graph() const
+{
+    return graph_;
+}
+
 void ExplanationToGraphVisitor::visit(rete::WME::Ptr wme, size_t /*depth*/)
 {
     ExplanationNode node;
@@ -38,7 +43,7 @@ void ExplanationToGraphVisitor::visit(rete::Evidence::Ptr, size_t)
     // do nothing. Only handle Asserted/Inferred evidences explicitely.
 }
 
-void ExplanationToGraphVisitor::visit(rete::InferredEvidence::Ptr evidence, size_t depth)
+void ExplanationToGraphVisitor::visit(rete::InferredEvidence::Ptr evidence, size_t)
 {
     ExplanationNode node;
     node.id = rete::util::ptrToStr(evidence.get());

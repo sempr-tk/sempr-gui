@@ -4,6 +4,8 @@
 #include <sempr/ECWME.hpp>
 #include <sempr/Component.hpp>
 #include <sempr/Entity.hpp>
+#include <rete-reasoner/Reasoner.hpp>
+#include <rete-reasoner/InferenceState.hpp>
 
 #include <sstream>
 #include <iostream>
@@ -11,6 +13,7 @@
 #include <algorithm>
 
 #include "DirectConnection.hpp"
+#include "ExplanationToGraphVisitor.hpp"
 
 namespace sempr { namespace gui {
 
@@ -28,6 +31,55 @@ Graph DirectConnection::getReteNetworkRepresentation()
     static_cast<rete::Node*>(core_->reasoner().net().getRoot().get())->accept(visitor);
 
     return visitor.graph();
+}
+
+ExplanationGraph DirectConnection::getExplanationGeneric(rete::WME::Ptr wme)
+{
+    ExplanationToGraphVisitor visitor;
+
+    {
+        std::lock_guard<std::recursive_mutex> lg(core_->reasonerMutex());
+        auto infstate = core_->reasoner().getCurrentState();
+
+        infstate.traverseExplanation(wme, visitor);
+    }
+
+    return visitor.graph();
+}
+
+
+ExplanationGraph DirectConnection::getExplanation(const ECData& ec)
+{
+    std::lock_guard<std::recursive_mutex> lg(core_->reasonerMutex());
+    auto infstate = core_->reasoner().getCurrentState();
+    auto wmes = infstate.getWMEs();
+    auto toExplain = std::find_if(wmes.begin(), wmes.end(),
+            [&ec](rete::WME::Ptr wme) -> bool
+            {
+                auto ecwme = std::dynamic_pointer_cast<ECWME>(wme);
+                if (ecwme)
+                {
+                    return std::get<0>(ecwme->value_)->id() == ec.entityId &&
+                           rete::util::ptrToStr(std::get<1>(ecwme->value_).get()) == ec.componentId;
+                }
+                return false;
+            });
+
+    if (toExplain == wmes.end()) return ExplanationGraph();
+
+    return getExplanationGeneric(*toExplain);
+}
+
+
+ExplanationGraph DirectConnection::getExplanation(sempr::Triple::Ptr triple)
+{
+    auto wme = std::make_shared<rete::Triple>(
+        triple->getField(sempr::Triple::Field::SUBJECT),
+        triple->getField(sempr::Triple::Field::PREDICATE),
+        triple->getField(sempr::Triple::Field::OBJECT)
+    );
+
+    return getExplanationGeneric(wme);
 }
 
 

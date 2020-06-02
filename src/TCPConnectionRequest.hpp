@@ -23,11 +23,14 @@ struct TCPConnectionRequest {
         REMOVE_EC_PAIR,
         GET_RETE_NETWORK,
         GET_RULES,
-        LIST_ALL_TRIPLES
+        LIST_ALL_TRIPLES,
+        GET_EXPLANATION_ECWME,
+        GET_EXPLANATION_TRIPLE
     };
 
     Action action;
     ECData data;
+    sempr::Triple toExplain; // just for GET_EXPLANATION_TRIPLE
 };
 
 
@@ -51,6 +54,7 @@ struct TCPConnectionResponse {
     std::string reteNetwork; // just for GET_RETE_NETWORK action, json representation of a Graph
     std::vector<Rule> rules; // just for GET_RULES
     std::vector<sempr::Triple> triples; // just for LIST_ALL_TRIPLES
+    ExplanationGraph explanationGraph; // just for GET_EXPLANATION_[ECWME|TRIPLE]
 };
 
 
@@ -75,11 +79,35 @@ inline zmqpp::message& operator >> (zmqpp::message& msg, Rule& r)
 
     std::stringstream ss(s);
     cereal::JSONInputArchive ar(ss);
-    ar >> r;
+    ar(r);
 
     return msg;
 }
 
+// helper: write ExplanationGraph
+inline zmqpp::message& operator << (zmqpp::message& msg, const ExplanationGraph& graph)
+{
+    std::stringstream ss;
+    {
+        cereal::JSONOutputArchive ar(ss);
+        ar(graph);
+    }
+    msg << ss.str();
+    return msg;
+}
+
+// helper: read ExplanationGraph
+inline zmqpp::message& operator >> (zmqpp::message& msg, ExplanationGraph& graph)
+{
+    std::string explString;
+    msg >> explString;
+
+    std::stringstream ss(explString);
+    cereal::JSONInputArchive ar(ss);
+    ar(graph);
+
+    return msg;
+}
 
 // next, we need operators to read and write requests and responses from/to
 // the zmqpp::message type.
@@ -113,18 +141,42 @@ inline zmqpp::message& operator >> (zmqpp::message& msg, UpdateType& type)
     return msg;
 }
 
+// helper: write triple
+inline zmqpp::message& operator << (zmqpp::message& msg, const sempr::Triple& triple)
+{
+    std::stringstream ss;
+    {
+        cereal::JSONOutputArchive ar(ss);
+        ar(triple);
+    }
+    msg << ss.str();
+    return msg;
+}
+
+// helper: read triple
+inline zmqpp::message& operator >> (zmqpp::message& msg, sempr::Triple& triple)
+{
+    std::string tstr;
+    msg >> tstr;
+    std::stringstream ss(tstr);
+    cereal::JSONInputArchive ar(ss);
+    ar(triple);
+
+    return msg;
+}
+
 
 // write request
 inline zmqpp::message& operator << (zmqpp::message& msg, const TCPConnectionRequest& request)
 {
-    msg << request.data << request.action;
+    msg << request.data << request.toExplain << request.action;
     return msg;
 }
 
 // read request
 inline zmqpp::message& operator >> (zmqpp::message& msg, TCPConnectionRequest& request)
 {
-    msg >> request.data >> request.action;
+    msg >> request.data >> request.toExplain >> request.action;
     return msg;
 }
 
