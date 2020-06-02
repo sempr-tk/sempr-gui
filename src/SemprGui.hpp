@@ -4,6 +4,7 @@
 #include <QtCore>
 #include <QWidget>
 #include <QTabWidget>
+#include <QMenu>
 
 #include "ECModel.hpp"
 #include "AbstractInterface.hpp"
@@ -27,6 +28,7 @@ class SemprGui : public QWidget {
     // the main ui form
     Ui_Form* form_;
 
+    AbstractInterface::Ptr sempr_;
 private slots:
     /**
         Adds/removes the widget tab to/from the tab widget.
@@ -53,6 +55,11 @@ private slots:
     // helper, moves the content to a visible tabwidget
     void emptyUtilTabWidget(QTabWidget*);
 
+    /**
+        Opens a context menu for the selected entity-component entry in the
+        treeview
+    */
+    void onECCustomContextMenu(const QPoint& point);
 public:
     SemprGui(AbstractInterface::Ptr interface);
     ~SemprGui();

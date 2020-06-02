@@ -57,6 +57,8 @@ set(GUI_SRC
     src/AbstractInterface.cpp
     src/AnyColumnFilterProxyModel.cpp
     src/ECModel.cpp
+    src/ExplanationNodeItem.cpp
+    src/ExplanationEdgeItem.cpp
     src/ModelEntry.cpp
     src/ColoredBranchTreeView.cpp
     src/ComponentAdderWidget.cpp
@@ -65,6 +67,7 @@ set(GUI_SRC
     src/DirectConnectionBuilder.cpp
     src/DragDropTabBar.cpp
     src/ExplanationToGraphVisitor.cpp
+    src/ExplanationWidget.cpp
     src/FlattenTreeProxyModel.cpp
     src/GeometryFilterProxyModel.cpp
     src/GeoMapWidget.cpp
@@ -90,6 +93,7 @@ set(GUI_SRC
     src/UsefulWidget.cpp
     src/ZoomGraphicsView.cpp
     ui/main.ui
+    ui/explanationwidget.ui
     ui/raw_component.ui
     ui/sparqlwidget.ui
     ui/textcomponent.ui

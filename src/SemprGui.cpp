@@ -2,11 +2,12 @@
 #include "../ui/ui_main.h"
 
 #include "DragDropTabBar.hpp"
+#include "CustomDataRoles.hpp"
 
 namespace sempr { namespace gui {
 
 SemprGui::SemprGui(AbstractInterface::Ptr interface)
-    : dataModel_(interface), form_(new Ui_Form())
+    : dataModel_(interface), form_(new Ui_Form()), sempr_(interface)
 {
     // register metatypes
     qRegisterMetaType<ModelEntry>();
@@ -18,6 +19,11 @@ SemprGui::SemprGui(AbstractInterface::Ptr interface)
     form_->utilTabWidget_22->hide();
     changeWidgetLayout("1 x 2");
     form_->comboLayout->setCurrentText("1 x 2");
+
+    // context menu for the treeview
+    form_->treeView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(form_->treeView, &QTreeView::customContextMenuRequested,
+            this, &SemprGui::onECCustomContextMenu);
 
     // both views use the same model
     form_->treeView->setModel(&dataModel_);
@@ -228,6 +234,43 @@ void SemprGui::emptyUtilTabWidget(QTabWidget* widget)
 
             widget->removeTab(i);
             target->addTab(tab, label);
+        }
+    }
+}
+
+
+void SemprGui::onECCustomContextMenu(const QPoint& point)
+{
+    QModelIndex index = form_->treeView->indexAt(point);
+    if (index.isValid() && index.parent().isValid())
+    {
+        QMenu menu;
+        auto actionExplain = menu.addAction("explain");
+        auto selectedAction = menu.exec(form_->treeView->viewport()->mapToGlobal(point));
+
+        if (selectedAction == actionExplain)
+        {
+            auto entityId = index.data(Role::EntityIdRole).toString();
+            auto componentId = index.data(Role::ComponentIdRole).toString();
+
+            ECData data;
+            data.entityId = entityId.toStdString();
+            data.componentId = componentId.toStdString();
+            auto graph = sempr_->getExplanation(data);
+
+            form_->explanationWidget->display(graph);
+            for (auto tabWidget : { form_->utilTabWidget_11,
+                                    form_->utilTabWidget_12,
+                                    form_->utilTabWidget_21,
+                                    form_->utilTabWidget_22 })
+            {
+                int index = tabWidget->indexOf(form_->explanationWidget);
+                if (index != -1)
+                {
+                    tabWidget->setCurrentIndex(index);
+                    break;
+                }
+            }
         }
     }
 }

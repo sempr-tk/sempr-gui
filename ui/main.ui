@@ -285,7 +285,7 @@ selection-color: black;
       </property>
       <widget class="sempr::gui::DragDropTabWidget" name="utilTabWidget_12">
        <property name="currentIndex">
-        <number>0</number>
+        <number>3</number>
        </property>
        <widget class="sempr::gui::ReteWidget" name="reteWidget">
         <attribute name="title">
@@ -300,6 +300,11 @@ selection-color: black;
        <widget class="sempr::gui::SPARQLWidget" name="sparqlWidget">
         <attribute name="title">
          <string>SPARQL</string>
+        </attribute>
+       </widget>
+       <widget class="sempr::gui::ExplanationWidget" name="explanationWidget">
+        <attribute name="title">
+         <string>Explanation</string>
         </attribute>
        </widget>
       </widget>
@@ -379,6 +384,12 @@ selection-color: black;
    <class>sempr::gui::SPARQLWidget</class>
    <extends>QWidget</extends>
    <header>../src/SPARQLWidget.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>sempr::gui::ExplanationWidget</class>
+   <extends>QWidget</extends>
+   <header>../src/ExplanationWidget.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
