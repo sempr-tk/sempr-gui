@@ -204,6 +204,8 @@ inline zmqpp::message& operator << (zmqpp::message& msg, const TCPConnectionResp
     }
     msg << ss.str();
 
+    msg << response.explanationGraph;
+
     return msg;
 }
 
@@ -237,6 +239,8 @@ inline zmqpp::message& operator >> (zmqpp::message& msg, TCPConnectionResponse& 
     std::stringstream ss(triples);;
     cereal::JSONInputArchive ar(ss);
     ar(response.triples);
+
+    msg >> response.explanationGraph;
 
     return msg;
 }
