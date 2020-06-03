@@ -27,7 +27,7 @@ void ExplanationWidget::display(const ExplanationGraph& graph)
 
     for (auto node : graph_.nodes)
     {
-        auto item = new GraphNodeItem(QString::fromStdString(node.str));
+        auto item = new GraphNodeItem(QString::fromStdString(node.str), GraphNodeItem::Ellipse);
         nodes_[node.id] = item;
         scene_.addItem(item);
         item->setFlag(QGraphicsItem::ItemIsMovable);

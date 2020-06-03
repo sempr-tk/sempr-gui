@@ -15,7 +15,7 @@ GraphNodeItem::GraphNodeItem(const QString& text, Shape s)
     setCacheMode(DeviceCoordinateCache);
     setFlag(ItemSendsGeometryChanges);
     setFlag(ItemIsMovable);
-    setZValue(0);
+    setZValue(-1);
     setAcceptHoverEvents(true);
 }
 
@@ -166,6 +166,49 @@ double GraphNodeItem::ellipseRadiusAtVectorIntersection(double a, double b, doub
     double ysq = tana*tana * xsq;
 
     return sqrt(xsq+ysq);
+}
+
+
+double GraphNodeItem::rectangleRadiusAtVectorIntersection(
+                        double width, double height,
+                        double dx, double dy)
+{
+    if (height < 10e-5 || width < 10e-5) return 0.;
+
+
+    bool intersectsTopOrBotton = abs(dy/height) > abs(dx/width);
+
+    if (intersectsTopOrBotton)
+    {
+        double x = 0.5 * height * (dx/dy);
+        double y = 0.5 * height;
+        return sqrt(x*x + y*y);
+    }
+    else /*intersectsLeftOrRight*/
+    {
+        double y = 0.5 * width * (dy/dx);
+        double x = 0.5 * width;
+        return sqrt(x*x + y*y);
+    }
+}
+
+double GraphNodeItem::innerRadiusInDirection(double dx, double dy) const
+{
+    auto rect = boundingRect();
+    if (shape_ == Shape::Ellipse)
+    {
+        return GraphNodeItem::ellipseRadiusAtVectorIntersection(
+                                rect.width()/2., rect.height()/2.,
+                                dx, dy);
+    }
+    else if (shape_ == Shape::Rectangle)
+    {
+        return GraphNodeItem::rectangleRadiusAtVectorIntersection(
+                                rect.width(), rect.height(),
+                                dx, dy);
+    }
+
+    return 0.;
 }
 
 void GraphNodeItem::setHighlighted(bool on)

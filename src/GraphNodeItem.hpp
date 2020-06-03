@@ -45,6 +45,11 @@ protected:
     */
     static double ellipseRadiusAtVectorIntersection(double a, double b, double dx, double dy);
 
+    /**
+        Analogon to ellipseRadiusAtVectorIntersection, just for rectangles.
+    */
+    static double rectangleRadiusAtVectorIntersection(double width, double height, double dx, double dy);
+
 public:
     GraphNodeItem(const QString& text, Shape s = Shape::Ellipse);
 
@@ -57,6 +62,13 @@ public:
 
     void addEdge(GraphEdgeItem* edge);
     std::vector<GraphEdgeItem*> edges() const;
+
+
+    /**
+        Returns the distance between the items (0,0) and its border in the
+        specified direction.
+    */
+    double innerRadiusInDirection(double dx, double dy) const;
 
     /**
         Adjusts the connected edges whenever the node is moved
