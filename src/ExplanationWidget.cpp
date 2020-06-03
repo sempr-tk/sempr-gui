@@ -37,7 +37,6 @@ void ExplanationWidget::display(const ExplanationGraph& graph)
     {
         auto from = nodes_[std::get<0>(edge)];
         auto to = nodes_[std::get<1>(edge)];
-        std::cout << from << ", " << to << std::endl;
         auto edgeItem = new ExplanationEdgeItem(from, to);
         edgeItem->adjust();
         scene_.addItem(edgeItem);

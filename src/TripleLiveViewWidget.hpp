@@ -26,6 +26,8 @@ namespace sempr { namespace gui {
     strictly read-only thing.
 */
 class TripleLiveViewWidget : public QWidget {
+    Q_OBJECT
+
     Ui::TripleLiveViewWidget* form_;
 
     // stack columns & filter duplicates, for the completer
@@ -40,11 +42,17 @@ class TripleLiveViewWidget : public QWidget {
 
     std::map<rete::Triple, int> tripleToIndex_;
 
+protected slots:
+    void onRequestMenu(const QPoint& point);
+
 public:
     TripleLiveViewWidget(QWidget* parent = nullptr);
     ~TripleLiveViewWidget();
 
     void tripleUpdate(sempr::Triple, AbstractInterface::Notification);
+
+signals:
+    void requestExplanation(const QString& sub, const QString& pred, const QString& obj);
 };
 
 }}

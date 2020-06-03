@@ -25,6 +25,10 @@ SemprGui::SemprGui(AbstractInterface::Ptr interface)
     connect(form_->treeView, &QTreeView::customContextMenuRequested,
             this, &SemprGui::onECCustomContextMenu);
 
+    // explain triples
+    connect(form_->tripleLiveViewWidget, &TripleLiveViewWidget::requestExplanation,
+            this, &SemprGui::onExplainRequest);
+
     // both views use the same model
     form_->treeView->setModel(&dataModel_);
     auto selectionModel = form_->treeView->selectionModel();
@@ -271,6 +275,27 @@ void SemprGui::onECCustomContextMenu(const QPoint& point)
                     break;
                 }
             }
+        }
+    }
+}
+
+void SemprGui::onExplainRequest(const QString& s, const QString& p, const QString& o)
+{
+    auto triple = std::make_shared<sempr::Triple>(s.toStdString(),
+                                                  p.toStdString(),
+                                                  o.toStdString());
+    auto graph = sempr_->getExplanation(triple);
+    form_->explanationWidget->display(graph);
+    for (auto tabWidget : { form_->utilTabWidget_11,
+                            form_->utilTabWidget_12,
+                            form_->utilTabWidget_21,
+                            form_->utilTabWidget_22 })
+    {
+        int index = tabWidget->indexOf(form_->explanationWidget);
+        if (index != -1)
+        {
+            tabWidget->setCurrentIndex(index);
+            break;
         }
     }
 }

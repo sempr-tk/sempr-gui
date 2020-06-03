@@ -27,6 +27,30 @@ TripleLiveViewWidget::TripleLiveViewWidget(QWidget* parent)
     connect(form_->tripleListFilterEdit, &QLineEdit::textChanged,
             &filterModel_,
             QOverload<const QString&>::of(&AnyColumnFilterProxyModel::setFilterFixedString));
+
+    form_->tripleList->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(form_->tripleList, &QTreeView::customContextMenuRequested,
+            this, &TripleLiveViewWidget::onRequestMenu);
+}
+
+
+void TripleLiveViewWidget::onRequestMenu(const QPoint& point)
+{
+    auto index = form_->tripleList->indexAt(point);
+    if (index.isValid())
+    {
+        QMenu menu;
+        auto explainAction = menu.addAction("explain");
+        auto requestedAction = menu.exec(form_->tripleList->viewport()->mapToGlobal(point));
+        if (requestedAction == explainAction)
+        {
+            auto s = index.sibling(index.row(), 0).data().toString();
+            auto p = index.sibling(index.row(), 1).data().toString();
+            auto o = index.sibling(index.row(), 2).data().toString();
+
+            emit requestExplanation(s, p, o);
+        }
+    }
 }
 
 

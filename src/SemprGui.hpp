@@ -60,6 +60,11 @@ private slots:
         treeview
     */
     void onECCustomContextMenu(const QPoint& point);
+
+    /**
+        Handles the request (from another widget) to explain a triple
+    */
+    void onExplainRequest(const QString& s, const QString& p, const QString& o);
 public:
     SemprGui(AbstractInterface::Ptr interface);
     ~SemprGui();

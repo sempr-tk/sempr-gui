@@ -47,7 +47,8 @@ void ExplanationToGraphVisitor::visit(rete::InferredEvidence::Ptr evidence, size
 {
     ExplanationNode node;
     node.id = rete::util::ptrToStr(evidence.get());
-    node.str = evidence->toString();
+    // node.str = evidence->toString();
+    node.str = evidence->production()->getName();
     node.type = ExplanationNode::Type::InferredEvidence;
 
     graph_.nodes.insert(node);
