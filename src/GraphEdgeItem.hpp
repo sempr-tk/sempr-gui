@@ -1,24 +1,24 @@
-#ifndef SEMPR_GUI_RETEEDGEITEM_HPP_
-#define SEMPR_GUI_RETEEDGEITEM_HPP_
+#ifndef SEMPR_GUI_GRAPHEDGEITEM_HPP_
+#define SEMPR_GUI_GRAPHEDGEITEM_HPP_
 
 #include <QGraphicsItem>
 #include <QStyleOptionGraphicsItem>
 #include <QPainter>
 
-#include "ReteNodeItem.hpp"
+#include "GraphNodeItem.hpp"
 
 namespace sempr { namespace gui {
 
 /**
-    A QGraphicsItem to draw an edge between two ReteNodeItems.
+    A QGraphicsItem to draw an edge between two GraphNodeItems.
 */
-class ReteEdgeItem : public QGraphicsItem {
-    ReteNodeItem *fromNode_, *toNode_;
+class GraphEdgeItem : public QGraphicsItem {
+    GraphNodeItem *fromNode_, *toNode_;
     QPointF fromPoint_, toPoint_;
 
     bool localHighlight_, globalHighlight_;
 public:
-    ReteEdgeItem(ReteNodeItem* from, ReteNodeItem* to);
+    GraphEdgeItem(GraphNodeItem* from, GraphNodeItem* to);
 
     /// re-compute start and end points
     void adjust();
@@ -26,8 +26,8 @@ public:
     void setLocalHighlighted(bool);
     void setGlobalHighlighted(bool);
 
-    ReteNodeItem* from() const;
-    ReteNodeItem* to() const;
+    GraphNodeItem* from() const;
+    GraphNodeItem* to() const;
 
     QRectF boundingRect() const override;
     void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*) override;
@@ -35,4 +35,4 @@ public:
 
 }}
 
-#endif /* include guard: SEMPR_GUI_RETEEDGEITEM_HPP_ */
+#endif /* include guard: SEMPR_GUI_GRAPHEDGEITEM_HPP_ */

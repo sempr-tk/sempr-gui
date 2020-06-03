@@ -2,8 +2,8 @@
 #include "../ui/ui_retewidget.h"
 
 #include "ReteVisualSerialization.hpp"
-#include "ReteNodeItem.hpp"
-#include "ReteEdgeItem.hpp"
+#include "GraphNodeItem.hpp"
+#include "GraphEdgeItem.hpp"
 
 #include <QRectF>
 #include <cmath>
@@ -89,7 +89,7 @@ void ReteWidget::onSelectionChanged()
     else
     {
         auto first = selectedItems[0];
-        auto node = dynamic_cast<ReteNodeItem*>(first);
+        auto node = dynamic_cast<GraphNodeItem*>(first);
         if (node) highlight(node);
     }
 }
@@ -105,7 +105,7 @@ void ReteWidget::onSelectedRuleChanged(QTreeWidgetItem* current)
 
 
 
-void ReteWidget::highlight(ReteNodeItem* node)
+void ReteWidget::highlight(GraphNodeItem* node)
 {
     for (auto entry : nodes_)
     {
@@ -192,7 +192,11 @@ void ReteWidget::rebuild()
 
     for (auto node : graph_.nodes)
     {
-        auto item = new ReteNodeItem(node.type, QString::fromStdString(node.label));
+        //auto item = new GraphNodeItem(node.type, QString::fromStdString(node.label));
+        GraphNodeItem::Shape shape = GraphNodeItem::Ellipse;
+        if (node.type == Node::Type::MEMORY) shape = GraphNodeItem::Rectangle;
+
+        auto item = new GraphNodeItem(QString::fromStdString(node.label), shape);
         nodes_[node.id] = item;
         scene_.addItem(item); // scene takes ownership
 
@@ -205,7 +209,7 @@ void ReteWidget::rebuild()
         auto from = nodes_[edge.from];
         auto to = nodes_[edge.to];
 
-        auto edgeItem = new ReteEdgeItem(from, to);
+        auto edgeItem = new GraphEdgeItem(from, to);
         edgeItem->adjust();
         scene_.addItem(edgeItem);
     }
@@ -282,8 +286,8 @@ void ReteWidget::populateTreeWidget()
 void ReteWidget::resetLayout()
 {
     // step 1: assign levels to the nodes
-    std::map<int, std::vector<ReteNodeItem*>> levelToNodes;
-    std::set<ReteNodeItem*> assignedNodes;
+    std::map<int, std::vector<GraphNodeItem*>> levelToNodes;
+    std::set<GraphNodeItem*> assignedNodes;
 
 
     // search for the root node -- the only one that is not at the end of
@@ -298,7 +302,7 @@ void ReteWidget::resetLayout()
 
     // from the root node, traverse the graph to assign levels
     std::vector<std::pair<int, std::string>> toVisit;
-    std::set<ReteNodeItem*> visited;
+    std::set<GraphNodeItem*> visited;
 
     toVisit.push_back({0, allNodes.begin()->id}); // root node
 

@@ -57,8 +57,6 @@ set(GUI_SRC
     src/AbstractInterface.cpp
     src/AnyColumnFilterProxyModel.cpp
     src/ECModel.cpp
-    src/ExplanationNodeItem.cpp
-    src/ExplanationEdgeItem.cpp
     src/ModelEntry.cpp
     src/ColoredBranchTreeView.cpp
     src/ComponentAdderWidget.cpp
@@ -74,8 +72,8 @@ set(GUI_SRC
     src/GeosQCoordinateTranform.cpp
     src/ReteWidget.cpp
     src/RawComponentWidget.cpp
-    src/ReteNodeItem.cpp
-    src/ReteEdgeItem.cpp
+    src/GraphNodeItem.cpp
+    src/GraphEdgeItem.cpp
     src/ReteVisualSerialization.cpp
     src/RoleNameProxyModel.cpp
     src/SemprGui.cpp

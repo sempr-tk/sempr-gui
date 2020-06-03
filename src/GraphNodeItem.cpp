@@ -1,43 +1,30 @@
-#include "ReteNodeItem.hpp"
+#include "GraphNodeItem.hpp"
+#include "GraphEdgeItem.hpp"
+
 #include <QFontDatabase>
 #include <QFontMetrics>
 #include <QApplication>
-#include "ReteEdgeItem.hpp"
-
-#include <iostream>
 #include <QGraphicsView>
-#include <QGraphicsScene>
-#include <QDebug>
 #include <cmath>
 
 namespace sempr { namespace gui {
 
-ReteNodeItem::ReteNodeItem(Node::Type type, const QString& text)
-    : type_(type), text_(text), highlight_(false), localHighlight_(false)
+GraphNodeItem::GraphNodeItem(const QString& text, Shape s)
+    : text_(text), shape_(s), highlight_(false), localHighlight_(false)
 {
-    setAcceptHoverEvents(true);
     setCacheMode(DeviceCoordinateCache);
-    setFlag(ItemIsSelectable);
     setFlag(ItemSendsGeometryChanges);
     setFlag(ItemIsMovable);
-    setZValue(-1);
+    setZValue(0);
+    setAcceptHoverEvents(true);
 }
 
-void ReteNodeItem::setHighlighted(bool on)
-{
-    highlight_ = on;
-    update();
-}
 
-bool ReteNodeItem::isHighlighted() const
-{
-    return highlight_;
-}
-
-QRectF ReteNodeItem::drawingRect() const
+QRectF GraphNodeItem::drawingRect() const
 {
     auto rect = textRect();
-    if (type_ != Node::MEMORY)
+
+    if (shape_ == Shape::Ellipse)
     {
         // ellipse -> scale up to fit the text!
         // sqrt(2)? Seems to easy, but it's what the equations tell us...
@@ -57,21 +44,20 @@ QRectF ReteNodeItem::drawingRect() const
         // also, add a constant margin
         rect.adjust(-5, -5, 5, 5);
     }
-    else
+    else /* if (shape_ == Shape::Rectangle) */
     {
         rect.adjust(-10, -10, 10, 10);
     }
 
-
     return rect;
 }
 
-QRectF ReteNodeItem::boundingRect() const
+QRectF GraphNodeItem::boundingRect() const
 {
     return drawingRect().adjusted(-5, -5, 5, 5);
 }
 
-QRectF ReteNodeItem::textRect() const
+QRectF GraphNodeItem::textRect() const
 {
     QFontMetricsF fm(font());
     auto rect = fm.boundingRect(QRect(), 0, text_);
@@ -79,34 +65,7 @@ QRectF ReteNodeItem::textRect() const
     return rect;
 }
 
-
-void ReteNodeItem::hoverEnterEvent(QGraphicsSceneHoverEvent* e)
-{
-    localHighlight_ = true;
-    update();
-
-    for (auto e : edges_)
-    {
-        e->setLocalHighlighted(true);
-    }
-
-    QGraphicsItem::hoverEnterEvent(e);
-}
-
-void ReteNodeItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* e)
-{
-    localHighlight_ = false;
-    update();
-
-    for (auto e : edges_)
-    {
-        e->setLocalHighlighted(false);
-    }
-
-    QGraphicsItem::hoverLeaveEvent(e);
-}
-
-QFont ReteNodeItem::font() const
+QFont GraphNodeItem::font() const
 {
     // select a font.
     // fallback: application wide default font
@@ -122,7 +81,7 @@ QFont ReteNodeItem::font() const
     return font;
 }
 
-void ReteNodeItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*)
+void GraphNodeItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*)
 {
     auto rect = drawingRect();
     auto txtRect = textRect();
@@ -151,12 +110,12 @@ void ReteNodeItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWi
     painter->setPen(pen);
     painter->setRenderHint(QPainter::RenderHint::HighQualityAntialiasing);
 
-    if (type_ == Node::MEMORY)
+    if (shape_ == Shape::Rectangle)
     {
         painter->fillRect(rect, background);
         painter->drawRect(rect);
     }
-    else //if (type_ == Node::PRODUCTION)
+    else if (shape_ == Shape::Ellipse)
     {
         painter->setBrush(background);
         painter->drawEllipse(rect);
@@ -168,18 +127,18 @@ void ReteNodeItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWi
     painter->drawText(txtRect, Qt::AlignCenter, text_);
 }
 
-void ReteNodeItem::addEdge(ReteEdgeItem* edge)
+void GraphNodeItem::addEdge(GraphEdgeItem* edge)
 {
     edges_.push_back(edge);
 }
 
 
-std::vector<ReteEdgeItem*> ReteNodeItem::edges() const
+std::vector<GraphEdgeItem*> GraphNodeItem::edges() const
 {
     return edges_;
 }
 
-QVariant ReteNodeItem::itemChange(GraphicsItemChange change, const QVariant& value)
+QVariant GraphNodeItem::itemChange(GraphicsItemChange change, const QVariant& value)
 {
     if (change == ItemPositionHasChanged)
     {
@@ -194,7 +153,7 @@ QVariant ReteNodeItem::itemChange(GraphicsItemChange change, const QVariant& val
 }
 
 
-double ReteNodeItem::ellipseRadiusAtVectorIntersection(double a, double b, double dx, double dy)
+double GraphNodeItem::ellipseRadiusAtVectorIntersection(double a, double b, double dx, double dy)
 {
     if (abs(dx * dy) < 10e-10)
     {
@@ -209,7 +168,48 @@ double ReteNodeItem::ellipseRadiusAtVectorIntersection(double a, double b, doubl
     return sqrt(xsq+ysq);
 }
 
-void ReteNodeItem::calculateForces()
+void GraphNodeItem::setHighlighted(bool on)
+{
+    highlight_ = on;
+    update();
+}
+
+bool GraphNodeItem::isHighlighted() const
+{
+    return highlight_;
+}
+
+
+
+void GraphNodeItem::hoverEnterEvent(QGraphicsSceneHoverEvent* e)
+{
+    localHighlight_ = true;
+    update();
+
+    for (auto e : edges_)
+    {
+        e->setLocalHighlighted(true);
+    }
+
+    QGraphicsItem::hoverEnterEvent(e);
+}
+
+void GraphNodeItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* e)
+{
+    localHighlight_ = false;
+    update();
+
+    for (auto e : edges_)
+    {
+        e->setLocalHighlighted(false);
+    }
+
+    QGraphicsItem::hoverLeaveEvent(e);
+}
+
+
+
+void GraphNodeItem::calculateForces()
 {
     if (!scene() || scene()->mouseGrabberItem() == this)
     {
@@ -232,13 +232,13 @@ void ReteNodeItem::calculateForces()
     const QList<QGraphicsItem*> items = scene()->items();
 
 
-    QMap<ReteNodeItem*, double> distances;
+    QMap<GraphNodeItem*, double> distances;
 
     for (auto item : items)
     {
         if (item == this) continue;
 
-        ReteNodeItem* node = dynamic_cast<ReteNodeItem*>(item);
+        GraphNodeItem* node = dynamic_cast<GraphNodeItem*>(item);
         if (!node) continue;
 
 
@@ -292,7 +292,7 @@ void ReteNodeItem::calculateForces()
     double weight = (edges_.size() + 1) * 50;
     for (auto edge : edges_)
     {
-        ReteNodeItem* other;
+        GraphNodeItem* other;
         if (edge->from() == this) other = edge->to();
         else                      other = edge->from();
 
@@ -320,7 +320,7 @@ void ReteNodeItem::calculateForces()
 
 }
 
-bool ReteNodeItem::advancePosition()
+bool GraphNodeItem::advancePosition()
 {
     if (dynamicNewPos_ == pos()) return false;
     setPos(dynamicNewPos_);

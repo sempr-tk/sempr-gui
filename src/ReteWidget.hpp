@@ -10,7 +10,7 @@
 #include <map>
 
 #include "AbstractInterface.hpp"
-#include "ReteNodeItem.hpp"
+#include "GraphNodeItem.hpp"
 
 namespace Ui {
     class ReteWidget;
@@ -31,7 +31,7 @@ class ReteWidget : public QWidget {
     AbstractInterface::Ptr sempr_;
 
     // a list of graphics items that were added to the scene
-    std::map<std::string, ReteNodeItem*> nodes_;
+    std::map<std::string, GraphNodeItem*> nodes_;
 
     // store the graph, non-visual, abstract representation
     Graph graph_;
@@ -63,7 +63,7 @@ class ReteWidget : public QWidget {
         Highlights the part of the graph connected to the given node
     */
     void highlight(const std::string& id);
-    void highlight(ReteNodeItem* node);
+    void highlight(GraphNodeItem* node);
     void highlight(const std::vector<std::string>& ids);
 
 private slots:

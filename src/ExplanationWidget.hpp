@@ -5,7 +5,7 @@
 #include <QGraphicsScene>
 
 #include "ExplanationNode.hpp"
-#include "ExplanationNodeItem.hpp"
+#include "GraphNodeItem.hpp"
 
 namespace Ui {
     class ExplanationWidget;
@@ -19,7 +19,7 @@ class ExplanationWidget : public QWidget {
     Ui::ExplanationWidget* form_;
 
     QGraphicsScene scene_;
-    std::map<std::string, ExplanationNodeItem*> nodes_;
+    std::map<std::string, GraphNodeItem*> nodes_;
     ExplanationGraph graph_;
 
 public:

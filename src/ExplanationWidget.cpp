@@ -1,7 +1,7 @@
 #include "ExplanationWidget.hpp"
 #include "../ui/ui_explanationwidget.h"
 
-#include "ExplanationEdgeItem.hpp"
+#include "GraphEdgeItem.hpp"
 
 namespace sempr { namespace gui {
 
@@ -27,7 +27,7 @@ void ExplanationWidget::display(const ExplanationGraph& graph)
 
     for (auto node : graph_.nodes)
     {
-        auto item = new ExplanationNodeItem(QString::fromStdString(node.str));
+        auto item = new GraphNodeItem(QString::fromStdString(node.str));
         nodes_[node.id] = item;
         scene_.addItem(item);
         item->setFlag(QGraphicsItem::ItemIsMovable);
@@ -37,7 +37,7 @@ void ExplanationWidget::display(const ExplanationGraph& graph)
     {
         auto from = nodes_[std::get<0>(edge)];
         auto to = nodes_[std::get<1>(edge)];
-        auto edgeItem = new ExplanationEdgeItem(from, to);
+        auto edgeItem = new GraphEdgeItem(from, to);
         edgeItem->adjust();
         scene_.addItem(edgeItem);
     }
