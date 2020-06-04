@@ -21,6 +21,7 @@ before_script:
     - apt install -y -qq libboost-all-dev
     - apt install -y -qq libzmqpp-dev libzmq3-dev
     - apt install -y -qq qtbase5-dev qtdeclarative5-dev qtlocation5-dev qtpositioning5-dev qtquickcontrols2-5-dev
+    - apt install -y -qq libgraphviz-dev
 
 stages:
     - build
