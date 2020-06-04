@@ -31,7 +31,11 @@ void ExplanationWidget::display(const ExplanationGraph& graph)
 
     for (auto node : graph_.nodes)
     {
-        auto item = new GraphNodeItem(QString::fromStdString(node.str), GraphNodeItem::Rectangle);
+        GraphNodeItem::Shape shape = GraphNodeItem::Shape::Rectangle;
+        if (node.type == ExplanationNode::Type::InferredEvidence)
+            shape = GraphNodeItem::Shape::Ellipse;
+
+        auto item = new GraphNodeItem(QString::fromStdString(node.str), shape);
         nodes_[node.id] = item;
         scene_.addItem(item);
         item->setFlag(QGraphicsItem::ItemIsMovable);
