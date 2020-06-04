@@ -40,6 +40,11 @@ pkg_check_modules(zmq REQUIRED libzmq)
 include_directories(${zmq_INCLUDE_DIRS})
 link_directories(${zmq_LIBRARY_DIRS})
 
+# graphviz to layout the rete and explanation graphs
+pkg_check_modules(CGRAPH REQUIRED libcgraph libgvc libcdt)
+include_directories(${CGRAPH_INCLUDE_DIRS})
+link_directories(${CGRAPH_LIBRARY_DIRS})
+
 # qt stuff
 find_package(Qt5 COMPONENTS Core Widgets Quick QuickWidgets Location QuickControls2 REQUIRED)
 include_directories(${Qt5_INCLUDE_DIRS})
@@ -70,6 +75,7 @@ set(GUI_SRC
     src/GeometryFilterProxyModel.cpp
     src/GeoMapWidget.cpp
     src/GeosQCoordinateTranform.cpp
+    src/GraphvizLayout.cpp
     src/ReteWidget.cpp
     src/RawComponentWidget.cpp
     src/GraphNodeItem.cpp
@@ -110,7 +116,7 @@ set(GUI_SRC
 
 add_library(sempr-gui SHARED ${GUI_SRC})
 target_link_libraries(sempr-gui
-    ${sempr_LIBRARIES} ${zmq_LIBRARIES} ${ZeroMQPP_LIBRARIES}
+    ${sempr_LIBRARIES} ${zmq_LIBRARIES} ${ZeroMQPP_LIBRARIES} ${CGRAPH_LIBRARIES}
     Qt5::Core Qt5::Widgets Qt5::Quick Qt5::QuickWidgets Qt5::QuickControls2
     Qt5::Location Threads::Threads)
 set_target_properties(sempr-gui PROPERTIES VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})

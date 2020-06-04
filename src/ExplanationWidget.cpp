@@ -2,6 +2,7 @@
 #include "../ui/ui_explanationwidget.h"
 
 #include "GraphEdgeItem.hpp"
+#include "GraphvizLayout.hpp"
 
 namespace sempr { namespace gui {
 
@@ -21,16 +22,21 @@ ExplanationWidget::~ExplanationWidget()
 void ExplanationWidget::display(const ExplanationGraph& graph)
 {
     nodes_.clear();
+    nodeList_.clear();
+    edgeList_.clear();
+
     scene_.clear();
 
     graph_ = graph;
 
     for (auto node : graph_.nodes)
     {
-        auto item = new GraphNodeItem(QString::fromStdString(node.str), GraphNodeItem::Ellipse);
+        auto item = new GraphNodeItem(QString::fromStdString(node.str), GraphNodeItem::Rectangle);
         nodes_[node.id] = item;
         scene_.addItem(item);
         item->setFlag(QGraphicsItem::ItemIsMovable);
+
+        nodeList_.push_back(item);
     }
 
     for (auto edge : graph_.edges)
@@ -40,7 +46,11 @@ void ExplanationWidget::display(const ExplanationGraph& graph)
         auto edgeItem = new GraphEdgeItem(from, to);
         edgeItem->adjust();
         scene_.addItem(edgeItem);
+
+        edgeList_.push_back(edgeItem);
     }
+
+    GraphvizLayout::layout(nodeList_, edgeList_);
 }
 
 

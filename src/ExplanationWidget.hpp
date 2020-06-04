@@ -20,6 +20,11 @@ class ExplanationWidget : public QWidget {
 
     QGraphicsScene scene_;
     std::map<std::string, GraphNodeItem*> nodes_;
+
+    // for layouting with graphviz:
+    std::vector<GraphNodeItem*> nodeList_;
+    std::vector<GraphEdgeItem*> edgeList_;
+
     ExplanationGraph graph_;
 
 public:
