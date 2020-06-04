@@ -33,6 +33,10 @@ class ReteWidget : public QWidget {
     // a list of graphics items that were added to the scene
     std::map<std::string, GraphNodeItem*> nodes_;
 
+    // for layouting
+    std::vector<GraphNodeItem*> nodeList_;
+    std::vector<GraphEdgeItem*> edgeList_;
+
     // store the graph, non-visual, abstract representation
     Graph graph_;
     std::map<QTreeWidgetItem*, Rule> rules_;

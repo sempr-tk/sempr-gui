@@ -4,6 +4,7 @@
 #include "ReteVisualSerialization.hpp"
 #include "GraphNodeItem.hpp"
 #include "GraphEdgeItem.hpp"
+#include "GraphvizLayout.hpp"
 
 #include <QRectF>
 #include <cmath>
@@ -186,6 +187,8 @@ void ReteWidget::highlight(const std::vector<std::string>& ids)
 void ReteWidget::rebuild()
 {
     nodes_.clear();
+    nodeList_.clear();
+    edgeList_.clear();
     scene_.clear();
 
     graph_ = sempr_->getReteNetworkRepresentation();
@@ -197,11 +200,11 @@ void ReteWidget::rebuild()
         if (node.type == Node::Type::MEMORY) shape = GraphNodeItem::Rectangle;
 
         auto item = new GraphNodeItem(QString::fromStdString(node.label), shape);
-        nodes_[node.id] = item;
         scene_.addItem(item); // scene takes ownership
-
         item->setFlag(QGraphicsItem::ItemIsMovable);
+
         nodes_[node.id] = item;
+        nodeList_.push_back(item);
     }
 
     for (auto edge : graph_.edges)
@@ -212,6 +215,8 @@ void ReteWidget::rebuild()
         auto edgeItem = new GraphEdgeItem(from, to);
         edgeItem->adjust();
         scene_.addItem(edgeItem);
+
+        edgeList_.push_back(edgeItem);
     }
 
 
@@ -285,6 +290,9 @@ void ReteWidget::populateTreeWidget()
 
 void ReteWidget::resetLayout()
 {
+    GraphvizLayout::layout(nodeList_, edgeList_);
+
+    /*
     // step 1: assign levels to the nodes
     std::map<int, std::vector<GraphNodeItem*>> levelToNodes;
     std::set<GraphNodeItem*> assignedNodes;
@@ -359,6 +367,7 @@ void ReteWidget::resetLayout()
 
         y += yOffset;
     }
+    */
 }
 
 
