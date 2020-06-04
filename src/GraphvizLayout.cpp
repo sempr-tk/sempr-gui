@@ -111,7 +111,7 @@ void GraphvizLayout::layout(const std::vector<GraphNodeItem*>& nodes,
         auto agNode = entry.second;
 
         auto coord = ND_coord(agNode);
-        item->setPos(coord.x * scale, coord.y * scale);
+        item->setPos(coord.x * scale, -coord.y * scale);
         item->update();
     }
 
