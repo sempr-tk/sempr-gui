@@ -230,9 +230,11 @@ void ReteWidget::updateGraphVisibility()
     for (auto& entry : nodes_)
     {
         entry.second->hide();
+        entry.second->update();
         for (auto edge : entry.second->edges())
         {
             edge->setVisible(false);
+            edge->update();
         }
     }
 
@@ -263,6 +265,9 @@ void ReteWidget::updateGraphVisibility()
             if (e.to == toShow) toVisit.push_back(e.from);
         }
     }
+
+    // redo the layout
+    resetLayout();
 }
 
 
@@ -290,84 +295,52 @@ void ReteWidget::populateTreeWidget()
 
 void ReteWidget::resetLayout()
 {
-    GraphvizLayout::layout(nodeList_, edgeList_);
+    // collect all visible nodes and edges, as we only want to take those
+    // into consideration during layouting.
+    //
 
-    /*
-    // step 1: assign levels to the nodes
-    std::map<int, std::vector<GraphNodeItem*>> levelToNodes;
-    std::set<GraphNodeItem*> assignedNodes;
+    std::vector<GraphNodeItem*> nodes;
+    std::vector<GraphEdgeItem*> edges;
 
-
-    // search for the root node -- the only one that is not at the end of
-    // and edge:
-    auto allNodes = graph_.nodes;
-    for (auto edge : graph_.edges)
+    for (auto node : nodeList_)
     {
-        Node n;
-        n.id = edge.to;
-        allNodes.erase(n);
-    }
-
-    // from the root node, traverse the graph to assign levels
-    std::vector<std::pair<int, std::string>> toVisit;
-    std::set<GraphNodeItem*> visited;
-
-    toVisit.push_back({0, allNodes.begin()->id}); // root node
-
-    int maxLevel = 0;
-
-    while (!toVisit.empty())
-    {
-        auto entry = toVisit.back(); toVisit.pop_back();
-        auto node = nodes_[entry.second];
-
-        if (visited.find(node) == visited.end())
+        if (node->isVisible())
         {
-            levelToNodes[entry.first].push_back(node);
-            visited.insert(node);
-
-            // add all child nodes to be visited
-            for (auto edge : graph_.edges)
-            {
-                if (edge.from == entry.second)
-                {
-                    toVisit.push_back({entry.first+1, edge.to});
-                    if (entry.first+1 > maxLevel) maxLevel = entry.first+1;
-                }
-            }
+            nodes.push_back(node);
         }
     }
 
-
-    // step 2: set positions
-    double y = 0;
-    const double yOffset = 100;
-    const double xOffset = 50;
-
-    for (int level = 0; level <= maxLevel; level++)
+    for (auto edge : edgeList_)
     {
-        // compute the overall width
-        double width = 0;
-        for (auto node : levelToNodes[level])
+        if (edge->from()->isVisible() && edge->to()->isVisible())
         {
-            width += node->boundingRect().width() + xOffset;
+            edges.push_back(edge);
         }
-        width += xOffset;
-
-        // start shifted to the left (-> align center)
-        double x = -width/2.;
-
-        // set the nodes position
-        for (auto node : levelToNodes[level])
-        {
-            x += node->boundingRect().width()/2.;
-            node->setPos(x, y);
-            x += node->boundingRect().width()/2. + xOffset;
-        }
-
-        y += yOffset;
     }
-    */
+
+    //GraphvizLayout::layout(nodeList_, edgeList_);
+    GraphvizLayout::layout(nodes, edges);
+
+    QRectF boundingRect;
+    for (auto node : nodeList_)
+    {
+        if (node->isVisible())
+        {
+            boundingRect = boundingRect.united(
+                    node->mapToScene(
+                        node->boundingRect()
+                        ).boundingRect()
+                    );
+        }
+
+    }
+
+    scene_.setSceneRect(boundingRect);
+
+    form_->graphicsView->fitInView(
+        boundingRect,
+        Qt::KeepAspectRatio
+    );
 }
 
 
