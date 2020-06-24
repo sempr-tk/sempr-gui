@@ -1,0 +1,10 @@
+prefix=/usr
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: sempr-gui
+Description: Library for extending sempr-applications with a GUI
+Version: @PROJECT_VERSION@
+Requires: sempr-core libzmq libcgraph libgvc libcdt
+Libs: -L${libdir} -lsempr-gui -lsempr_core
+Cflags: -std=c++17 -I${includedir}

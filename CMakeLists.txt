@@ -135,11 +135,19 @@ add_executable(${client_name} src/ExampleClient.cpp)
 target_link_libraries(${client_name} sempr-gui)
 
 
+# configure pkg config
+configure_file("sempr-gui.pc.in" "sempr-gui.pc" @ONLY)
+
 # install stuff
 install(
     TARGETS sempr-gui
     LIBRARY DESTINATION lib
 )
+install(
+    FILES "${CMAKE_CURRENT_BINARY_DIR}/sempr-gui.pc"
+    DESTINATION lib/pkgconfig
+)
+
 install(
     DIRECTORY src/.
     DESTINATION include/sempr-gui
