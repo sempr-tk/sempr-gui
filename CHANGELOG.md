@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.2.1] - 2020-06-24
+
+- Added a pkg-config configuration file
+
 ## [0.2.0] - 2020-06-10
 
 - Show explanation-graphs, accessible by right-clicking on either a component
