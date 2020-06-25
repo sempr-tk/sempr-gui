@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.2.2] - 2020-06-25
+
+- Added Qt dependencies to pkg-config file
+
 ## [0.2.1] - 2020-06-24
 
 - Added a pkg-config configuration file
