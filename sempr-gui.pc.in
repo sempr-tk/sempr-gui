@@ -5,6 +5,6 @@ includedir=${prefix}/include
 Name: sempr-gui
 Description: Library for extending sempr-applications with a GUI
 Version: @PROJECT_VERSION@
-Requires: sempr-core libzmq libcgraph libgvc libcdt
+Requires: sempr-core libzmq libcgraph libgvc libcdt Qt5Core Qt5Widgets Qt5Quick Qt5QuickWidgets Qt5Location Qt5QuickControls2
 Libs: -L${libdir} -lsempr-gui -lsempr_core
 Cflags: -std=c++17 -I${includedir}
