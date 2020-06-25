@@ -501,14 +501,19 @@ int ECModel::columnCount(const QModelIndex& /*index*/) const
 
 QModelIndex ECModel::index(int row, int col, const QModelIndex& parent) const
 {
-    // the internalId stores the groupId of the ModelEntryGroup that the parent
-    // points to. This allows us to find the correct parent of an index even
-    // after the parent has been moved, as opposed to using simply the row of
-    // the parent as the internalId.
-    int groupId = data_[parent.row()].groupId_;
-
     if (parent.isValid())
+    {
+        // check bounds!
+        if (static_cast<size_t>(parent.row()) >= data_.size()) return QModelIndex();
+
+        // the internalId stores the groupId of the ModelEntryGroup that the parent
+        // points to. This allows us to find the correct parent of an index even
+        // after the parent has been moved, as opposed to using simply the row of
+        // the parent as the internalId.
+        int groupId = data_[parent.row()].groupId_;
         return this->createIndex(row, col, groupId);
+    }
+
     // if the parent is not valid, i.e. we want to create an index that points
     // at a ModelEntryGroup, we just set the internalId to zero.
     return this->createIndex(row, col, quintptr(0));

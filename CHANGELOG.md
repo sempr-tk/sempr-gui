@@ -3,6 +3,7 @@
 ## [0.2.2] - 2020-06-25
 
 - Added Qt dependencies to pkg-config file
+- Fixed segfault when working with an empty model
 
 ## [0.2.1] - 2020-06-24
 

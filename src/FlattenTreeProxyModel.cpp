@@ -220,13 +220,20 @@ void FlattenTreeProxyModel::onSourceRowsAboutToBeInserted(
         const QModelIndex& sourceParent,
         int first, int last)
 {
-//    qDebug() << "before insert " << parents_;
-
     // find the position of the first source item in the proxy
     auto sourceFirst = sourceModel()->index(first, 0, sourceParent);
-    auto proxyFirst = mapFromSource(sourceFirst);
-    // signal begin inserting
-    beginInsertRows(QModelIndex(), proxyFirst.row(), proxyFirst.row() + (last-first));
+
+    if (!sourceFirst.isValid())
+    {
+        // there was no entry yet!
+        beginInsertRows(QModelIndex(), 0, (last-first));
+    }
+    else
+    {
+        auto proxyFirst = mapFromSource(sourceFirst);
+        // signal begin inserting
+        beginInsertRows(QModelIndex(), proxyFirst.row(), proxyFirst.row() + (last-first));
+    }
 }
 
 void FlattenTreeProxyModel::onSourceRowsInserted(
