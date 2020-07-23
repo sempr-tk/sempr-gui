@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QStandardItemModel>
 #include <QAbstractItemModel>
+#include <QGeoCoordinate>
 
 #include <QTimer>
 
@@ -61,6 +62,14 @@ public:
     */
     void setup(QAbstractItemModel* model, QItemSelectionModel* selectionModel);
 
+    // returns the center of the currently visible map section
+    QGeoCoordinate mapCenter() const;
+
+    // returns the coordinate of the top-left corner of the map
+    QGeoCoordinate mapTopLeft() const;
+
+    // returns the coordinate of the bottom-right corner of the map
+    QGeoCoordinate mapBottomRight() const;
 };
 
 }}

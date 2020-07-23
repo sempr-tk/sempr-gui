@@ -9,6 +9,7 @@ import "./MapDelegates"
 
 Item {
     id: geoWidget
+    objectName: "geoWidget"
 
     // to be emitted when some map delegate was clicked
     signal geometryDelegateClicked(int index)
@@ -24,6 +25,7 @@ Item {
     // The Map. Obviously.
     Map {
         id: map
+        objectName: "map"
         anchors.fill: parent
 
         // specify the plugin to use

@@ -82,4 +82,47 @@ void GeoMapWidget::onSourceCurrentRowChanged(
     emit currentRowChanged(proxyIndex);
 }
 
+
+QGeoCoordinate GeoMapWidget::mapCenter() const
+{
+    QQuickItem* root = form_->quickWidget->rootObject();
+    QObject* map = root->findChild<QObject*>("map");
+
+    return map->property("center").value<QGeoCoordinate>();
+}
+
+QGeoCoordinate GeoMapWidget::mapTopLeft() const
+{
+    QQuickItem* root = form_->quickWidget->rootObject();
+    QObject* map = root->findChild<QObject*>("map");
+
+    QGeoCoordinate coord;
+    QPointF position(0, 0);
+    QMetaObject::invokeMethod(map, "toCoordinate",
+        Q_RETURN_ARG(QGeoCoordinate, coord),
+        Q_ARG(QPointF, position),
+        Q_ARG(bool, false));
+
+    return coord;
+}
+
+QGeoCoordinate GeoMapWidget::mapBottomRight() const
+{
+    QQuickItem* root = form_->quickWidget->rootObject();
+    QObject* map = root->findChild<QObject*>("map");
+
+    QGeoCoordinate coord;
+    QPointF position(
+        form_->quickWidget->width(),
+        form_->quickWidget->height()
+    );
+
+    QMetaObject::invokeMethod(map, "toCoordinate",
+        Q_RETURN_ARG(QGeoCoordinate, coord),
+        Q_ARG(QPointF, position),
+        Q_ARG(bool, false));
+
+    return coord;
+}
+
 }}

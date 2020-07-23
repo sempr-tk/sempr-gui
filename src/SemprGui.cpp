@@ -4,7 +4,17 @@
 #include "DragDropTabBar.hpp"
 #include "CustomDataRoles.hpp"
 
+#include <sempr/component/GeosGeometry.hpp>
+
 namespace sempr { namespace gui {
+
+// helper to create geometries from wkt
+GeosGeometry::Ptr fromWKT(const std::string& wkt)
+{
+    geos::io::WKTReader reader(geos::geom::GeometryFactory::getDefaultInstance());
+    return std::make_shared<GeosGeometry>(reader.read(wkt));
+}
+
 
 SemprGui::SemprGui(AbstractInterface::Ptr interface)
     : dataModel_(interface), form_(new Ui_Form()), sempr_(interface)
@@ -54,9 +64,88 @@ SemprGui::SemprGui(AbstractInterface::Ptr interface)
     // setup ReteWidget
     form_->reteWidget->setConnection(interface);
 
+    // debug stuff
+    connect(
+        form_->debugButton, &QPushButton::clicked,
+        this,
+        [this]()
+        {
+            qDebug() << "tl: " << this->form_->geoMapWidget->mapTopLeft();
+            qDebug() << "br: " << this->form_->geoMapWidget->mapBottomRight();
+        }
+    );
+
+
     // setup component adder
     form_->componentAdder->setModel(&dataModel_);
     form_->componentAdder->setSelectionModel(selectionModel);
+
+    // add methods to add geometries
+    form_->componentAdder->registerComponentType("Point",
+        [this]()
+        {
+            auto center = form_->geoMapWidget->mapCenter();
+            QString wkt("POINT (%1 %2)");
+            wkt = wkt.arg(center.longitude())
+                     .arg(center.latitude());
+            return fromWKT(wkt.toStdString());
+        }
+    );
+
+    form_->componentAdder->registerComponentType("Polygon",
+        [this]()
+        {
+            auto tl = form_->geoMapWidget->mapTopLeft();
+            auto br = form_->geoMapWidget->mapBottomRight();
+            auto center = form_->geoMapWidget->mapCenter();
+
+            double minLon = tl.longitude() + 1*(br.longitude() - tl.longitude())/4.;
+            double maxLon = tl.longitude() + 3*(br.longitude() - tl.longitude())/4.;
+            double minLat = tl.latitude() + 1*(br.latitude() - tl.latitude())/4.;
+            double maxLat = tl.latitude() + 3*(br.latitude() - tl.latitude())/4.;
+
+            QString wkt(
+                "POLYGON (("
+                    "%1 %2,"
+                    "%3 %4,"
+                    "%5 %6,"
+                    "%1 %2"
+                "))"
+            );
+
+            wkt = wkt.arg(minLon).arg(minLat)
+                     .arg(maxLon).arg(minLat)
+                     .arg(center.longitude()).arg(maxLat);
+            return fromWKT(wkt.toStdString());
+        }
+    );
+
+    form_->componentAdder->registerComponentType("LineString",
+        [this]()
+        {
+            auto tl = form_->geoMapWidget->mapTopLeft();
+            auto br = form_->geoMapWidget->mapBottomRight();
+
+            double minLon = tl.longitude() + 1*(br.longitude() - tl.longitude())/4.;
+            double maxLon = tl.longitude() + 3*(br.longitude() - tl.longitude())/4.;
+            double minLat = tl.latitude() + 1*(br.latitude() - tl.latitude())/4.;
+            double maxLat = tl.latitude() + 3*(br.latitude() - tl.latitude())/4.;
+
+            QString wkt(
+                "LINESTRING ("
+                    "%1 %2,"
+                    "%3 %4"
+                ")"
+            );
+
+            wkt = wkt.arg(minLon).arg(minLat)
+                     .arg(maxLon).arg(maxLat);
+            return fromWKT(wkt.toStdString());
+ 
+        }
+    );
+
+
 
     // connection to hide/show tabs depending on selected component type
     connect(form_->tabRawComponent, &UsefulWidget::isUseful,
