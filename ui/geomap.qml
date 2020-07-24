@@ -22,6 +22,42 @@ Item {
         name: "osm"
     }
 
+    // focus on the currently selected item
+    Connections {
+        target: GeoMapWidget
+        onCurrentRowChanged: {
+            if (boxAutoFocusOnSelectedItem.checked)
+            {
+                // first, hide all items that are not the selected on
+                for (var c in map.children)
+                {
+                    var child = map.children[c]
+                    if ("isCurrentItem" in child)
+                    {
+                        // i wanted to use child.isCurrentItem, but this leads to a race condition
+                        // as this property is only set in onCurrentRowChanged of the
+                        // CoordinateDelegate. Hence this reimplemenation/redundancy.
+                        child.visible = (currentProxyIndex.row === child.geometryIndex)
+                    }
+                }
+
+                // then fit to visible items
+                map.fitViewportToVisibleMapItems()
+
+                // and show all items again
+                for (c in map.children)
+                {
+                    var child = map.children[c]
+                    child.visible = true
+                }
+
+                // newer versions of Qt5 have methods to fit the viewport to
+                // a list of items, but I'm stuck to an older version that can only
+                // adjust to "all items" or "all visible items".
+            }
+        }
+    }
+
     // The Map. Obviously.
     Map {
         id: map
@@ -123,6 +159,15 @@ Item {
                     text: "allow editing"
                     font.pointSize: 10
                     checked: false
+                    height: 50
+                }
+
+                // a checkbox to enable/disable focussing the selected object
+                CheckBox {
+                    id: boxAutoFocusOnSelectedItem
+                    text: "focus item on selection"
+                    font.pointSize: 10
+                    checked: true
                     height: 50
                 }
 
