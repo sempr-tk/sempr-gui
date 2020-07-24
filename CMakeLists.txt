@@ -111,6 +111,7 @@ set(GUI_SRC
     ui/MapDelegates/CoordinateDelegate.qml
     ui/MapDelegates/PolygonDelegate.qml
     ui/MapDelegates/PointDelegate.qml
+    ui/MapDelegates/LineStringDelegate.qml
     qrc/resources.qrc
 )
 

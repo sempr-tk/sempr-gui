@@ -5,11 +5,11 @@
     <file alias="PolygonDelegate.qml">../ui/MapDelegates/PolygonDelegate.qml</file>
     <file alias="PointDelegate.qml">../ui/MapDelegates/PointDelegate.qml</file>
     <file alias="CoordinateDelegate.qml">../ui/MapDelegates/CoordinateDelegate.qml</file>
+    <file alias="LineStringDelegate.qml">../ui/MapDelegates/LineStringDelegate.qml</file>
 </qresource>
 
 <qresource prefix="/">
     <file alias="geomap.qml">../ui/geomap.qml</file>
     <file alias="qtquickcontrols2.conf">../ui/qtquickcontrols2.conf</file>
 </qresource>
-
 </RCC>

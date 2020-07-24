@@ -47,6 +47,8 @@ Item {
                         return "./MapDelegates/PolygonDelegate.qml"
                     else if (model.geometryType === "Point")
                         return "./MapDelegates/PointDelegate.qml"
+                    else if (model.geometryType === "LineString")
+                        return "./MapDelegates/LineStringDelegate.qml"
                     else
                         return "./MapDelegates/CoordinateDelegate.qml"
             }
