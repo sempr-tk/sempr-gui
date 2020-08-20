@@ -114,11 +114,11 @@ int main(int argc, char** args)
     const geos::geom::GeometryFactory& factory = *geos::geom::GeometryFactory::getDefaultInstance();
     geos::io::WKTReader reader(factory);
     // with 4 coordinates (coord[0] == coord[3])
-    auto geosGeometry = reader.read("POLYGON((8.020405035544446 52.26796266283766,8.04975913100343 52.290857976112314,8.07670996718507 52.26554641241761,8.020405035544446 52.26796266283766))");
-    auto geometryComponent = std::make_shared<GeosGeometry>(geosGeometry);
+    std::unique_ptr<geos::geom::Geometry> geosGeometry(reader.read("POLYGON((8.020405035544446 52.26796266283766,8.04975913100343 52.290857976112314,8.07670996718507 52.26554641241761,8.020405035544446 52.26796266283766))"));
+    auto geometryComponent = std::make_shared<GeosGeometry>(std::move(geosGeometry));
 
-    auto geosGeometry2 = reader.read("POLYGON((8.020405035544446 52.26796266283766,8.04975913100343 52.290857976112314,8.07670996718507 52.26554641241761,8.020405035544446 52.26796266283766))");
-    auto geometryComponent2 = std::make_shared<GeosGeometry>(geosGeometry2);
+    std::unique_ptr<geos::geom::Geometry> geosGeometry2(reader.read("POLYGON((8.020405035544446 52.26796266283766,8.04975913100343 52.290857976112314,8.07670996718507 52.26554641241761,8.020405035544446 52.26796266283766))"));
+    auto geometryComponent2 = std::make_shared<GeosGeometry>(std::move(geosGeometry2));
 
     geoEntity->addComponent(geometryComponent);
     geoEntity->addComponent(geometryComponent2);

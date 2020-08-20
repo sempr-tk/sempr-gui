@@ -46,14 +46,32 @@ build-bionic:
             - build_bionic
         expire_in: 1 hour
 
+build-focal:
+    stage: build
+    image: buildpack-deps:focal
+    script:
+        # get and install sempr
+        - echo "deb [trusted=yes] file:/tmp/debian-pkgs/focal ./" >> /etc/apt/sources.list
+        - apt update -qq
+        - apt install -y -qq sempr
+        # build sempr
+        - mkdir build_focal && cd build_focal
+        - cmake ..
+        - make -j8
+        - make package
+    artifacts:
+        paths:
+            - build_focal
+        expire_in: 1 hour
+
 
 deploy-deb:
     stage: deploy
-    image: buildpack-deps:bionic
     only:
         - tags
     script:
         - cp build_bionic/sempr*.deb /tmp/debian-pkgs/bionic/
+        - cp build_focal/sempr*.deb /tmp/debian-pkgs/focal/
         - cd /tmp/debian-pkgs
         - ./update-pkg-list
         - git add --all
