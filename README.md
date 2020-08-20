@@ -1,4 +1,4 @@
-## SEMPR-GUI
+# SEMPR-GUI
 The title is almost self-explaining. This project provides a graphical user-interface to the sempr-core. It contains a definition of an interface between those two, and an implementation of such an interface that establishes a network connection using ZeroMQ. 
 
 The basic principle behind the gui is the following: All your data in sempr is represented in components, which are serializable to json. This is what is transmitted via the interface, and the gui can then list all the components. Even if itself fails to parse the json (as it might not know the component type), it can still provide this textual information to you. If it recognizes the component type and additionally has a widget specialized to display and edit it, that will be shown to you. 
@@ -15,8 +15,15 @@ Be aware that modifications to components made through the editors or the OpenSt
 
 ![](img/gui-2.png)
 
+## Installation
+```bash
+sudo apt-get install libzmqpp-dev libzmq3-dev
+sudo apt-get install qtbase5-dev qtdeclarative5-dev qtlocation5-dev qtpositioning5-dev qtquickcontrols2-5-dev
+sudo apt-get install qml-module-qtlocation qml-module-qtpositioning
+sudo apt-get install libgraphviz-dev
+```
 
-### Connecting to a sempr-core
+## Connecting to a sempr-core
 
 A bit of overhead is needed to actually connect your own sempr-core-application (remember, sempr-core is a library, not an executable), to the gui. You will need to tell it to actually send updates on internal changes, and you need to tell it where to send them to.
 
