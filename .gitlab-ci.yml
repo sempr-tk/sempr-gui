@@ -13,7 +13,7 @@ before_script:
     # setup and install of rete will be done in the build phase, as it is
     # distro-specific (bionic / xenial)
     # install dependencies
-    - ENV DEBIAN_FRONTEND noninteractive #workaround to skip stdin interaction of keyboard-configuration pacakge
+    - export DEBIAN_FRONTEND=noninteractive #workaround to skip stdin interaction of keyboard-configuration pacakge
     - apt update -qq
     - apt install -y -qq git g++ cmake
     - apt install -y -qq libcereal-dev
