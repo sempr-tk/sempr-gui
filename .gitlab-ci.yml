@@ -68,6 +68,7 @@ build-focal:
 
 deploy-deb:
     stage: deploy
+    image: buildpack-deps:bionic
     only:
         - tags
     script:
