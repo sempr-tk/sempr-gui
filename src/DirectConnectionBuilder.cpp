@@ -21,14 +21,19 @@ rete::Production::Ptr DirectConnectionBuilder::buildEffect(rete::ArgumentList& a
     if(args[0].isConst() || args[1].isConst())
         throw rete::NodeBuilderException("Arguments must not be constants.");
 
-    if (!args[0].getAccessor()->canAs<EntityAccessor>())
+    if (!args[0].getAccessor()->getInterpretation<Entity::Ptr>())
         throw rete::NodeBuilderException("First argument must be an Entity.");
-    if (!args[1].getAccessor()->canAs<ComponentAccessor<Component>>())
-        throw rete::NodeBuilderException("Second argument must be a ComponentAccessor.");
+    if (!args[1].getAccessor()->getInterpretation<Component::Ptr>())
+        throw rete::NodeBuilderException("Second argument must be a Component.");
 
     // clone accessors
-    std::unique_ptr<EntityAccessor> eacc(args[0].getAccessor()->clone()->as<EntityAccessor>());
-    std::unique_ptr<ComponentAccessor<Component>> cacc(args[1].getAccessor()->clone()->as<ComponentAccessor<Component>>());
+    rete::PersistentInterpretation<Entity::Ptr> eacc(
+        args[0].getAccessor()->getInterpretation<Entity::Ptr>()->makePersistent()
+    );
+
+    rete::PersistentInterpretation<Component::Ptr> cacc(
+        args[1].getAccessor()->getInterpretation<Component::Ptr>()->makePersistent()
+    );
 
     // build the node
     auto node = std::make_shared<DirectConnectionNode>(
@@ -60,23 +65,26 @@ rete::Production::Ptr DirectConnectionTripleBuilder::buildEffect(rete::ArgumentL
     // must get exactly three arguments: StringAccessors for (?s ?p ?o)
     if (args.size() != 3) throw rete::NodeBuilderException("Wrong number of arguments (!= 3)");
 
-    std::unique_ptr<rete::StringAccessor> tripleParts[3];
+    rete::PersistentInterpretation<rete::TriplePart> tripleParts[3];
     for (int i = 0; i < 3; i++)
     {
         if (args[i].isConst())
         {
-            tripleParts[i].reset(new rete::ConstantStringAccessor(args[i].getAST()));
-            tripleParts[i]->index() = 0;
+            rete::ConstantAccessor<rete::TriplePart> acc({args[i].getAST()});
+            acc.index() = 0;
+            tripleParts[i] = acc.getInterpretation<rete::TriplePart>()->makePersistent();
         }
         else
         {
-            if (!args[i].getAccessor()->canAs<rete::StringAccessor>())
+            if (!args[i].getAccessor()->getInterpretation<rete::TriplePart>())
             {
                 throw rete::NodeBuilderException("Argument " + args[i].getVariableName() +
-                        " is not compatible with StringAccessor");
+                        " does not refer to a part of a triple.");
             }
 
-            tripleParts[i].reset(args[i].getAccessor()->clone()->as<rete::StringAccessor>());
+            tripleParts[i] = args[i].getAccessor()
+                                ->getInterpretation<rete::TriplePart>()
+                                    ->makePersistent();
         }
     }
 

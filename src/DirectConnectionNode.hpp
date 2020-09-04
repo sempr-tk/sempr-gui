@@ -2,6 +2,7 @@
 #define SEMPR_GUI_DIRECTCONNECTIONNODE_HPP_
 
 #include <rete-core/Production.hpp>
+#include <rete-rdf/TriplePart.hpp>
 #include <sempr/ECAccessors.hpp>
 
 #include "DirectConnection.hpp"
@@ -14,14 +15,14 @@ namespace sempr { namespace gui {
 */
 class DirectConnectionNode : public rete::Production {
     DirectConnection::Ptr connection_;
-    std::unique_ptr<EntityAccessor> entity_;
-    std::unique_ptr<ComponentAccessor<Component>> component_;
+    rete::PersistentInterpretation<Entity::Ptr> entity_;
+    rete::PersistentInterpretation<Component::Ptr> component_;
 public:
     using Ptr = std::shared_ptr<DirectConnectionNode>;
     DirectConnectionNode(
         DirectConnection::Ptr connection,
-        std::unique_ptr<EntityAccessor> entity,
-        std::unique_ptr<ComponentAccessor<Component>> component);
+        rete::PersistentInterpretation<Entity::Ptr> entity,
+        rete::PersistentInterpretation<Component::Ptr> component);
 
     void execute(rete::Token::Ptr, rete::PropagationFlag, std::vector<rete::WME::Ptr>&) override;
 
@@ -36,15 +37,15 @@ public:
 */
 class DirectConnectionTripleNode : public rete::Production {
     DirectConnection::Ptr connection_;
-    std::unique_ptr<rete::StringAccessor> s_, p_, o_;
+    rete::PersistentInterpretation<rete::TriplePart> s_, p_, o_;
 public:
     using Ptr = std::shared_ptr<DirectConnectionTripleNode>;
 
     DirectConnectionTripleNode(
             DirectConnection::Ptr connection,
-            std::unique_ptr<rete::StringAccessor> s,
-            std::unique_ptr<rete::StringAccessor> p,
-            std::unique_ptr<rete::StringAccessor> o);
+            rete::PersistentInterpretation<rete::TriplePart> s,
+            rete::PersistentInterpretation<rete::TriplePart> p,
+            rete::PersistentInterpretation<rete::TriplePart> o);
 
     void execute(rete::Token::Ptr, rete::PropagationFlag, std::vector<rete::WME::Ptr>&) override;
     std::string toString() const override;

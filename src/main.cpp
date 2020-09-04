@@ -66,7 +66,7 @@ int main(int argc, char** args)
     parser.registerNodeBuilder<ECNodeBuilder<TripleContainer>>();
     parser.registerNodeBuilder<ECNodeBuilder<TriplePropertyMap>>();
     parser.registerNodeBuilder<ECNodeBuilder<AffineTransform>>();
-    parser.registerNodeBuilder<InferECBuilder<AffineTransform>>();
+    parser.registerNodeBuilder<InferECBuilder>();
     parser.registerNodeBuilder<AffineTransformCreateBuilder>();
     parser.registerNodeBuilder<DirectConnectionBuilder>(connection);
     parser.registerNodeBuilder<DirectConnectionTripleBuilder>(connection);

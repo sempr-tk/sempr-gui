@@ -8,8 +8,8 @@ namespace sempr { namespace gui {
 
 DirectConnectionNode::DirectConnectionNode(
         DirectConnection::Ptr conn,
-        std::unique_ptr<EntityAccessor> entity,
-        std::unique_ptr<ComponentAccessor<Component>> component)
+        rete::PersistentInterpretation<Entity::Ptr> entity,
+        rete::PersistentInterpretation<Component::Ptr> component)
     : connection_(conn),
       entity_(std::move(entity)),
       component_(std::move(component))
@@ -24,8 +24,8 @@ void DirectConnectionNode::execute(
     // extract entity and component from the token
     Entity::Ptr entity;
     Component::Ptr component;
-    entity_->getValue(token, entity);
-    component_->getValue(token, component);
+    entity_.interpretation->getValue(token, entity);
+    component_.interpretation->getValue(token, component);
 
     // construct a model entry
     ECData entry;
@@ -72,7 +72,9 @@ void DirectConnectionNode::execute(
 
 std::string DirectConnectionNode::toString() const
 {
-    return "DirectConnection-Update(" + entity_->toString() + ", " + component_->toString() + ")";
+    return "DirectConnection-Update(" +
+            entity_.accessor->toString() + ", " +
+            component_.accessor->toString() + ")";
 }
 
 
@@ -81,9 +83,9 @@ std::string DirectConnectionNode::toString() const
 // -------------------------------------------
 DirectConnectionTripleNode::DirectConnectionTripleNode(
             DirectConnection::Ptr con,
-            std::unique_ptr<rete::StringAccessor> s,
-            std::unique_ptr<rete::StringAccessor> p,
-            std::unique_ptr<rete::StringAccessor> o)
+            rete::PersistentInterpretation<rete::TriplePart> s,
+            rete::PersistentInterpretation<rete::TriplePart> p,
+            rete::PersistentInterpretation<rete::TriplePart> o)
     : connection_(con),
       s_(std::move(s)),
       p_(std::move(p)),
@@ -101,12 +103,12 @@ void DirectConnectionTripleNode::execute(
     else if (flag == rete::PropagationFlag::UPDATE) n = DirectConnection::UPDATED;
     else /*if (n == rete::PropagationFlag::RETRACT)*/ n = DirectConnection::REMOVED;
 
-    // get the data
-    sempr::Triple triple(
-        s_->getString(token),
-        p_->getString(token),
-        o_->getString(token)
-    );
+    rete::TriplePart s, p, o;
+    s_.interpretation->getValue(token, s);
+    p_.interpretation->getValue(token, p);
+    o_.interpretation->getValue(token, o);
+
+    sempr::Triple triple(s.value, p.value, o.value);
 
     // trigger the callback
     connection_->triggerTripleCallback(triple, n);
@@ -116,7 +118,9 @@ void DirectConnectionTripleNode::execute(
 std::string DirectConnectionTripleNode::toString() const
 {
     return "DirectConnection-TripleUpdate\n" +
-            s_->toString() + ", " + p_->toString() + ", " + o_->toString();
+            s_.accessor->toString() + ", " +
+            p_.accessor->toString() + ", " +
+            o_.accessor->toString();
 }
 
 }}

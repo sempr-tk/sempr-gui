@@ -74,8 +74,13 @@ int main(int argc, char** args)
     server.start();
 
     // but we still need to insert the connection into the reasoner
+    sempr.loadPlugins();
     rete::RuleParser& parser = sempr.parser();
+
     parser.registerNodeBuilder<ECNodeBuilder<Component>>();
+    parser.registerNodeBuilder<DirectConnectionBuilder>(connection);
+    parser.registerNodeBuilder<DirectConnectionTripleBuilder>(connection);
+    /*
     parser.registerNodeBuilder<ECNodeBuilder<TextComponent>>();
     parser.registerNodeBuilder<ECNodeBuilder<TripleContainer>>();
     parser.registerNodeBuilder<ECNodeBuilder<TriplePropertyMap>>();
@@ -84,13 +89,12 @@ int main(int argc, char** args)
     parser.registerNodeBuilder<ECNodeBuilder<GeosGeometryInterface>>();
     parser.registerNodeBuilder<TextComponentTextBuilder>();
     parser.registerNodeBuilder<ConstructRulesBuilder>(&sempr);
-    parser.registerNodeBuilder<InferECBuilder<AffineTransform>>();
+    parser.registerNodeBuilder<InferECBuilder>();
     parser.registerNodeBuilder<AffineTransformCreateBuilder>();
-    parser.registerNodeBuilder<DirectConnectionBuilder>(connection);
-    parser.registerNodeBuilder<DirectConnectionTripleBuilder>(connection);
     parser.registerNodeBuilder<ExtractTriplesBuilder>();
     parser.registerNodeBuilder<GeoDistanceBuilder>();
     parser.registerNodeBuilder<UTMFromWGSBuilder>();
+    */
 
     auto rules = sempr.addRules(
         // connect to the gui

@@ -20,6 +20,7 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 
 add_definitions(-std=c++11 -Wall -Wextra -pedantic -Wnon-virtual-dtor)
+set(CMAKE_CXX_STANDARD 14)
 
 find_package(PkgConfig REQUIRED)
 find_package(Threads REQUIRED)
