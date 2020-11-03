@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(sempr-gui VERSION 0.2.2)
+project(sempr-gui VERSION 0.3.0)
 
 add_definitions(-DCEREAL_THREAD_SAFE=1)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")

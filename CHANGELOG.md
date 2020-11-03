@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.3.0] - 2020-11-03
+
+- Updated for newer accessor system in rete/sempr
+
 ## [0.2.2] - 2020-06-25
 
 - Added Qt dependencies to pkg-config file
