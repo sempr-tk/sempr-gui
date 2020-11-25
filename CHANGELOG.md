@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.3.1] - 2020-11-25
+
+- Build for sempr 0.10.x
+
 ## [0.3.0] - 2020-11-03
 
 - Updated for newer accessor system in rete/sempr
