@@ -8,6 +8,7 @@
 #include <functional>
 #include <memory>
 #include <mutex>
+#include <chrono>
 
 #include "ReteVisualSerialization.hpp"
 #include "Rule.hpp"
@@ -39,6 +40,24 @@ struct ECData {
 
 
 /**
+    A struct carrying information about any kind of error/exception/warning/..
+    which does not belong to the actual data but arises while processing them
+    etc.
+*/
+struct LogData {
+    typedef std::chrono::time_point<
+                std::chrono::system_clock,
+                std::chrono::system_clock::duration> sys_time;
+
+    enum Level { DEBUG, INFO, WARNING, ERROR };
+    Level level;            // log category
+    std::string name;       // (short) general name/type of error/...
+    std::string message;    // (longer) specific description what happened
+    sys_time timestamp;     // when did this happen?
+};
+
+
+/**
     The AbstractInterface specifies the ways in which the sempr core can be
     accessed. The GUI uses this interface to retrieve, modify, add and remove
     data from the sempr instance it is connected to. An implementation of this
@@ -65,6 +84,7 @@ public:
     enum Notification { ADDED, UPDATED, REMOVED };
     typedef std::function<void(ECData, Notification)> callback_t;
     typedef std::function<void(sempr::Triple, Notification)> triple_callback_t;
+    typedef std::function<void(LogData)> logging_callback_t;
 
 
     /**
@@ -124,12 +144,14 @@ public:
     */
     void setUpdateCallback(callback_t);
     void setTripleUpdateCallback(triple_callback_t);
+    void setLoggingCallback(logging_callback_t);
 
     /**
         Removes the currently set callback
     */
     void clearUpdateCallback();
     void clearTripleUpdateCallback();
+    void clearLoggingCallback();
 
     /**
         Calls the internally stored callback
@@ -140,10 +162,13 @@ public:
     void triggerTripleCallback(triple_callback_t::first_argument_type,
                                triple_callback_t::second_argument_type);
 
+    void triggerLoggingCallback(logging_callback_t::argument_type);
+
 private:
     std::mutex callbackMutex_;
     callback_t callback_;
     triple_callback_t tripleCallback_;
+    logging_callback_t loggingCallback_;
 };
 
 
