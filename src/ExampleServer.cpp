@@ -47,12 +47,13 @@ int main(int argc, char** args)
     }
     else
     {
+        // --- no longer needed, included in base plugins! ---
         // if no rules are explicitely given, add a single rule to allow
         // adding rules like data
-        extraRules = "[inferRules: (?a <type> <Rules>), EC<TextComponent>(?a ?c), text:value(?text ?c) -> constructRules(?text)]";
+        //extraRules = "[inferRules: (?a <type> <Rules>), EC<TextComponent>(?a ?c), text:value(?text ?c) -> constructRules(?text)]";
         // actually, we need one more: The basic "Extract Triples" thing to get
         // the "(?a <type> <Rules>)" condition fulfilled.
-        extraRules += "[extractTriples: EC<TripleContainer>(?e ?c) -> ExtractTriples(?c)]";
+        //extraRules += "[extractTriples: EC<TripleContainer>(?e ?c) -> ExtractTriples(?c)]";
     }
 
     if (!fs::exists("./db")) fs::create_directory("./db");
