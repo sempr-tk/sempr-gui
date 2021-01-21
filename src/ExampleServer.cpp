@@ -109,17 +109,31 @@ int main(int argc, char** args)
     }
 
 
-    sempr.performInference();
-    {
-        std::ofstream("debug.dot") << sempr.reasoner().net().toDot();
-    }
+    bool firstInference = true;
 
     std::cout << "starting reasoning-loop" << std::endl;
     while (true)
     {
-        sempr.performInference();
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        // there should probably be some kind of signalling system instead of
-        // this kind of polling...
+        try {
+            sempr.performInference();
+            if (firstInference)
+            {
+                std::ofstream("debug.dot") << sempr.reasoner().net().toDot();
+                firstInference = false;
+            }
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            // there should probably be some kind of signalling system instead of
+            // this kind of polling...
+        } catch (std::exception& e) {
+            std::cerr << e.what() << std::endl;
+
+            LogData l;
+            l.level = LogData::ERROR;
+            l.message = e.what();
+            l.name = "inference";
+            l.timestamp = LogData::sys_time::clock::now();
+            connection->triggerLoggingCallback(l);
+        }
     }
 }
