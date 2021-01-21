@@ -1,5 +1,6 @@
 #include "TCPConnectionServer.hpp"
 #include "ECDataZMQ.hpp"
+#include "LogDataZMQ.hpp"
 #include "TCPConnectionRequest.hpp"
 
 #include <cereal/archives/json.hpp>
@@ -28,10 +29,12 @@ void TCPConnectionServer::updateCallback(
 {
     // construct the message -- just all the data entries in the ECData struct,
     // plus the action.
-    zmqpp::message msg;
+    zmqpp::message msg, topic;
     msg << UpdateType::EntityComponent << data << action;
+    topic << "data";
 
     // and send it to all subscribers
+    updatePublisher_.send("data", zmqpp::socket_t::send_more);
     updatePublisher_.send(msg);
 }
 
@@ -52,6 +55,17 @@ void TCPConnectionServer::tripleUpdateCallback(
 
     msg << UpdateType::Triple << ss.str() << action;
 
+    updatePublisher_.send("data", zmqpp::socket_t::send_more);
+    updatePublisher_.send(msg);
+}
+
+void TCPConnectionServer::loggingCallback(
+        AbstractInterface::logging_callback_t::argument_type log)
+{
+    zmqpp::message msg;
+    msg << log;
+
+    updatePublisher_.send("logging", zmqpp::socket_t::send_more);
     updatePublisher_.send(msg);
 }
 
@@ -73,6 +87,14 @@ void TCPConnectionServer::start()
             this,
             std::placeholders::_1,
             std::placeholders::_2
+        )
+    );
+
+    semprConnection_->setLoggingCallback(
+        std::bind(
+            &TCPConnectionServer::loggingCallback,
+            this,
+            std::placeholders::_1
         )
     );
 

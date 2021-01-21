@@ -43,6 +43,11 @@ class TCPConnectionServer {
             AbstractInterface::triple_callback_t::second_argument_type);
 
     /**
+        And one for logging data
+    */
+    void loggingCallback(AbstractInterface::logging_callback_t::argument_type);
+
+    /**
         Handling a request
     */
     TCPConnectionResponse handleRequest(const TCPConnectionRequest& request);

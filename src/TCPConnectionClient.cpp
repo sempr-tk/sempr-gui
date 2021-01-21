@@ -1,6 +1,7 @@
 #include "TCPConnectionClient.hpp"
 #include "TCPConnectionRequest.hpp"
 #include "ECDataZMQ.hpp"
+#include "LogDataZMQ.hpp"
 
 #include <cereal/archives/json.hpp>
 #include <iostream>
@@ -11,6 +12,7 @@ namespace sempr { namespace gui {
 TCPConnectionClient::TCPConnectionClient()
     : updateSubscriber_(context_, zmqpp::socket_type::subscribe),
       requestSocket_(context_, zmqpp::socket_type::request),
+      loggingSubscriber_(context_, zmqpp::socket_type::subscribe),
       running_(false)
 {
 }
@@ -21,7 +23,10 @@ void TCPConnectionClient::connect(
         const std::string& requestEndpoint)
 {
     updateSubscriber_.connect(updateEndpoint);
-    updateSubscriber_.subscribe("");
+    updateSubscriber_.subscribe("data");
+
+    loggingSubscriber_.connect(updateEndpoint);
+    loggingSubscriber_.subscribe("logging");
 
     requestSocket_.connect(requestEndpoint);
 }
@@ -37,9 +42,12 @@ void TCPConnectionClient::start()
             while (running_)
             {
                 zmqpp::message msg;
-                bool msgAvailable = updateSubscriber_.receive(msg, true);
+                std::string topic;
+                bool msgAvailable = updateSubscriber_.receive(topic, true);
                 if (msgAvailable)
                 {
+                    updateSubscriber_.receive(msg);
+
                     UpdateType type;
                     msg >> type;
                     if (type == UpdateType::EntityComponent)
@@ -73,7 +81,18 @@ void TCPConnectionClient::start()
                                   << static_cast<int>(type) << std::endl;
                     }
                 }
-                else
+
+                bool logAvailable = loggingSubscriber_.receive(topic, true);
+                if (logAvailable)
+                {
+                    loggingSubscriber_.receive(msg);
+
+                    LogData log;
+                    msg >> log;
+                    this->triggerLoggingCallback(log);
+                }
+
+                if (!(msgAvailable || logAvailable))
                 {
                     // only sleep if there is no message available
                     std::this_thread::sleep_for(std::chrono::milliseconds(10));

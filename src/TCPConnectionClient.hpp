@@ -20,6 +20,7 @@ class TCPConnectionClient : public AbstractInterface {
     zmqpp::context context_;
     zmqpp::socket updateSubscriber_;
     zmqpp::socket requestSocket_;
+    zmqpp::socket loggingSubscriber_;
 
     // an extra thread handling messages incoming on updateSubscriber_
     std::thread updateWorker_;
