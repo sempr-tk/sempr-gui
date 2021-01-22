@@ -245,19 +245,24 @@ selection-color: black;
           </sizepolicy>
          </property>
          <property name="columnCount">
-          <number>2</number>
+          <number>3</number>
          </property>
          <attribute name="headerDefaultSectionSize">
-          <number>50</number>
+          <number>70</number>
          </attribute>
          <column>
           <property name="text">
-           <string/>
+           <string>Timestamp</string>
           </property>
          </column>
          <column>
           <property name="text">
-           <string/>
+           <string>Category</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Message</string>
           </property>
          </column>
         </widget>

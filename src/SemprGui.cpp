@@ -213,6 +213,16 @@ SemprGui::SemprGui(AbstractInterface::Ptr interface)
             this->form_->sparqlWidget->update(triple, action);
         }
     );
+
+    interface->setLoggingCallback(
+        [this](LogData data) -> void
+        {
+            this->addLogData(data);
+        }
+    );
+
+    connect(form_->errorList, &QTreeWidget::itemDoubleClicked,
+            this, &SemprGui::displayLogDataEntry);
 }
 
 
@@ -242,6 +252,70 @@ void SemprGui::logError(const QString& what)
     form_->errorList->insertTopLevelItem(0, item);
 }
 
+
+void SemprGui::addLogData(LogData log)
+{
+    auto sinceEpoch = log.timestamp.time_since_epoch();
+    auto sinceEpochSeconds =
+        std::chrono::duration_cast<std::chrono::seconds>(sinceEpoch);
+
+    QTreeWidgetItem* item = new QTreeWidgetItem();
+    item->setData(0, Qt::DisplayRole,
+                  QDateTime::fromSecsSinceEpoch(sinceEpochSeconds.count()));
+    item->setData(0, Qt::UserRole,
+                  QVariant::fromValue(static_cast<size_t>(log.level)));
+
+    item->setText(1, QString::fromStdString(log.name));
+    item->setText(2, QString::fromStdString(log.message));
+    item->setToolTip(2, QString::fromStdString(log.message));
+
+    QFontMetrics metrics(QApplication::font());
+    item->setSizeHint(2, metrics.boundingRect(item->text(2)).size());
+
+    switch (log.level) {
+        case LogData::ERROR:
+            item->setBackgroundColor(0, Qt::red);
+            break;
+        case LogData::WARNING:
+            item->setBackgroundColor(0, Qt::yellow);
+            break;
+        case LogData::INFO:
+            item->setBackgroundColor(0, Qt::blue);
+            break;
+        case LogData::DEBUG:
+            item->setBackgroundColor(0, Qt::lightGray);
+            break;
+    }
+
+    form_->errorList->insertTopLevelItem(0, item);
+}
+
+void SemprGui::displayLogDataEntry(QTreeWidgetItem* item, int /*column*/)
+{
+    QMessageBox popup(this);
+    LogData::Level level =
+        static_cast<LogData::Level>(item->data(0, Qt::UserRole).value<size_t>());
+
+    switch (level) {
+        case LogData::ERROR:
+            popup.setIcon(QMessageBox::Icon::Critical);
+            break;
+        case LogData::WARNING:
+            popup.setIcon(QMessageBox::Icon::Warning);
+            break;
+        case LogData::INFO:
+            popup.setIcon(QMessageBox::Icon::Information);
+            break;
+        case LogData::DEBUG:
+            break;
+    }
+
+    popup.setWindowTitle(item->text(1));
+    popup.setText(item->text(2));
+    popup.setStandardButtons(QMessageBox::Close);
+    popup.setFont(this->font());
+    popup.exec();
+}
 
 void SemprGui::updateTabStatus(UsefulWidget* widget, bool visible)
 {

@@ -5,6 +5,7 @@
 #include <QWidget>
 #include <QTabWidget>
 #include <QMenu>
+#include <QTreeWidgetItem>
 
 #include "ECModel.hpp"
 #include "AbstractInterface.hpp"
@@ -47,6 +48,16 @@ private slots:
     */
     void logError(const QString&);
 
+    /**
+        Parses and displays LogData received from the AbstractInterface
+    */
+    void addLogData(LogData);
+
+    /**
+        Display detailed log information (may just need some more space than
+        there is available in a single QTreeWidgetItem)
+    */
+    void displayLogDataEntry(QTreeWidgetItem*, int);
 
     /**
         Changes the layout of the extra-utility-widgets
