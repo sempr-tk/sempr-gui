@@ -153,6 +153,7 @@ std::vector<ECData> DirectConnection::listEntityComponentPairs()
         {
             auto entity = std::get<0>(ec->value_);
             auto component = std::get<1>(ec->value_);
+            auto tag = std::get<2>(ec->value_);
 
             ECData entry;
             // populate the model entry with...
@@ -160,14 +161,19 @@ std::vector<ECData> DirectConnection::listEntityComponentPairs()
             entry.componentId = rete::util::ptrToStr(component.get());
             // entity id
             entry.entityId = entity->id();
+            entry.tag = tag;
+
             // whether it is mutable, i.e., if it is not inferred --
             // we can check this by trying to find the component in the entity.
             // If it is there, it is not inferred.
-            auto allComponents = entity->getComponents<Component>();
+            auto allComponents = entity->getComponentsWithTag<Component>();
+            std::pair<Component::Ptr, std::string> searchFor(component, tag);
             bool inferred =
-                (std::find(allComponents.begin(), allComponents.end(), component)
+                (std::find(allComponents.begin(), allComponents.end(), searchFor)
                  == allComponents.end());
             entry.isComponentMutable = !inferred;
+
+            std::cout << entity->id() << " " << component.get() << " isComponentMutable ? " << entry.isComponentMutable << std::endl;
 
 
             // create the serialized version of the component
@@ -177,6 +183,7 @@ std::vector<ECData> DirectConnection::listEntityComponentPairs()
                 ar(std::get<1>(ec->value_));
             }
             entry.componentJSON = ss.str();
+            entry.tag = tag;
 
             // add the entry to the list
             entries.push_back(entry);
@@ -213,7 +220,7 @@ void DirectConnection::addEntityComponentPair(const ECData& entry)
         ar(c);
     } // exceptions?
 
-    entity->addComponent(c);
+    entity->addComponent(c, entry.tag);
 }
 
 
@@ -244,10 +251,10 @@ void DirectConnection::modifyEntityComponentPair(const ECData& entry)
     if (!entity) throw std::exception(); // TODO: Better exceptions.
 
     // find the component
-    auto components = entity->getComponents<Component>();
-    for (auto c : components)
+    auto components = entity->getComponentsWithTag<Component>();
+    for (auto ct : components)
     {
-        if (rete::util::ptrToStr(c.get()) == entry.componentId)
+        if (rete::util::ptrToStr(std::get<0>(ct).get()) == entry.componentId)
         {
             // update the component
             // this requires multiple steps:
@@ -261,7 +268,7 @@ void DirectConnection::modifyEntityComponentPair(const ECData& entry)
             try {
                 ar(tmp);
                 // next, check if the type is correct.
-                auto& oldC = *c;
+                auto& oldC = *std::get<0>(ct);
                 auto& newC = *tmp;
                 if (typeid(oldC) == typeid(newC))
                 {
@@ -274,10 +281,20 @@ void DirectConnection::modifyEntityComponentPair(const ECData& entry)
                     }
                     // and use it to update the existing component
                     cereal::JSONInputArchive ar(ss);
-                    c->loadFromJSON(ar);
+                    std::get<0>(ct)->loadFromJSON(ar);
 
-                    // inform the reasoner
-                    c->changed();
+                    if (entry.tag == std::get<1>(ct))
+                    {
+                        // the tag has not changed, it suffices to call "changed"
+                        std::get<0>(ct)->changed();
+                    }
+                    else
+                    {
+                        // the tag changed, we need to remove and re-add the
+                        // component from its entity
+                        entity->removeComponent(std::get<0>(ct));
+                        entity->addComponent(std::get<0>(ct), entry.tag);
+                    }
                     return;
                 }
                 // type ids dont match. :(

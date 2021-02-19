@@ -52,6 +52,8 @@ void runGUI(int argc, char** args, AbstractInterface::Ptr interface)
 int main(int argc, char** args)
 {
     Core sempr;
+    sempr.loadPlugins();
+
     std::mutex semprMutex;
     auto connection = std::make_shared<DirectConnection>(&sempr, semprMutex);
     connection->setUpdateCallback(
@@ -63,20 +65,20 @@ int main(int argc, char** args)
 
     rete::RuleParser& parser = sempr.parser();
     parser.registerNodeBuilder<ECNodeBuilder<Component>>();
-    parser.registerNodeBuilder<ECNodeBuilder<TripleContainer>>();
-    parser.registerNodeBuilder<ECNodeBuilder<TriplePropertyMap>>();
-    parser.registerNodeBuilder<ECNodeBuilder<AffineTransform>>();
-    parser.registerNodeBuilder<InferECBuilder>();
-    parser.registerNodeBuilder<AffineTransformCreateBuilder>();
+//    parser.registerNodeBuilder<ECNodeBuilder<TripleContainer>>();
+//    parser.registerNodeBuilder<ECNodeBuilder<TriplePropertyMap>>();
+//    parser.registerNodeBuilder<ECNodeBuilder<AffineTransform>>();
+//    parser.registerNodeBuilder<InferECBuilder>();
+//    parser.registerNodeBuilder<AffineTransformCreateBuilder>();
     parser.registerNodeBuilder<DirectConnectionBuilder>(connection);
     parser.registerNodeBuilder<DirectConnectionTripleBuilder>(connection);
-    parser.registerNodeBuilder<ExtractTriplesBuilder>();
+//    parser.registerNodeBuilder<ExtractTriplesBuilder>();
 
     auto rules = sempr.addRules(
         // connect to the gui
-        "[connectionEC: EC<Component>(?e ?c) -> DirectConnection(?e ?c)]\n" \
-        "[connectionTriples: (?s ?p ?o) -> DirectConnectionTriple(?s ?p ?o)]"\
-        "[extract: EC<TripleContainer>(?e ?c) -> ExtractTriples(?c)]"
+        "[connectionEC: EC<Component>(?e ?c) -> DirectConnection(?e ?c)]\n"
+        "[connectionTriples: (?s ?p ?o) -> DirectConnectionTriple(?s ?p ?o)]"
+//        "[extract: EC<TripleContainer>(?e ?c) -> ExtractTriples(?c)]"
         //"[EC<TripleContainer>(?e ?c), tf:create(?tf 1 2 3 0 0 0 1) -> EC<Transform>(?e ?tf)]" // every entity with a triplecontainer gets a transform
     );
 

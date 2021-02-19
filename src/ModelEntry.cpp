@@ -10,15 +10,23 @@ ModelEntry::ModelEntry(const ECData& data)
 {
     coreData_ = data;
     setJSON(data.componentJSON);
+    setTag(data.tag);
 }
 
 std::string ModelEntry::entityId()           const { return coreData_.entityId; }
 std::string ModelEntry::componentId()        const { return coreData_.componentId; }
+std::string ModelEntry::tag()                const { return tag_; }
 bool        ModelEntry::isComponentMutable() const { return coreData_.isComponentMutable; }
+
+void ModelEntry::setTag(const std::string& tag)
+{
+    this->tag_ = tag;
+}
 
 bool ModelEntry::isModified() const
 {
-    return !(coreData_.componentJSON == componentJSON_);
+    return !(coreData_.componentJSON == componentJSON_) ||
+           !(coreData_.tag == tag_);
 }
 
 

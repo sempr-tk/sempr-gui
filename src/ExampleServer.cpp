@@ -99,7 +99,7 @@ int main(int argc, char** args)
 
     auto rules = sempr.addRules(
         // connect to the gui
-        "[connectionEC: EC<Component>(?e ?c) -> DirectConnection(?e ?c)]\n"
+        "[connectionEC: EC<Component>(?e ?c ?t) -> DirectConnection(?e ?c ?t)]\n"
         "[connectionTriple: (?s ?p ?o) -> DirectConnectionTriple(?s ?p ?o)]"
     );
 

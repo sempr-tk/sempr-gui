@@ -89,7 +89,8 @@ class ECModel : public QAbstractItemModel {
     /// compute the model index of the entry
     QModelIndex findEntry(const ModelEntry&) const;
     QModelIndex findEntry(const std::string& entityId,
-                          const std::string& componentId) const;
+                          const std::string& componentId,
+                          const std::string& tag) const;
 
 signals:
     // These are emitted from the thread that calls the set callback in
@@ -154,7 +155,7 @@ public slots:
         Convenience method, creates a json representation of the component
         and fills a ModelEntry.
     */
-    void addComponent(Component::Ptr component, const std::string& entityId);
+    void addComponent(Component::Ptr component, const std::string& entityId, const std::string& tag);
 
     /**
         Uses the componentId and the entityId to remove the component from the

@@ -11,7 +11,8 @@ namespace sempr { namespace gui {
     inline zmqpp::message& operator << (zmqpp::message& msg, const ECData& data)
     {
         msg << data.entityId << data.componentId
-            << data.componentJSON << data.isComponentMutable;
+            << data.componentJSON << data.tag
+            << data.isComponentMutable;
         return msg;
     }
 
@@ -19,7 +20,8 @@ namespace sempr { namespace gui {
     inline zmqpp::message& operator >> (zmqpp::message& msg, ECData& data)
     {
         msg >> data.entityId >> data.componentId
-            >> data.componentJSON >> data.isComponentMutable;
+            >> data.componentJSON >> data.tag
+            >> data.isComponentMutable;
         return msg;
     }
 

@@ -15,16 +15,18 @@ rete::Production::Ptr DirectConnectionBuilder::buildEffect(rete::ArgumentList& a
 {
     if (!connection_) throw rete::NodeBuilderException("No DirectConnection set in the builder!");
 
-    // must get exactly two arguments: An entity- and a component-accessor.
-    if (args.size() != 2) throw rete::NodeBuilderException("Wrong number of arguments (!= 2)");
+    // must get exactly three arguments: An entity- and a component-accessor, and a tag
+    if (args.size() != 3) throw rete::NodeBuilderException("Wrong number of arguments (!= 3)");
 
-    if(args[0].isConst() || args[1].isConst())
+    if(args[0].isConst() || args[1].isConst() || args[2].isConst())
         throw rete::NodeBuilderException("Arguments must not be constants.");
 
     if (!args[0].getAccessor()->getInterpretation<Entity::Ptr>())
         throw rete::NodeBuilderException("First argument must be an Entity.");
     if (!args[1].getAccessor()->getInterpretation<Component::Ptr>())
         throw rete::NodeBuilderException("Second argument must be a Component.");
+    if (!args[2].getAccessor()->getInterpretation<std::string>())
+        throw rete::NodeBuilderException("Third argument must be a string.");
 
     // clone accessors
     rete::PersistentInterpretation<Entity::Ptr> eacc(
@@ -35,11 +37,16 @@ rete::Production::Ptr DirectConnectionBuilder::buildEffect(rete::ArgumentList& a
         args[1].getAccessor()->getInterpretation<Component::Ptr>()->makePersistent()
     );
 
+    rete::PersistentInterpretation<std::string> tacc(
+        args[2].getAccessor()->getInterpretation<std::string>()->makePersistent()
+    );
+
     // build the node
     auto node = std::make_shared<DirectConnectionNode>(
                     connection_,
                     std::move(eacc),
-                    std::move(cacc));
+                    std::move(cacc),
+                    std::move(tacc));
 
     return node;
 }

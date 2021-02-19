@@ -9,10 +9,12 @@ namespace sempr { namespace gui {
 DirectConnectionNode::DirectConnectionNode(
         DirectConnection::Ptr conn,
         rete::PersistentInterpretation<Entity::Ptr> entity,
-        rete::PersistentInterpretation<Component::Ptr> component)
+        rete::PersistentInterpretation<Component::Ptr> component,
+        rete::PersistentInterpretation<std::string> tag)
     : connection_(conn),
       entity_(std::move(entity)),
-      component_(std::move(component))
+      component_(std::move(component)),
+      tag_(std::move(tag))
 {
 }
 
@@ -24,13 +26,17 @@ void DirectConnectionNode::execute(
     // extract entity and component from the token
     Entity::Ptr entity;
     Component::Ptr component;
+    std::string tag;
+
     entity_.interpretation->getValue(token, entity);
     component_.interpretation->getValue(token, component);
+    tag_.interpretation->getValue(token, tag);
 
     // construct a model entry
     ECData entry;
     entry.componentId = rete::util::ptrToStr(component.get());
     entry.entityId = entity->id();
+    entry.tag = tag;
 
     std::stringstream ss;
     {
@@ -42,9 +48,9 @@ void DirectConnectionNode::execute(
     // only if the component is also part of the entity (and not only associated
     // in the reasoner) can we modify it.
     entry.isComponentMutable = false;
-    for (auto c : entity->getComponents<Component>())
+    for (auto ct : entity->getComponentsWithTag<Component>())
     {
-        if (c == component)
+        if (std::get<0>(ct) == component && entry.tag == std::get<1>(ct))
         {
             entry.isComponentMutable = true;
             break;

@@ -71,11 +71,14 @@ ECModel::~ECModel()
 
 QModelIndex ECModel::findEntry(const ModelEntry& entry) const
 {
-    return findEntry(entry.entityId(), entry.componentId());
+    return findEntry(entry.entityId(), entry.componentId(),
+                     //entry.tag());
+                     entry.coreData_.tag);
 }
 
 QModelIndex ECModel::findEntry(const std::string& entityId,
-                               const std::string& componentId) const
+                               const std::string& componentId,
+                               const std::string& tag) const
 {
     // find the row of the entity-group
     auto group = std::find_if(data_.begin(), data_.end(),
@@ -92,9 +95,11 @@ QModelIndex ECModel::findEntry(const std::string& entityId,
 
         // find the entry in the group
         auto component = std::find_if(group->entries_.begin(), group->entries_.end(),
-            [&componentId](const ModelEntry& other)
+            [&componentId, &tag](const ModelEntry& other)
             {
-                return componentId == other.componentId();
+                return componentId == other.componentId()
+                        //&& tag == other.tag(); // search for currently set tag?
+                        && tag == other.coreData_.tag; // or for the originally set tag?
             }
         );
         if (component != group->entries_.end())
@@ -113,7 +118,7 @@ void ECModel::addModelEntry(const ECData& entry)
 {
     // This can happen e.g. if data was added between setting the callback
     // for updates and the initialization of the model.
-    auto index = this->findEntry(entry.entityId, entry.componentId);
+    auto index = this->findEntry(entry.entityId, entry.componentId, entry.tag);
     if (index.isValid()) return;
 
     // find the entity-group
@@ -162,7 +167,7 @@ void ECModel::addModelEntry(const ECData& entry)
 
 void ECModel::removeModelEntry(const ECData& entry)
 {
-    auto index = this->findEntry(entry.entityId, entry.componentId);
+    auto index = this->findEntry(entry.entityId, entry.componentId, entry.tag);
     if (index.isValid())
     {
         // signal removal of this entry
@@ -191,7 +196,7 @@ void ECModel::removeModelEntry(const ECData& entry)
 void ECModel::updateModelEntry(const ECData& entry)
 {
     // find the entries index
-    auto index = this->findEntry(entry.entityId, entry.componentId);
+    auto index = this->findEntry(entry.entityId, entry.componentId, entry.tag);
 
     // get the group
     auto group = data_.begin() + index.parent().row();
@@ -245,14 +250,16 @@ void ECModel::addComponent(const ModelEntry& entry)
     ECData data;
     data.entityId = entry.entityId();
     data.componentJSON = entry.json();
+    data.tag = entry.tag();
 
     semprInterface_->addEntityComponentPair(data);
 }
 
-void ECModel::addComponent(Component::Ptr component, const std::string& entityId)
+void ECModel::addComponent(Component::Ptr component, const std::string& entityId, const std::string& tag)
 {
     ECData data;
     data.entityId = entityId;
+    data.tag = tag;
 
     std::stringstream ss;
     {
@@ -270,6 +277,9 @@ void ECModel::removeComponent(const ModelEntry& entry)
     ECData data;
     data.entityId = entry.entityId();
     data.componentId = entry.componentId();
+    data.tag = entry.coreData_.tag; // entry.tag() could be a modified one
+    // doesnt matter, though, as at the entity only one tag is actually stored
+    // and the component is identified by its id
 
     semprInterface_->removeEntityComponentPair(data);
 }
@@ -280,6 +290,7 @@ void ECModel::updateComponent(const ModelEntry& entry)
     data.entityId = entry.entityId();
     data.componentId = entry.componentId();
     data.componentJSON = entry.json();
+    data.tag = entry.tag(); // the new tag to set
 
     semprInterface_->modifyEntityComponentPair(data);
 }
@@ -329,7 +340,7 @@ QVariant ECModel::data(const QModelIndex& index, int role) const
     {
         if (role == Qt::DisplayRole || role == Qt::EditRole)
         {
-            return QString::fromStdString(entry.component()->getTag());
+            return QString::fromStdString(entry.tag());
         }
         else
         {
@@ -401,7 +412,7 @@ bool ECModel::setData(const QModelIndex& index, const QVariant& value, int role)
     if (role == Qt::EditRole && index.column() == 1)
     {
         // set a new tag
-        entry.component()->setTag(value.value<QString>().toStdString());
+        entry.setTag(value.value<QString>().toStdString());
         // since we actually changed the component, trigger an update of it
         return setData(
                 index.sibling(index.row(), 0),

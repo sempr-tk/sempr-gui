@@ -34,6 +34,9 @@ class ModelEntry {
     */
     std::string componentJSON_;
 
+    /// a copy of the tag, so we can see if it has changed
+    std::string tag_;
+
     /**
         A Component::Ptr deserialized from the componentJSON_, for convenience.
     */
@@ -55,8 +58,10 @@ public:
 
     std::string entityId() const;
     std::string componentId() const;
+    std::string tag() const;
     bool isComponentMutable() const;
 
+    void setTag(const std::string&);
 
     /**
         Compares the current json representation with the one originally

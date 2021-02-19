@@ -35,6 +35,7 @@ struct ECData {
     std::string entityId;
     std::string componentId;
     std::string componentJSON;
+    std::string tag;
     bool isComponentMutable;
 };
 

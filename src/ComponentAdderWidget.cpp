@@ -46,7 +46,7 @@ void ComponentAdderWidget::createComponent()
 
     auto component = creatorFunctions_[name]();
 
-    model_->addComponent(component, entityId);
+    model_->addComponent(component, entityId, "");
 }
 
 void ComponentAdderWidget::setModel(ECModel* model)
