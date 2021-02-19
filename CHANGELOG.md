@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.0] - 2021-02-19
+
+- logging exceptions from server
+- removed duplicate rules
+- build for sempr 0.11.0
+
 ## [0.3.1] - 2020-11-25
 
 - Build for sempr 0.10.x
